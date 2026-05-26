@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:stockflow/core/env.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,12 +12,12 @@ import 'features/auth/presentation/cubit/auth_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  // Load environment variables
+  await dotenv.load(fileName: '.env');
   // Initialize Supabase
   await Supabase.initialize(
-    url: 'https://xeiosxvazvdwpdsxrrvi.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlaW9zeHZhenZkd3Bkc3hycnZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MTU0OTksImV4cCI6MjA5NTI5MTQ5OX0.HNEQ2af_ysY_AvroTSO5OY2D7THSDzj6dhZ-HCWWu7w',
+    url: StockFlowEnv.supabaseUrl,
+    anonKey: StockFlowEnv.supabaseAnonKey,
   );
 
   await initServiceLocator();
