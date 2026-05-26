@@ -14,4 +14,16 @@ class AppColors {
   static const Color grey = Colors.grey;
   static const Color error = Colors.red;
   static const Color transparent = Colors.transparent;
+
+  // Dashboard specific
+  static const Color appBackground = Color(0xFFF7F8F7);
+  static const Color cardBackground = Color(0xFFFFFFFF);
+  static const Color trendUp = Color(0xFF16A34A);
+  static const Color trendDown = Color(0xFFDC2626);
+  static const Color inactiveNav = Color(0xFF9CA3AF);
+
+  // Dark green tones for dashboard cards
+  static const Color lightGreen = Color(0xFFDCFCE7);
+  static const Color lightOrange = Color(0xFFFFEDD5);
+  static const Color lightRed = Color(0xFFFEE2E2);
 }

@@ -8,6 +8,12 @@ import '../../features/auth/presentation/cubit/auth_state.dart';
 import '../../features/auth/presentation/pages/splash_screen.dart';
 import '../../features/auth/presentation/pages/login_screen.dart';
 import '../../features/auth/presentation/pages/register_screen.dart';
+import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
+import '../../features/products/presentation/pages/products_screen.dart';
+import '../../features/customers/presentation/pages/customers_screen.dart';
+import '../../features/invoices/presentation/pages/invoices_screen.dart';
+import '../../features/settings/presentation/pages/settings_screen.dart';
+import '../../features/shell/presentation/pages/app_shell.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -16,7 +22,7 @@ final List<String> _authRoutes = [
   AppRoutes.login,
   AppRoutes.register,
 ];
-final List<String> _protectedRoutes = [AppRoutes.dashboard];
+final List<String> _protectedRoutes = [...AppRoutes.shellRoutes];
 
 bool _isAuthRoute(String location) => _authRoutes.contains(location);
 bool _isProtectedRoute(String location) => _protectedRoutes.contains(location);
@@ -68,24 +74,51 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.register,
       builder: (context, state) => const RegisterScreen(),
     ),
-    GoRoute(
-      path: AppRoutes.dashboard,
-      builder: (context, state) {
-        final authCubit = context.read<AuthCubit>();
-        final userName = authCubit.state is Authenticated
-            ? (authCubit.state as Authenticated).user.name
-            : 'User';
-        return Scaffold(
-          appBar: AppBar(title: Text('Welcome, $userName!')),
-          body: Center(
-            child: TextButton.icon(
-              icon: const Icon(Icons.logout),
-              label: const Text('Logout'),
-              onPressed: () => authCubit.signOut(),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) =>
+          AppShell(navigationShell: navigationShell),
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.dashboard,
+              builder: (context, state) => const DashboardScreen(),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.products,
+              builder: (context, state) => const ProductsScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.customers,
+              builder: (context, state) => const CustomersScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.invoices,
+              builder: (context, state) => const InvoicesScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.settings,
+              builder: (context, state) => const SettingsScreen(),
+            ),
+          ],
+        ),
+      ],
     ),
   ],
 );
