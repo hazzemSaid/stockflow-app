@@ -1,47 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'config/theme/theme.dart';
+import 'config/routes/router.dart';
+import 'core/di/service_locator.dart';
+import 'features/auth/presentation/cubit/auth_cubit.dart';
 
-import 'config/theme/stockflow_theme.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
-  runApp(const MainApp());
+  // Initialize Supabase
+  await Supabase.initialize(
+    url: 'https://xeiosxvazvdwpdsxrrvi.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlaW9zeHZhenZkd3Bkc3hycnZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MTU0OTksImV4cCI6MjA5NTI5MTQ5OX0.HNEQ2af_ysY_AvroTSO5OY2D7THSDzj6dhZ-HCWWu7w',
+  );
+
+  await initServiceLocator();
+
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      locale: const Locale('ar'),
-      supportedLocales: const [
-        Locale('ar'),
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: StockFlowTheme.light(),
+    return ScreenUtilInit(
+      designSize: const Size(320, 762),
+      minTextAdapt: true,
+      splitScreenMode: true,
       builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: child ?? const SizedBox.shrink(),
-            ),
+        return BlocProvider(
+          create: (context) => sl<AuthCubit>(),
+          child: MaterialApp.router(
+            title: 'StockFlow',
+            theme: AppTheme.lightTheme,
+            routerConfig: appRouter,
+
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('ar', 'EG')],
+            locale: const Locale('ar', 'EG'),
+
+            debugShowCheckedModeBanner: false,
           ),
         );
       },
-      home: const Scaffold(
-        body: SafeArea(
-          child: Center(
-            child: Text('StockFlow'),
-          ),
-        ),
-      ),
     );
   }
 }
