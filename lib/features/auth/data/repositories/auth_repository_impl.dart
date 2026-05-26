@@ -11,13 +11,14 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._remoteDataSource);
 
   @override
-  Stream<UserEntity?> get authStateChanges => _remoteDataSource.authStateChanges;
+  Stream<UserEntity?> get authStateChanges =>
+      _remoteDataSource.authStateChanges.cast<UserEntity?>();
 
   @override
   Future<Either<Failure, UserEntity?>> getCurrentUser() async {
     try {
       final user = await _remoteDataSource.getCurrentUser();
-      return Right(user);
+      return Right(user as UserEntity?);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
@@ -29,7 +30,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> signUp(String email, String password, String name) async {
     try {
       final user = await _remoteDataSource.signUp(email, password, name);
-      return Right(user);
+      return Right(user as UserEntity);
     } on AuthException catch (e) {
       return Left(AuthFailure(e.message));
     } on ServerException catch (e) {
@@ -43,7 +44,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> signInWithEmailAndPassword(String email, String password) async {
     try {
       final user = await _remoteDataSource.signInWithEmailAndPassword(email, password);
-      return Right(user);
+      return Right(user as UserEntity);
     } on AuthException catch (e) {
       return Left(AuthFailure(e.message));
     } on ServerException catch (e) {
