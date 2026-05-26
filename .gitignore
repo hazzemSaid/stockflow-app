@@ -44,6 +44,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 db_password.txt
+.env
 supabase
 .agents
 .specify
+specs
