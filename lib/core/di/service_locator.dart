@@ -9,21 +9,36 @@ import '../../features/auth/domain/usecases/sign_in_usecase.dart';
 import '../../features/auth/domain/usecases/sign_up_usecase.dart';
 import '../../features/auth/domain/usecases/sign_out_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/products/data/datasources/product_remote_data_source.dart';
+import '../../features/products/data/datasources/product_remote_data_source_impl.dart';
+import '../../features/products/data/repositories/product_repository_impl.dart';
+import '../../features/products/domain/repositories/product_repository.dart';
+import '../../features/products/domain/usecases/get_products_usecase.dart';
+import '../../features/products/domain/usecases/create_product_usecase.dart';
+import '../../features/products/domain/usecases/upload_product_image_usecase.dart';
+import '../../features/products/domain/usecases/get_product_usecase.dart';
+import '../../features/products/domain/usecases/update_product_usecase.dart';
+import '../../features/products/domain/usecases/delete_product_usecase.dart';
+import '../../features/products/domain/usecases/update_product_quantity_usecase.dart';
+import '../../features/products/domain/usecases/get_inventory_movements_usecase.dart';
+import '../../features/products/presentation/cubit/products/products_cubit.dart';
+import '../../features/products/presentation/cubit/add_edit_product/add_edit_product_cubit.dart';
+import '../../features/products/presentation/cubit/product_details/product_details_cubit.dart';
 
 final sl = GetIt.instance;
 
 Future<void> initServiceLocator() async {
-  // Data sources
+  // Auth: Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(Supabase.instance.client),
   );
 
-  // Repositories
+  // Auth: Repositories
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(sl<AuthRemoteDataSource>()),
   );
 
-  // Use cases
+  // Auth: Use cases
   sl.registerLazySingleton<SignInUseCase>(
     () => SignInUseCase(sl<AuthRepository>()),
   );
@@ -40,7 +55,7 @@ Future<void> initServiceLocator() async {
     () => AuthStateChangesUseCase(sl<AuthRepository>()),
   );
 
-  // Cubits
+  // Auth: Cubits
   sl.registerLazySingleton<AuthCubit>(
     () => AuthCubit(
       signInUseCase: sl<SignInUseCase>(),
@@ -48,6 +63,68 @@ Future<void> initServiceLocator() async {
       signOutUseCase: sl<SignOutUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
       authStateChangesUseCase: sl<AuthStateChangesUseCase>(),
+    ),
+  );
+
+  // Products: Data sources
+  sl.registerLazySingleton<ProductRemoteDataSource>(
+    () => ProductRemoteDataSourceImpl(Supabase.instance.client),
+  );
+
+  // Products: Repositories
+  sl.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(sl<ProductRemoteDataSource>()),
+  );
+
+  // Products: Use cases
+  sl.registerLazySingleton<GetProductsUseCase>(
+    () => GetProductsUseCase(sl<ProductRepository>()),
+  );
+
+  sl.registerLazySingleton<CreateProductUseCase>(
+    () => CreateProductUseCase(sl<ProductRepository>()),
+  );
+  sl.registerLazySingleton<UploadProductImageUseCase>(
+    () => UploadProductImageUseCase(sl<ProductRepository>()),
+  );
+  sl.registerLazySingleton<GetProductUseCase>(
+    () => GetProductUseCase(sl<ProductRepository>()),
+  );
+  sl.registerLazySingleton<UpdateProductUseCase>(
+    () => UpdateProductUseCase(sl<ProductRepository>()),
+  );
+  sl.registerLazySingleton<DeleteProductUseCase>(
+    () => DeleteProductUseCase(sl<ProductRepository>()),
+  );
+  sl.registerLazySingleton<UpdateProductQuantityUseCase>(
+    () => UpdateProductQuantityUseCase(sl<ProductRepository>()),
+  );
+  sl.registerLazySingleton<GetInventoryMovementsUseCase>(
+    () => GetInventoryMovementsUseCase(sl<ProductRepository>()),
+  );
+
+  // Products: Cubits
+  sl.registerLazySingleton<ProductsCubit>(
+    () => ProductsCubit(
+      getProductsUseCase: sl<GetProductsUseCase>(),
+    ),
+  );
+
+  sl.registerFactory<AddEditProductCubit>(
+    () => AddEditProductCubit(
+      createProductUseCase: sl<CreateProductUseCase>(),
+      uploadImageUseCase: sl<UploadProductImageUseCase>(),
+      getProductUseCase: sl<GetProductUseCase>(),
+      updateProductUseCase: sl<UpdateProductUseCase>(),
+    ),
+  );
+
+  sl.registerFactory<ProductDetailsCubit>(
+    () => ProductDetailsCubit(
+      getProductUseCase: sl<GetProductUseCase>(),
+      deleteProductUseCase: sl<DeleteProductUseCase>(),
+      updateQuantityUseCase: sl<UpdateProductQuantityUseCase>(),
+      getMovementsUseCase: sl<GetInventoryMovementsUseCase>(),
     ),
   );
 }
