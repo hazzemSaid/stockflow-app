@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../shell/presentation/cubit/app_shell_cubit.dart';
 
 class DashboardHeader extends StatelessWidget {
   final String userName;
@@ -58,28 +56,7 @@ class DashboardHeader extends StatelessWidget {
                     ),
                   ],
                 ),
-                Semantics(
-                  button: true,
-                  label: 'إشعارات',
-                  child: InkWell(
-                    onTap: () =>
-                        context.read<AppShellCubit>().openSearch(),
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(
-                        Icons.notifications_outlined,
-                        color: AppColors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
+
               ],
             ),
             SizedBox(height: AppSizes.spacingMedium),
@@ -133,7 +110,7 @@ class _TodaySalesAmount extends StatelessWidget {
       text: TextSpan(
         children: [
           TextSpan(
-            text: '٢٤٬٥٠٠',
+            text: '24,500',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontFamily: 'Cairo',
