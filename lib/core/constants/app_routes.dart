@@ -8,6 +8,10 @@ class AppRoutes {
   static const String invoices = '/invoices';
   static const String settings = '/settings';
 
+  static const String productNew = '/products/new';
+  static const String productDetails = '/products/:id';
+  static const String productEdit = '/products/:id/edit';
+
   static const List<String> shellRoutes = [
     dashboard,
     products,

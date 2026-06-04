@@ -69,7 +69,7 @@ class _ProfitAmount extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: '٥٬٦٥٠',
+                  text: '5,650',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: AppSizes.fontXLarge,

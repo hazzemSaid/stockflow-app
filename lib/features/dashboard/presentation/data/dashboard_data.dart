@@ -11,7 +11,7 @@ import '../models/weekly_point.dart';
 const List<DashboardMetric> dashboardMetrics = [
   DashboardMetric(
     title: AppStrings.dashboardProductsCount,
-    value: '١٬٢٥٠',
+    value: '1,250',
     icon: Icons.inventory_2_outlined,
     iconBackground: AppColors.lightGreen,
     iconColor: AppColors.primary,
@@ -19,7 +19,7 @@ const List<DashboardMetric> dashboardMetrics = [
   ),
   DashboardMetric(
     title: AppStrings.dashboardTotalDebts,
-    value: '٨٬٧٥٠',
+    value: '8,750',
     currency: AppStrings.currencyEg,
     icon: Icons.account_balance_wallet_outlined,
     iconBackground: AppColors.lightRed,
@@ -28,7 +28,7 @@ const List<DashboardMetric> dashboardMetrics = [
   ),
   DashboardMetric(
     title: AppStrings.dashboardCustomersCount,
-    value: '٣٢٠',
+    value: '320',
     icon: Icons.people_outline,
     iconBackground: AppColors.lightOrange,
     iconColor: AppColors.accent,
@@ -36,7 +36,7 @@ const List<DashboardMetric> dashboardMetrics = [
   ),
   DashboardMetric(
     title: AppStrings.dashboardMonthlyProfit,
-    value: '٤٢٬١٠٠',
+    value: '42,100',
     currency: AppStrings.currencyEg,
     icon: Icons.trending_up,
     iconBackground: AppColors.lightGreen,
@@ -90,7 +90,7 @@ const List<ActivityItem> recentActivities = [
   ActivityItem(
     title: 'دفعة مستلمة',
     subtitle: 'متجر الهدى',
-    amount: '٢٬٣٥٠',
+    amount: '2,350',
     icon: Icons.payments_outlined,
     iconBackground: AppColors.lightGreen,
     iconColor: AppColors.primary,
@@ -99,7 +99,7 @@ const List<ActivityItem> recentActivities = [
   ActivityItem(
     title: 'فاتورة جديدة',
     subtitle: 'سوبر ماركت النور',
-    amount: '٤٬٩٨٠',
+    amount: '4,980',
     icon: Icons.receipt_long_outlined,
     iconBackground: AppColors.lightOrange,
     iconColor: AppColors.accent,
@@ -108,7 +108,7 @@ const List<ActivityItem> recentActivities = [
   ActivityItem(
     title: 'دين مسدد جزئياً',
     subtitle: 'شركة الصفوة',
-    amount: '١٬١٠٠',
+    amount: '1,100',
     icon: Icons.account_balance_wallet_outlined,
     iconBackground: AppColors.lightRed,
     iconColor: AppColors.trendDown,

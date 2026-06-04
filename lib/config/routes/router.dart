@@ -10,6 +10,8 @@ import '../../features/auth/presentation/pages/login_screen.dart';
 import '../../features/auth/presentation/pages/register_screen.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../../features/products/presentation/pages/products_screen.dart';
+import '../../features/products/presentation/pages/add_edit_product_screen.dart';
+import '../../features/products/presentation/pages/product_details_screen.dart';
 import '../../features/customers/presentation/pages/customers_screen.dart';
 import '../../features/invoices/presentation/pages/invoices_screen.dart';
 import '../../features/settings/presentation/pages/settings_screen.dart';
@@ -22,10 +24,24 @@ final List<String> _authRoutes = [
   AppRoutes.login,
   AppRoutes.register,
 ];
-final List<String> _protectedRoutes = [...AppRoutes.shellRoutes];
+final List<String> _protectedRoutes = [
+  ...AppRoutes.shellRoutes,
+  AppRoutes.productNew,
+  AppRoutes.productDetails,
+  AppRoutes.productEdit,
+];
 
 bool _isAuthRoute(String location) => _authRoutes.contains(location);
-bool _isProtectedRoute(String location) => _protectedRoutes.contains(location);
+bool _isProtectedRoute(String location) => _protectedRoutes.any(
+  (route) {
+    if (route == location) return true;
+    if (route.contains(':id')) {
+      final pattern = route.replaceAll(':id', '[^/]+');
+      return RegExp('^$pattern\$').hasMatch(location);
+    }
+    return false;
+  },
+);
 
 final ChangeNotifier _authStateNotifier = _AuthStateNotifier();
 
@@ -91,6 +107,31 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: AppRoutes.products,
               builder: (context, state) => const ProductsScreen(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const AddEditProductScreen(),
+                ),
+                GoRoute(
+                  path: ':id',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['id']!;
+                    return ProductDetailsScreen(productId: id);
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final id = state.pathParameters['id']!;
+                        return AddEditProductScreen(productId: id);
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
