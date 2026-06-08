@@ -131,7 +131,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             return ProductCard(
                               product: product,
                               onTap: () =>
-                                  context.push('/products/${product.id}'),
+                                  context.push(AppRoutes.productDetailsPath(product.id)),
                             );
                           }, childCount: state.products.length),
                         ),
@@ -155,6 +155,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          heroTag: 'products_fab',
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(32.r),
           ),

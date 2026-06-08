@@ -23,7 +23,24 @@ class AppColors {
   static const Color inactiveNav = Color(0xFF9CA3AF);
 
   // Dark green tones for dashboard cards
-  static const Color lightGreen = Color(0xFFDCFCE7);
-  static const Color lightOrange = Color(0xFFFFEDD5);
+  static const Color lightGreen = Color(0xFFE8F1EC);
+  static const Color lightOrange = Color(0xFFFFF1E6);
   static const Color lightRed = Color(0xFFFEE2E2);
+
+  // Customer specific
+  static const Color lightPrimaryBg = Color(0xFFE8F1EC);
+  static const Color debtAmberBg = Color(0xFFFEF3C7);
+  static const Color debtRedBg = Color(0xFFFEF2F2);
+  static const Color debtGreenBg = Color(0xFFF0FDF4);
+  static const Color darkGrey = Color(0xFF404040);
+  static const Color semiTransparent = Color(0x42000000);
+
+  // Figma-specific grays
+  static const Color textDark = Color(0xFF262626);
+  static const Color labelSecondary = Color(0xFF525252);
+  static const Color hintText = Color(0xFFA1A1A1);
+  static const Color amountGrey = Color(0xFF6B7280);
+  static const Color chipBg = Color(0xFFF3F4F6);
+  static const Color searchBg = Color(0xFFF5F5F5);
+  static const Color redDark = Color(0xFFB91C1C);
 }

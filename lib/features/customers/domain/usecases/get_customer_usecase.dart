@@ -1,0 +1,14 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:stockflow/core/error/failures.dart';
+import '../entities/customer.dart';
+import '../repositories/customer_repository.dart';
+
+class GetCustomerUseCase {
+  final CustomerRepository repository;
+
+  GetCustomerUseCase(this.repository);
+
+  Future<Either<Failure, Customer>> call(String id) {
+    return repository.getCustomer(id);
+  }
+}

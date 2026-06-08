@@ -13,6 +13,8 @@ import '../../features/products/presentation/pages/products_screen.dart';
 import '../../features/products/presentation/pages/add_edit_product_screen.dart';
 import '../../features/products/presentation/pages/product_details_screen.dart';
 import '../../features/customers/presentation/pages/customers_screen.dart';
+import '../../features/customers/presentation/pages/add_edit_customer_screen.dart';
+import '../../features/customers/presentation/pages/customer_details_screen.dart';
 import '../../features/invoices/presentation/pages/invoices_screen.dart';
 import '../../features/settings/presentation/pages/settings_screen.dart';
 import '../../features/shell/presentation/pages/app_shell.dart';
@@ -29,6 +31,9 @@ final List<String> _protectedRoutes = [
   AppRoutes.productNew,
   AppRoutes.productDetails,
   AppRoutes.productEdit,
+  AppRoutes.customerNew,
+  AppRoutes.customerDetails,
+  AppRoutes.customerEdit,
 ];
 
 bool _isAuthRoute(String location) => _authRoutes.contains(location);
@@ -49,6 +54,13 @@ class _AuthStateNotifier extends ChangeNotifier {
   _AuthStateNotifier() {
     sl<AuthCubit>().stream.listen((_) => notifyListeners());
   }
+}
+
+Page<void> _buildFullScreenPage<T>(GoRouterState state, Widget child) {
+  return NoTransitionPage(
+    key: state.pageKey,
+    child: child,
+  );
 }
 
 final GoRouter appRouter = GoRouter(
@@ -111,22 +123,31 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'new',
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const AddEditProductScreen(),
+                  pageBuilder: (context, state) => _buildFullScreenPage(
+                    state,
+                    const AddEditProductScreen(),
+                  ),
                 ),
                 GoRoute(
                   path: ':id',
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) {
+                  pageBuilder: (context, state) {
                     final id = state.pathParameters['id']!;
-                    return ProductDetailsScreen(productId: id);
+                    return _buildFullScreenPage(
+                      state,
+                      ProductDetailsScreen(productId: id),
+                    );
                   },
                   routes: [
                     GoRoute(
                       path: 'edit',
                       parentNavigatorKey: _rootNavigatorKey,
-                      builder: (context, state) {
+                      pageBuilder: (context, state) {
                         final id = state.pathParameters['id']!;
-                        return AddEditProductScreen(productId: id);
+                        return _buildFullScreenPage(
+                          state,
+                          AddEditProductScreen(productId: id),
+                        );
                       },
                     ),
                   ],
@@ -140,6 +161,40 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: AppRoutes.customers,
               builder: (context, state) => const CustomersScreen(),
+              routes: [
+                GoRoute(
+                  path: 'add',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) => _buildFullScreenPage(
+                    state,
+                    const AddEditCustomerScreen(),
+                  ),
+                ),
+                GoRoute(
+                  path: ':id',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final id = state.pathParameters['id']!;
+                    return _buildFullScreenPage(
+                      state,
+                      CustomerDetailsScreen(customerId: id),
+                    );
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) {
+                        final id = state.pathParameters['id']!;
+                        return _buildFullScreenPage(
+                          state,
+                          AddEditCustomerScreen(customerId: id),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
