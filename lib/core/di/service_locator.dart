@@ -24,6 +24,18 @@ import '../../features/products/domain/usecases/get_inventory_movements_usecase.
 import '../../features/products/presentation/cubit/products/products_cubit.dart';
 import '../../features/products/presentation/cubit/add_edit_product/add_edit_product_cubit.dart';
 import '../../features/products/presentation/cubit/product_details/product_details_cubit.dart';
+import '../../features/customers/data/datasources/customer_remote_data_source.dart';
+import '../../features/customers/data/datasources/customer_remote_data_source_impl.dart';
+import '../../features/customers/data/repositories/customer_repository_impl.dart';
+import '../../features/customers/domain/repositories/customer_repository.dart';
+import '../../features/customers/domain/usecases/get_customers_usecase.dart';
+import '../../features/customers/domain/usecases/create_customer_usecase.dart';
+import '../../features/customers/domain/usecases/upload_customer_image_usecase.dart';
+import '../../features/customers/domain/usecases/get_customer_usecase.dart';
+import '../../features/customers/domain/usecases/update_customer_usecase.dart';
+import '../../features/customers/presentation/cubit/customers/customers_cubit.dart';
+import '../../features/customers/presentation/cubit/add_edit_customer/add_edit_customer_cubit.dart';
+import '../../features/customers/presentation/cubit/customer_details/customer_details_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -105,9 +117,7 @@ Future<void> initServiceLocator() async {
 
   // Products: Cubits
   sl.registerLazySingleton<ProductsCubit>(
-    () => ProductsCubit(
-      getProductsUseCase: sl<GetProductsUseCase>(),
-    ),
+    () => ProductsCubit(getProductsUseCase: sl<GetProductsUseCase>()),
   );
 
   sl.registerFactory<AddEditProductCubit>(
@@ -126,5 +136,51 @@ Future<void> initServiceLocator() async {
       updateQuantityUseCase: sl<UpdateProductQuantityUseCase>(),
       getMovementsUseCase: sl<GetInventoryMovementsUseCase>(),
     ),
+  );
+
+  // Customers: Data sources
+  sl.registerLazySingleton<CustomerRemoteDataSource>(
+    () =>
+        CustomerRemoteDataSourceImpl(supabaseClient: Supabase.instance.client),
+  );
+
+  // Customers: Repositories
+  sl.registerLazySingleton<CustomerRepository>(
+    () => CustomerRepositoryImpl(sl<CustomerRemoteDataSource>()),
+  );
+
+  // Customers: Use cases
+  sl.registerLazySingleton<GetCustomersUseCase>(
+    () => GetCustomersUseCase(sl<CustomerRepository>()),
+  );
+  sl.registerLazySingleton<CreateCustomerUseCase>(
+    () => CreateCustomerUseCase(sl<CustomerRepository>()),
+  );
+  sl.registerLazySingleton<UploadCustomerImageUseCase>(
+    () => UploadCustomerImageUseCase(sl<CustomerRepository>()),
+  );
+  sl.registerLazySingleton<GetCustomerUseCase>(
+    () => GetCustomerUseCase(sl<CustomerRepository>()),
+  );
+  sl.registerLazySingleton<UpdateCustomerUseCase>(
+    () => UpdateCustomerUseCase(sl<CustomerRepository>()),
+  );
+
+  // Customers: Cubits
+  sl.registerLazySingleton<CustomersCubit>(
+    () => CustomersCubit(getCustomersUseCase: sl<GetCustomersUseCase>()),
+  );
+
+  sl.registerFactory<AddEditCustomerCubit>(
+    () => AddEditCustomerCubit(
+      createCustomerUseCase: sl<CreateCustomerUseCase>(),
+      uploadImageUseCase: sl<UploadCustomerImageUseCase>(),
+      getCustomerUseCase: sl<GetCustomerUseCase>(),
+      updateCustomerUseCase: sl<UpdateCustomerUseCase>(),
+    ),
+  );
+
+  sl.registerFactory<CustomerDetailsCubit>(
+    () => CustomerDetailsCubit(getCustomerUseCase: sl<GetCustomerUseCase>()),
   );
 }
