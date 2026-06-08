@@ -1,0 +1,164 @@
+import 'dart:io';
+import 'package:fpdart/src/either.dart';
+import 'package:stockflow/core/error/failures.dart';
+import 'package:stockflow/features/customers/data/datasources/customer_remote_data_source.dart';
+import 'package:stockflow/features/customers/data/models/customer_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+
+class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
+  final supabase.SupabaseClient _supabaseClient;
+
+  CustomerRemoteDataSourceImpl({required supabase.SupabaseClient supabaseClient})
+    : _supabaseClient = supabaseClient;
+
+  @override
+  Future<Either<Failure, CustomerModel>> createCustomer({
+    required String name,
+    String? nameOfficial,
+    String? phone,
+    String? address,
+    double totalDebt = 0,
+    String? imageUrl,
+  }) async {
+    try {
+      final body = <String, dynamic>{'name': name};
+      if (nameOfficial != null) body['name_official'] = nameOfficial;
+      if (phone != null) body['phone'] = phone;
+      if (address != null) body['address'] = address;
+      if (totalDebt > 0) body['total_debt'] = totalDebt;
+      if (imageUrl != null) body['image_url'] = imageUrl;
+
+      final response = await _supabaseClient
+          .from('customers')
+          .insert(body)
+          .select()
+          .single();
+      return Right(CustomerModel.fromJson(response));
+    } on supabase.PostgrestException catch (error) {
+      if (error.code == '23505') {
+        return Left(ServerFailure('هذا الاسم موجود مسبقاً'));
+      }
+      return Left(ServerFailure(error.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CustomerModel>> getCustomer(String id) async {
+    try {
+      final response = await _supabaseClient
+          .from('customers')
+          .select()
+          .filter('id', 'eq', id)
+          .single();
+      return Right(CustomerModel.fromJson(response));
+    } on supabase.PostgrestException catch (error) {
+      if (error.code == 'PGRST116') {
+        return Left(ServerFailure('العميل غير موجود'));
+      }
+      return Left(ServerFailure(error.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CustomerModel>>> listCustomers({
+    String? query,
+    int? limit,
+    int? offset,
+  }) async {
+    try {
+      var request = _supabaseClient.from('customers').select();
+
+      if (query != null && query.trim().isNotEmpty) {
+        request = request.or('name.ilike.%$query%,phone.ilike.%$query%');
+      }
+
+      final ordered = request.order('created_at', ascending: false);
+
+      List<dynamic> data;
+      if (limit != null && offset != null) {
+        data = await ordered.range(offset, offset + limit - 1) as List<dynamic>;
+      } else {
+        data = await ordered as List<dynamic>;
+      }
+
+      final customers = data
+          .map((json) => CustomerModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+      return Right(customers);
+    } on supabase.PostgrestException catch (error) {
+      if (error.code == 'PGRST116') {
+        return const Right([]);
+      }
+      return Left(ServerFailure(error.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CustomerModel>> updateCustomer({
+    required String id,
+    required String name,
+    String? nameOfficial,
+    String? phone,
+    String? address,
+    String? imageUrl,
+  }) async {
+    try {
+      final body = <String, dynamic>{'name': name};
+      if (nameOfficial != null) body['name_official'] = nameOfficial;
+      if (phone != null) body['phone'] = phone;
+      if (address != null) body['address'] = address;
+      body['image_url'] = imageUrl;
+
+      final response = await _supabaseClient
+          .from('customers')
+          .update(body)
+          .filter('id', 'eq', id)
+          .select()
+          .single();
+      return Right(CustomerModel.fromJson(response));
+    } on supabase.PostgrestException catch (error) {
+      if (error.code == 'PGRST116') {
+        return Left(ServerFailure('العميل غير موجود'));
+      }
+      return Left(ServerFailure(error.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadImage(String filePath) async {
+    try {
+      final fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${filePath.split(Platform.pathSeparator).last}';
+      final file = File(filePath);
+      await _supabaseClient.storage
+          .from('customer-images')
+          .upload(
+            fileName,
+            file,
+            fileOptions: const supabase.FileOptions(
+              contentType: 'image/jpeg',
+              upsert: true,
+            ),
+          );
+      final publicUrl = _supabaseClient.storage
+          .from('customer-images')
+          .getPublicUrl(fileName);
+      return Right(publicUrl);
+    } on supabase.StorageException catch (error) {
+      if (error.statusCode == '409') {
+        return Left(ServerFailure('الصورة موجودة مسبقاً'));
+      }
+      return Left(ServerFailure(error.message ?? 'خطأ في رفع الصورة'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+}
