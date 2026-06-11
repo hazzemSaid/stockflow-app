@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/service_locator.dart';
+import '../../../../core/widgets/app_snackbar.dart';
 import '../cubit/add_edit_customer/add_edit_customer_cubit.dart';
 import '../widgets/customer_text_input.dart';
 import '../widgets/customer_image_uploader.dart';
@@ -104,22 +104,17 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
         body: BlocConsumer<AddEditCustomerCubit, AddEditCustomerState>(
           listener: (context, state) {
             if (state.status == AddEditCustomerStatus.success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    state.successMessage ?? AppStrings.customerSaveSuccess,
-                  ),
-                ),
+              AppSnackbar.success(
+                context,
+                state.successMessage ?? AppStrings.customerSaveSuccess,
               );
               context.pop(true);
             }
             if (state.status == AddEditCustomerStatus.error &&
                 state.failure != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.failure!.message),
-                  backgroundColor: AppColors.error,
-                ),
+              AppSnackbar.error(
+                context,
+                state.failure?.message ?? AppStrings.unexpectedError,
               );
               _cubit.resetStatus();
             }

@@ -7,6 +7,7 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/service_locator.dart';
+import '../../../../core/widgets/app_snackbar.dart';
 import '../cubit/customer_details/customer_details_cubit.dart';
 import '../widgets/customer_action_buttons.dart';
 import '../widgets/customer_debt_summary_card.dart';
@@ -49,11 +50,9 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
           listener: (context, state) {
             if (state.status == CustomerDetailsStatus.error &&
                 state.failure != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.failure!.message),
-                  backgroundColor: AppColors.error,
-                ),
+              AppSnackbar.error(
+                context,
+                state.failure?.message ?? AppStrings.unexpectedError,
               );
             }
           },
@@ -68,8 +67,11 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        state.failure?.message ?? AppStrings.unexpectedError,
-                        style: const TextStyle(fontFamily: 'Cairo'),
+                        AppStrings.customerLoadError,
+                        style: TextStyle(
+                          fontSize: AppSizes.fontMedium,
+                          color: AppColors.textDark,
+                        ),
                       ),
                       SizedBox(height: AppSizes.spacingMedium),
                       ElevatedButton(
@@ -123,9 +125,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           SizedBox(height: AppSizes.spacingMedium),
                           _tabBar(),
                           SizedBox(height: AppSizes.spacingSmall),
-                          CustomerTransactionList(
-                            selectedTab: _selectedTab,
-                          ),
+                          CustomerTransactionList(selectedTab: _selectedTab),
                           SizedBox(height: AppSizes.spacingLarge),
                         ],
                       ),
@@ -157,20 +157,11 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
         ),
         child: Row(
           children: [
-            _tabItem(
-              label: AppStrings.customerAllFilter,
-              index: 0,
-            ),
+            _tabItem(label: AppStrings.customerAllFilter, index: 0),
             SizedBox(width: AppSizes.spacingTiny),
-            _tabItem(
-              label: AppStrings.customerInvoicesTab,
-              index: 1,
-            ),
+            _tabItem(label: AppStrings.customerInvoicesTab, index: 1),
             SizedBox(width: AppSizes.spacingTiny),
-            _tabItem(
-              label: AppStrings.customerPaymentsTab,
-              index: 2,
-            ),
+            _tabItem(label: AppStrings.customerPaymentsTab, index: 2),
           ],
         ),
       ),
