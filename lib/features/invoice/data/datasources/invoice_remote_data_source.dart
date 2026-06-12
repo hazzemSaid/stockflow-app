@@ -1,0 +1,17 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:stockflow/core/error/failures.dart';
+import 'package:stockflow/features/invoice/data/models/invoice_create_dto.dart';
+import 'package:stockflow/features/invoice/data/models/invoice_model.dart';
+
+abstract class InvoiceRemoteDataSource {
+  Future<Either<Failure, String>> createInvoice(
+    InvoiceCreateDto inputDto,
+  );
+
+  Future<Either<Failure, InvoiceModel>> getInvoice(String id);
+
+  Future<Either<Failure, List<InvoiceModel>>> getInvoices({
+    List<String>? statusFilter,
+    String? customerId,
+  });
+}
