@@ -1,0 +1,115 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:stockflow/core/constants/app_colors.dart';
+import 'package:stockflow/core/constants/app_sizes.dart';
+import 'package:stockflow/core/constants/app_strings.dart';
+import 'package:stockflow/features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
+
+class PaidNowInput extends StatefulWidget {
+  final CreateInvoiceCubit cubit;
+
+  const PaidNowInput({super.key, required this.cubit});
+
+  @override
+  State<PaidNowInput> createState() => _PaidNowInputState();
+}
+
+class _PaidNowInputState extends State<PaidNowInput> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+    widget.cubit.stream.listen((_) {
+      final text = widget.cubit.paidNow > 0
+          ? widget.cubit.paidNow.toStringAsFixed(0)
+          : '';
+      if (_controller.text != text) {
+        _controller.value = TextEditingValue(
+          text: text,
+          selection: TextSelection.collapsed(offset: text.length),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.cubit.paymentMethod != 'partial') {
+      return const SizedBox.shrink();
+    }
+
+    final remaining = widget.cubit.totalAfterDiscount - widget.cubit.paidNow;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppStrings.howMuchPaidNow,
+          style: TextStyle(
+            fontSize: AppSizes.fontXLarge,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textDark,
+          ),
+        ),
+        SizedBox(height: AppSizes.spacingSmall),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: InputDecoration(
+                  suffixText: AppStrings.currencyEg,
+                  hintText: AppStrings.paidNowHint,
+                  filled: true,
+                  fillColor: AppColors.inputBackground,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+                    borderSide: BorderSide(color: AppColors.inputBorder),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.spacingMedium,
+                    vertical: AppSizes.spacingSmall,
+                  ),
+                ),
+                onChanged: (value) {
+                  widget.cubit.setPaidNow(double.tryParse(value) ?? 0);
+                },
+              ),
+            ),
+            if (remaining > 0) ...[
+              SizedBox(width: AppSizes.spacingSmall),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSizes.spacingSmall,
+                  vertical: AppSizes.spacingTiny,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.lightGreen,
+                  borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+                ),
+                child: Text(
+                  '${AppStrings.remainingDebt}: ${remaining.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: AppSizes.fontSmall,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+}

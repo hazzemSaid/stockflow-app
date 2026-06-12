@@ -1,5 +1,5 @@
 import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/domain/entities/Invoice.dart';
+import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
 
 sealed class InvoiceDetailsState {}
 
