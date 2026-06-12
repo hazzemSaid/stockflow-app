@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/service_locator.dart';
+import '../../../../core/widgets/app_snackbar.dart';
 import '../cubit/product_details/product_details_cubit.dart';
 import '../widgets/inventory_movement_list.dart';
 import '../widgets/product_delete_dialog.dart';
@@ -47,12 +47,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           listener: (context, state) {
             if (state.status == ProductDetailsStatus.error &&
                 state.errorMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: AppColors.error,
-                ),
-              );
+              AppSnackbar.error(context, state.errorMessage!);
             }
           },
           builder: (context, state) {
@@ -108,9 +103,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     if (confirmed == true && mounted) {
       final success = await _cubit.deleteProduct(id);
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.productDeleted)),
-        );
+        AppSnackbar.success(context, AppStrings.productDeleted);
         context.pop();
       }
     }

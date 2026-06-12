@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/widgets/app_snackbar.dart';
 import '../models/activity_item.dart';
 import '../models/dashboard_metric.dart';
 import '../models/quick_action.dart';
@@ -117,7 +118,5 @@ const List<ActivityItem> recentActivities = [
 ];
 
 void _showComingSoon(BuildContext context) {
-  ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text(AppStrings.actionComingSoon)));
+  AppSnackbar.info(context, AppStrings.actionComingSoon);
 }

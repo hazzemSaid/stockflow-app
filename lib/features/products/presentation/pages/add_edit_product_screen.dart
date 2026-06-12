@@ -5,6 +5,7 @@ import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
 import 'package:stockflow/core/di/service_locator.dart';
+import 'package:stockflow/core/widgets/app_snackbar.dart';
 import '../../../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../../../features/auth/presentation/cubit/auth_state.dart';
 import '../cubit/add_edit_product/add_edit_product_cubit.dart';
@@ -67,23 +68,13 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
         body: BlocConsumer<AddEditProductCubit, AddEditProductState>(
           listener: (context, state) {
             if (state.status == AddEditProductStatus.success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    state.successMessage ?? AppStrings.productSaved,
-                  ),
-                ),
-              );
+              AppSnackbar.success(context,
+                  state.successMessage ?? AppStrings.productSaved);
               context.pop(true);
             }
             if (state.status == AddEditProductStatus.error &&
                 state.errorMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: AppColors.error,
-                ),
-              );
+              AppSnackbar.error(context, state.errorMessage!);
               _cubit.resetStatus();
             }
           },

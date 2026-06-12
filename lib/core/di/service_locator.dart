@@ -36,6 +36,15 @@ import '../../features/customers/domain/usecases/update_customer_usecase.dart';
 import '../../features/customers/presentation/cubit/customers/customers_cubit.dart';
 import '../../features/customers/presentation/cubit/add_edit_customer/add_edit_customer_cubit.dart';
 import '../../features/customers/presentation/cubit/customer_details/customer_details_cubit.dart';
+import '../../features/invoice/data/datasources/invoice_remote_data_source.dart';
+import '../../features/invoice/data/datasources/invoice_remote_data_source_impl.dart';
+import '../../features/invoice/data/repositories/invoice_repository_impl.dart';
+import '../../features/invoice/domain/repositories/invoice_repository.dart';
+import '../../features/invoice/domain/usecases/create_invoice_usecase.dart';
+import '../../features/invoice/domain/usecases/get_invoice_usecase.dart';
+import '../../features/invoice/domain/usecases/get_invoices_usecase.dart';
+import '../../features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
+import '../../features/invoice/presentation/cubit/invoice_details/invoice_details_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -182,5 +191,35 @@ Future<void> initServiceLocator() async {
 
   sl.registerFactory<CustomerDetailsCubit>(
     () => CustomerDetailsCubit(getCustomerUseCase: sl<GetCustomerUseCase>()),
+  );
+
+  // Invoice: Data sources
+  sl.registerLazySingleton<InvoiceRemoteDataSource>(
+    () => InvoiceRemoteDataSourceImpl(supabaseClient: Supabase.instance.client),
+  );
+
+  // Invoice: Repositories
+  sl.registerLazySingleton<InvoiceRepository>(
+    () => InvoiceRepositoryImpl(sl<InvoiceRemoteDataSource>()),
+  );
+
+  // Invoice: Use cases
+  sl.registerLazySingleton<CreateInvoiceUseCase>(
+    () => CreateInvoiceUseCase(sl<InvoiceRepository>()),
+  );
+  sl.registerLazySingleton<GetInvoiceUseCase>(
+    () => GetInvoiceUseCase(sl<InvoiceRepository>()),
+  );
+  sl.registerLazySingleton<GetInvoicesUseCase>(
+    () => GetInvoicesUseCase(sl<InvoiceRepository>()),
+  );
+
+  // Invoice: Cubits
+  sl.registerFactory<CreateInvoiceCubit>(
+    () => CreateInvoiceCubit(createInvoiceUseCase: sl<CreateInvoiceUseCase>()),
+  );
+
+  sl.registerFactory<InvoiceDetailsCubit>(
+    () => InvoiceDetailsCubit(getInvoiceUseCase: sl<GetInvoiceUseCase>()),
   );
 }

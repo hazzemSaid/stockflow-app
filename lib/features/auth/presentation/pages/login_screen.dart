@@ -5,6 +5,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/widgets/app_snackbar.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import '../widgets/auth_text_field.dart';
@@ -51,14 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (state is Authenticated) {
             context.go(AppRoutes.dashboard);
           } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.message,
-                  style: const TextStyle(fontFamily: 'Cairo'),
-                ),
-              ),
-            );
+            AppSnackbar.error(context, state.message);
           }
         },
         builder: (context, state) {
