@@ -200,4 +200,72 @@ class AppStrings {
   static const String customerDebtsLabel = 'ديون';
   static const String customerStore = 'سوبر ماركت';
   static const String customerInvoicesTab = 'فاتورات';
+
+  // Invoice — Create Invoice Screen
+  static const String invoiceNew = 'فاتورة جديدة';
+  static const String invoiceCreateSale = 'إنشاء فاتورة بيع';
+  static const String productsCount = 'المنتجات';
+  static const String addProduct = 'إضافة منتج';
+  static const String discountLabel = 'الخصم';
+  static const String byAmount = 'بالمبلغ';
+  static const String byPercentage = 'بالنسبة %';
+  static const String discountValueSuffix = 'ج.م';
+  static const String discountPercentSuffix = '%';
+  static const String paymentMethod = 'طريقة الدفع';
+  static const String fullPayment = 'دفع كامل';
+  static const String partialPayment = 'دفع جزئي';
+  static const String deferredPayment = 'آجل';
+  static const String howMuchPaidNow = 'كم تدفع الآن؟';
+  static const String paidNowHint = '٠';
+  static const String remainingDebt = 'المتبقي (دين)';
+  static const String subtotal = 'المجموع الفرعي';
+  static const String afterDiscount = 'بعد الخصم';
+  static const String totalLabel = 'الإجمالي';
+  static const String paidNowLabel = 'المدفوع الآن';
+  static const String confirmAndIssue = 'تأكيد وإصدار الفاتورة';
+  static const String customerSection = 'العميل';
+  static const String selectCustomer = 'اختر عميل';
+  static const String invoiceTotalPrefix = 'الإجمالي';
+  static const String invoiceItemsCount = 'منتجات';
+  static const String discountAmount = 'قيمة الخصم';
+  static const String discountNone = 'بدون خصم';
+
+  // Invoice — Product Picker
+  static const String searchProduct = 'ابحث عن منتج بالاسم أو الباركود...';
+  static const String scanBarcode = 'مسح الباركود';
+  static const String categoryGrains = 'الحبوب';
+  static const String categoryOils = 'الزيوت';
+  static const String categoryBeverages = 'المشروبات';
+  static const String categoryLegumes = 'البقوليات';
+  static const String categoryCanned = 'المعلقات';
+  static const String selectedProducts = 'منتجات محددة';
+  static const String showDetails = 'عرض التفاصيل';
+  static const String addNProducts = 'إضافة منتجات إلى الفاتورة';
+  static const String productsAvailable = 'منتج متاح';
+  static const String stockLabel = 'المخزون: ';
+  static const String productPickerTitle = 'إضافة منتج';
+  static const String done = 'تم';
+  static const String cancel = 'إلغاء';
+
+  // Invoice — Details
+  static const String invoiceDetailsTitle = 'تفاصيل الفاتورة';
+  static const String invoiceNo = 'فاتورة';
+  static const String printInvoice = 'طباعة الفاتورة';
+  static const String shareInvoice = 'مشاركة';
+  static const String mainWarehouse = 'مخزن التوزيع الرئيسي';
+  static const String invoiceNumber = 'رقم الفاتورة';
+  static const String date = 'التاريخ';
+  static const String employee = 'الموظف';
+  static const String productCol = 'المنتج';
+  static const String qtyCol = 'الكمية';
+  static const String priceCol = 'السعر';
+  static const String totalCol = 'الإجمالي';
+  static const String tax = 'الضريبة';
+  static const String paymentHistory = 'سجل المدفوعات';
+  static const String paymentReminder = 'المبلغ المتبقي مستحق خلال ٧ أيام';
+  static const String barcodeRef = 'INV';
+  static const String selectProducts = 'اختيار منتجات';
+  static const String invoiceSaved = 'تم حفظ الفاتورة بنجاح';
+  static const String invoiceSaveError = 'حدث خطأ أثناء حفظ الفاتورة';
+  static const String invoiceCreated = 'تم إنشاء الفاتورة بنجاح';
 }

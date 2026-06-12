@@ -16,9 +16,15 @@ class AppRoutes {
   static const String customerDetails = '/customers/:id';
   static const String customerEdit = '/customers/:id/edit';
 
+  static const String invoiceCreate = '/invoices/create';
+  static const String invoiceCreateSelectCustomer = '/invoices/create/select-customer';
+  static const String invoiceCreatePickProducts = '/invoices/create/pick-products';
+  static const String invoiceDetails = '/invoices/:id';
+
   static String customerDetailsPath(String id) => '/customers/$id';
   static String customerEditPath(String id) => '/customers/$id/edit';
   static String productDetailsPath(String id) => '/products/$id';
+  static String invoiceDetailsPath(String id) => '/invoices/$id';
 
   static const List<String> shellRoutes = [
     dashboard,
