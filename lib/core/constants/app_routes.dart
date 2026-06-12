@@ -17,8 +17,6 @@ class AppRoutes {
   static const String customerEdit = '/customers/:id/edit';
 
   static const String invoiceCreate = '/invoices/create';
-  static const String invoiceCreateSelectCustomer = '/invoices/create/select-customer';
-  static const String invoiceCreatePickProducts = '/invoices/create/pick-products';
   static const String invoiceDetails = '/invoices/:id';
 
   static String customerDetailsPath(String id) => '/customers/$id';

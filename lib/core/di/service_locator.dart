@@ -44,6 +44,7 @@ import '../../features/invoice/domain/usecases/create_invoice_usecase.dart';
 import '../../features/invoice/domain/usecases/get_invoice_usecase.dart';
 import '../../features/invoice/domain/usecases/get_invoices_usecase.dart';
 import '../../features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
+import '../../features/invoice/presentation/cubit/invoice_details/invoice_details_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -216,5 +217,9 @@ Future<void> initServiceLocator() async {
   // Invoice: Cubits
   sl.registerFactory<CreateInvoiceCubit>(
     () => CreateInvoiceCubit(createInvoiceUseCase: sl<CreateInvoiceUseCase>()),
+  );
+
+  sl.registerFactory<InvoiceDetailsCubit>(
+    () => InvoiceDetailsCubit(getInvoiceUseCase: sl<GetInvoiceUseCase>()),
   );
 }

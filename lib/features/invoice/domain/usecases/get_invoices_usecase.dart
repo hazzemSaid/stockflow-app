@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/domain/entities/Invoice.dart';
+import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
 import 'package:stockflow/features/invoice/domain/repositories/invoice_repository.dart';
 
 class GetInvoicesUseCase {

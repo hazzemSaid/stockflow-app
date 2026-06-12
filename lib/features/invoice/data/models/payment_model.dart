@@ -1,4 +1,4 @@
-import 'package:stockflow/features/invoice/domain/entities/Payment.dart';
+import 'package:stockflow/features/invoice/domain/entities/payment.dart';
 
 class PaymentModel {
   final String id;

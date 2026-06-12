@@ -1,4 +1,4 @@
-import 'package:stockflow/features/invoice/domain/entities/InvoiceItem.dart';
+import 'package:stockflow/features/invoice/domain/entities/invoice_item.dart';
 
 class InvoiceItemModel {
   final String? id;

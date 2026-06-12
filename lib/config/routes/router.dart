@@ -1,4 +1,3 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/app_routes.dart';
@@ -15,7 +14,9 @@ import '../../features/products/presentation/pages/product_details_screen.dart';
 import '../../features/customers/presentation/pages/customers_screen.dart';
 import '../../features/customers/presentation/pages/add_edit_customer_screen.dart';
 import '../../features/customers/presentation/pages/customer_details_screen.dart';
-import '../../features/invoices/presentation/pages/invoices_screen.dart';
+import '../../features/invoice/presentation/pages/invoices_screen.dart';
+import '../../features/invoice/presentation/pages/create_invoice_screen.dart';
+import '../../features/invoice/presentation/pages/invoice_details_screen.dart';
 import '../../features/settings/presentation/pages/settings_screen.dart';
 import '../../features/shell/presentation/pages/app_shell.dart';
 
@@ -34,19 +35,19 @@ final List<String> _protectedRoutes = [
   AppRoutes.customerNew,
   AppRoutes.customerDetails,
   AppRoutes.customerEdit,
+  AppRoutes.invoiceCreate,
+  AppRoutes.invoiceDetails,
 ];
 
 bool _isAuthRoute(String location) => _authRoutes.contains(location);
-bool _isProtectedRoute(String location) => _protectedRoutes.any(
-  (route) {
-    if (route == location) return true;
-    if (route.contains(':id')) {
-      final pattern = route.replaceAll(':id', '[^/]+');
-      return RegExp('^$pattern\$').hasMatch(location);
-    }
-    return false;
-  },
-);
+bool _isProtectedRoute(String location) => _protectedRoutes.any((route) {
+  if (route == location) return true;
+  if (route.contains(':id')) {
+    final pattern = route.replaceAll(':id', '[^/]+');
+    return RegExp('^$pattern\$').hasMatch(location);
+  }
+  return false;
+});
 
 final ChangeNotifier _authStateNotifier = _AuthStateNotifier();
 
@@ -57,10 +58,7 @@ class _AuthStateNotifier extends ChangeNotifier {
 }
 
 Page<void> _buildFullScreenPage<T>(GoRouterState state, Widget child) {
-  return NoTransitionPage(
-    key: state.pageKey,
-    child: child,
-  );
+  return NoTransitionPage(key: state.pageKey, child: child);
 }
 
 final GoRouter appRouter = GoRouter(
@@ -123,10 +121,8 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'new',
                   parentNavigatorKey: _rootNavigatorKey,
-                  pageBuilder: (context, state) => _buildFullScreenPage(
-                    state,
-                    const AddEditProductScreen(),
-                  ),
+                  pageBuilder: (context, state) =>
+                      _buildFullScreenPage(state, const AddEditProductScreen()),
                 ),
                 GoRoute(
                   path: ':id',
@@ -202,7 +198,26 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.invoices,
-              builder: (context, state) => const InvoicesScreen(),
+              builder: (context, state) => InvoicesScreen(),
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) =>
+                      _buildFullScreenPage(state, const CreateInvoiceScreen()),
+                ),
+                GoRoute(
+                  path: ':id',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final id = state.pathParameters['id']!;
+                    return _buildFullScreenPage(
+                      state,
+                      InvoiceDetailsScreen(invoiceId: id),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),
