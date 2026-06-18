@@ -12,6 +12,12 @@ abstract class InvoiceRepository {
     double discountValue = 0,
   });
 
+  Future<Either<Failure, String>> addPayment({
+    required String invoiceId,
+    required double amount,
+    String? createdBy,
+  });
+
   Future<Either<Failure, Invoice>> getInvoice(String id);
 
   Future<Either<Failure, List<Invoice>>> getInvoices({

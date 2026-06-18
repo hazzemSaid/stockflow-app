@@ -16,7 +16,6 @@ class Invoice extends Equatable {
   final double discountValue;
   final double discountAmount;
   final double totalAmount;
-  final double paidAmount;
   final double remainingAmount;
   final InvoiceStatus paymentStatus;
   final DateTime? createdAt;
@@ -34,7 +33,6 @@ class Invoice extends Equatable {
     this.discountValue = 0,
     this.discountAmount = 0,
     required this.totalAmount,
-    this.paidAmount = 0,
     this.remainingAmount = 0,
     this.paymentStatus = InvoiceStatus.debt,
     this.createdAt,
@@ -53,7 +51,6 @@ class Invoice extends Equatable {
     double? discountValue,
     double? discountAmount,
     double? totalAmount,
-    double? paidAmount,
     double? remainingAmount,
     InvoiceStatus? paymentStatus,
     DateTime? createdAt,
@@ -71,7 +68,6 @@ class Invoice extends Equatable {
       discountValue: discountValue ?? this.discountValue,
       discountAmount: discountAmount ?? this.discountAmount,
       totalAmount: totalAmount ?? this.totalAmount,
-      paidAmount: paidAmount ?? this.paidAmount,
       remainingAmount: remainingAmount ?? this.remainingAmount,
       paymentStatus: paymentStatus ?? this.paymentStatus,
       createdAt: createdAt ?? this.createdAt,
@@ -92,7 +88,6 @@ class Invoice extends Equatable {
     discountValue,
     discountAmount,
     totalAmount,
-    paidAmount,
     remainingAmount,
     paymentStatus,
     createdAt,
