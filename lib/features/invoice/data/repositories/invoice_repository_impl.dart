@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:stockflow/core/error/failures.dart';
 import 'package:stockflow/features/invoice/data/datasources/invoice_remote_data_source.dart';
+import 'package:stockflow/features/invoice/data/models/add_payment_dto.dart';
 import 'package:stockflow/features/invoice/data/models/invoice_create_dto.dart';
 import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
 import 'package:stockflow/features/invoice/domain/repositories/invoice_repository.dart';
@@ -31,6 +32,20 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
       discountValue: discountValue,
     );
     return dataSource.createInvoice(dto);
+  }
+
+  @override
+  Future<Either<Failure, String>> addPayment({
+    required String invoiceId,
+    required double amount,
+    String? createdBy,
+  }) async {
+    final dto = AddPaymentDto(
+      invoiceId: invoiceId,
+      amount: amount,
+      createdBy: createdBy,
+    );
+    return dataSource.addPayment(dto);
   }
 
   @override
