@@ -4,7 +4,7 @@ import '../constants/app_strings.dart';
 abstract class Failure extends Equatable {
   final String message;
   
-  const Failure([this.message = AppStrings.unexpectedError]);
+  const Failure([String? message]) : message = message ?? AppStrings.unexpectedError;
   
   @override
   List<Object> get props => [message];

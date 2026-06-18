@@ -16,6 +16,7 @@ import '../../features/customers/presentation/pages/add_edit_customer_screen.dar
 import '../../features/customers/presentation/pages/customer_details_screen.dart';
 import '../../features/invoice/presentation/pages/invoices_screen.dart';
 import '../../features/invoice/presentation/pages/create_invoice_screen.dart';
+import '../../features/invoice/presentation/pages/add_payment_screen.dart';
 import '../../features/invoice/presentation/pages/invoice_details_screen.dart';
 import '../../features/settings/presentation/pages/settings_screen.dart';
 import '../../features/shell/presentation/pages/app_shell.dart';
@@ -37,6 +38,7 @@ final List<String> _protectedRoutes = [
   AppRoutes.customerEdit,
   AppRoutes.invoiceCreate,
   AppRoutes.invoiceDetails,
+  AppRoutes.customerAddPayment,
 ];
 
 bool _isAuthRoute(String location) => _authRoutes.contains(location);
@@ -177,20 +179,35 @@ final GoRouter appRouter = GoRouter(
                     );
                   },
                   routes: [
-                    GoRoute(
-                      path: 'edit',
-                      parentNavigatorKey: _rootNavigatorKey,
-                      pageBuilder: (context, state) {
-                        final id = state.pathParameters['id']!;
-                        return _buildFullScreenPage(
-                          state,
-                          AddEditCustomerScreen(customerId: id),
-                        );
-                      },
-                    ),
-                  ],
+                GoRoute(
+                  path: 'edit',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final id = state.pathParameters['id']!;
+                    return _buildFullScreenPage(
+                      state,
+                      AddEditCustomerScreen(customerId: id),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'payment',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final id = state.pathParameters['id']!;
+                    final customerName = state.extra as String?;
+                    return _buildFullScreenPage(
+                      state,
+                      AddPaymentScreen(
+                        customerId: id,
+                        customerName: customerName,
+                      ),
+                    );
+                  },
                 ),
               ],
+            ),
+          ],
             ),
           ],
         ),

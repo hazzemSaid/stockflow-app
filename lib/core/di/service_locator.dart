@@ -40,9 +40,11 @@ import '../../features/invoice/data/datasources/invoice_remote_data_source.dart'
 import '../../features/invoice/data/datasources/invoice_remote_data_source_impl.dart';
 import '../../features/invoice/data/repositories/invoice_repository_impl.dart';
 import '../../features/invoice/domain/repositories/invoice_repository.dart';
+import '../../features/invoice/domain/usecases/add_payment_usecase.dart';
 import '../../features/invoice/domain/usecases/create_invoice_usecase.dart';
 import '../../features/invoice/domain/usecases/get_invoice_usecase.dart';
 import '../../features/invoice/domain/usecases/get_invoices_usecase.dart';
+import '../../features/invoice/presentation/cubit/add_payment/add_payment_cubit.dart';
 import '../../features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
 import '../../features/invoice/presentation/cubit/invoice_details/invoice_details_cubit.dart';
 
@@ -207,6 +209,9 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton<CreateInvoiceUseCase>(
     () => CreateInvoiceUseCase(sl<InvoiceRepository>()),
   );
+  sl.registerLazySingleton<AddPaymentUseCase>(
+    () => AddPaymentUseCase(sl<InvoiceRepository>()),
+  );
   sl.registerLazySingleton<GetInvoiceUseCase>(
     () => GetInvoiceUseCase(sl<InvoiceRepository>()),
   );
@@ -221,5 +226,12 @@ Future<void> initServiceLocator() async {
 
   sl.registerFactory<InvoiceDetailsCubit>(
     () => InvoiceDetailsCubit(getInvoiceUseCase: sl<GetInvoiceUseCase>()),
+  );
+
+  sl.registerFactory<AddPaymentCubit>(
+    () => AddPaymentCubit(
+      getInvoicesUseCase: sl<GetInvoicesUseCase>(),
+      addPaymentUseCase: sl<AddPaymentUseCase>(),
+    ),
   );
 }
