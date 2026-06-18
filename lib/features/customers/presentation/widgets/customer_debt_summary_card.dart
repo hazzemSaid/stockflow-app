@@ -132,7 +132,7 @@ class CustomerDebtSummaryCard extends StatelessWidget {
           ),
         ),
         Text(
-          '${ratio.toStringAsFixed(0)}${AppStrings.customerPaidPercent}',
+          '${ratio.toInt()}${AppStrings.customerPaidPercent}',
           style: TextStyle(
             fontFamily: 'Cairo',
             fontSize: AppSizes.fontSmall,
