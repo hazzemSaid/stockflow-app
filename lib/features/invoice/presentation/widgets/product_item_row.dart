@@ -56,7 +56,7 @@ class ProductItemRow extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${unitPrice.toStringAsFixed(0)} ج.م',
+                  '${unitPrice.toInt()} ج.م',
                   style: TextStyle(
                     fontSize: AppSizes.fontMedium,
                     color: AppColors.accent,

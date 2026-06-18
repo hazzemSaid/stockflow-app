@@ -50,7 +50,7 @@ class InvoiceBottomBar extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${cubit.totalAfterDiscount.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                    '${cubit.totalAfterDiscount.toInt()} ${AppStrings.currencyEg}',
                     style: TextStyle(
                       fontSize: AppSizes.fontXXLarge,
                       fontWeight: FontWeight.w700,

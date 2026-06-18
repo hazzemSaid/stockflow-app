@@ -72,7 +72,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
               body: state is CreateInvoiceLoading
                   ? const CreateInvoiceLoadingState()
-                  : const CreateInvoiceForm(),
+                  : CreateInvoiceForm(),
             );
           },
         ),

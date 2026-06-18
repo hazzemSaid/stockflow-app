@@ -55,7 +55,7 @@ class ProductTile extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '${product.price.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                      '${product.price.toInt()} ${AppStrings.currencyEg}',
                       style: TextStyle(
                         color: AppColors.accent,
                         fontSize: AppSizes.fontMedium,

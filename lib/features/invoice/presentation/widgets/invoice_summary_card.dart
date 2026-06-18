@@ -104,7 +104,7 @@ class _SummaryRow extends StatelessWidget {
           ),
         ),
         Text(
-          '${value >= 0 ? '' : '-'}${value.abs().toStringAsFixed(0)} ${AppStrings.currencyEg}',
+          '${value >= 0 ? '' : '-'}${value.abs().toInt()} ${AppStrings.currencyEg}',
           style: TextStyle(
             fontSize: large ? AppSizes.fontXXLarge : AppSizes.fontLarge,
             fontWeight: bold ? FontWeight.w700 : FontWeight.w500,

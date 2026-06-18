@@ -23,6 +23,7 @@ class _CustomerPickerScreenState extends State<CustomerPickerScreen> {
   List<Customer> _allCustomers = [];
   List<Customer> _filteredCustomers = [];
   bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -39,11 +40,16 @@ class _CustomerPickerScreenState extends State<CustomerPickerScreen> {
   Future<void> _loadCustomers() async {
     final result = await sl<GetCustomersUseCase>()();
     result.fold(
-      (_) {
+      (failure) {
+        debugPrint('[CustomerPicker] Error loading customers: ${failure.message}');
         if (!mounted) return;
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+          _errorMessage = failure.message;
+        });
       },
       (customers) {
+        debugPrint('[CustomerPicker] Loaded ${customers.length} customers');
         if (!mounted) return;
         setState(() {
           _allCustomers = customers;
@@ -118,9 +124,23 @@ class _CustomerPickerScreenState extends State<CustomerPickerScreen> {
           Expanded(
             child: _isLoading
                 ? const CustomerPickerLoadingState()
-                : _filteredCustomers.isEmpty
-                    ? const CustomerPickerEmptyState()
-                    : ListView.separated(
+                : _errorMessage != null
+                    ? Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSizes.spacingMedium),
+                          child: Text(
+                            _errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.redDark,
+                              fontSize: AppSizes.fontMedium,
+                            ),
+                          ),
+                        ),
+                      )
+                    : _filteredCustomers.isEmpty
+                        ? const CustomerPickerEmptyState()
+                        : ListView.separated(
                         padding: EdgeInsets.symmetric(
                           horizontal: AppSizes.spacingMedium,
                         ),

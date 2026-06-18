@@ -119,9 +119,23 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
             _buildFilters(hasActiveFilter),
             Expanded(
               child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const Center(child: CircularProgressIndicator()),
+                      ),
+                    )
                   : _filteredInvoices.isEmpty
-                  ? InvoicesEmptyState(hasFilter: hasActiveFilter)
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: InvoicesEmptyState(hasFilter: hasActiveFilter),
+                        ),
+                      ],
+                    )
                   : ListView.builder(
                       padding: EdgeInsets.symmetric(
                         vertical: AppSizes.spacingSmall,

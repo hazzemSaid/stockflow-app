@@ -47,7 +47,7 @@ class InvoiceDetailsPaymentHistory extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${payment.amount.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                    '${payment.amount.toInt()} ${AppStrings.currencyEg}',
                     style: TextStyle(
                       fontSize: AppSizes.fontMedium,
                       fontWeight: FontWeight.w600,

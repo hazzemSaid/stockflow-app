@@ -10,11 +10,7 @@ class InvoiceCard extends StatelessWidget {
   final Invoice invoice;
   final VoidCallback? onTap;
 
-  const InvoiceCard({
-    super.key,
-    required this.invoice,
-    this.onTap,
-  });
+  const InvoiceCard({super.key, required this.invoice, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -56,20 +52,27 @@ class InvoiceCard extends StatelessWidget {
                     ],
                     SizedBox(height: AppSizes.spacingTiny),
                     Text(
-                      NumberFormat.currency(
-                        symbol: '${AppStrings.currencyEg} ',
-                        decimalDigits: 2,
-                      ).format(invoice.totalAmount),
+                      '${invoice.remainingAmount.toInt()} ${AppStrings.currencyEg}',
                       style: TextStyle(
                         fontSize: AppSizes.fontXLarge,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
                       ),
                     ),
+                    SizedBox(height: AppSizes.spacingTiny),
+                    Text(
+                      '${AppStrings.addPaymentTotal}${invoice.totalAmount.toInt()} ${AppStrings.currencyEg}',
+                      style: TextStyle(
+                        fontSize: AppSizes.fontSmall,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                     if (invoice.createdAt != null) ...[
                       SizedBox(height: AppSizes.spacingTiny),
                       Text(
-                        DateFormat('yyyy/MM/dd – hh:mm a').format(invoice.createdAt!),
+                        DateFormat(
+                          'yyyy/MM/dd – hh:mm a',
+                        ).format(invoice.createdAt!),
                         style: TextStyle(
                           fontSize: AppSizes.fontMedium,
                           color: AppColors.textSecondary,
