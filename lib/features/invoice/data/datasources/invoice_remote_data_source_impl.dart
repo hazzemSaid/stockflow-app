@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:stockflow/core/error/failures.dart';
 import 'package:stockflow/features/invoice/data/datasources/invoice_remote_data_source.dart';
+import 'package:stockflow/features/invoice/data/models/add_payment_dto.dart';
 import 'package:stockflow/features/invoice/data/models/invoice_create_dto.dart';
 import 'package:stockflow/features/invoice/data/models/invoice_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -28,6 +29,49 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
     } catch (e) {
       return Left(ServerFailure('حدث خطأ غير متوقع: ${e.toString()}'));
     }
+  }
+
+  @override
+  Future<Either<Failure, String>> addPayment(AddPaymentDto inputDto) async {
+    try {
+      final response = await _supabaseClient.rpc(
+        'add_payment',
+        params: inputDto.toJson(),
+      );
+      final paymentId = response?.toString();
+      if (paymentId == null || paymentId.isEmpty) {
+        return Left(ServerFailure('لم يتم استلام معرف الدفعة من الخادم'));
+      }
+      return Right(paymentId);
+    } on supabase.PostgrestException catch (error) {
+      debugPrint('[addPayment] PostgrestException: ${error.message}');
+      return Left(ServerFailure(_translatePaymentError(error.message)));
+    } catch (e, stack) {
+      debugPrint('[addPayment] Unexpected error: $e\n$stack');
+      return Left(ServerFailure('حدث خطأ غير متوقع: ${e.toString()}'));
+    }
+  }
+
+  String _translatePaymentError(String message) {
+    if (message.contains('Payment amount must be greater than 0')) {
+      return 'يجب أن يكون مبلغ الدفعة أكبر من 0';
+    }
+    if (message.contains('Invoice not found')) {
+      return 'الفاتورة غير موجودة';
+    }
+    if (message.contains('Payment exceeds remaining amount')) {
+      return 'المبلغ يتجاوز المبلغ المتبقي';
+    }
+    if (message.contains('duplicate key')) {
+      return 'بيانات مكررة';
+    }
+    if (message.contains('foreign key constraint')) {
+      return 'العامل أو العميل المحدد غير موجود';
+    }
+    if (message.contains('row-level security')) {
+      return 'ليس لديك صلاحية تنفيذ هذا الإجراء';
+    }
+    return 'حدث خطأ غير متوقع';
   }
 
   String _translateError(String message, [List<Map<String, dynamic>>? items]) {
@@ -66,7 +110,10 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
     return match?.group(0);
   }
 
-  String? _productNameById(String? productId, List<Map<String, dynamic>>? items) {
+  String? _productNameById(
+    String? productId,
+    List<Map<String, dynamic>>? items,
+  ) {
     if (productId == null || items == null) return null;
     for (final item in items) {
       if (item['product_id'] == productId) {
@@ -89,6 +136,8 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
         ''')
           .eq('id', id)
           .single();
+      print('getInvoice response: $response');
+
       return Right(InvoiceModel.fromJson(response));
     } on supabase.PostgrestException catch (error) {
       return Left(ServerFailure(error.message));

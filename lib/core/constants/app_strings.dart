@@ -268,4 +268,19 @@ class AppStrings {
   static const String invoiceSaved = 'تم حفظ الفاتورة بنجاح';
   static const String invoiceSaveError = 'حدث خطأ أثناء حفظ الفاتورة';
   static const String invoiceCreated = 'تم إنشاء الفاتورة بنجاح';
+  static const String invoiceCreatedAt = 'تم إنشاؤها';
+
+  // Payment — Add Payment Screen
+  static const String addPaymentTitle = 'تسجيل دفعة جديدة';
+  static const String addPaymentTotalSelected = 'إجمالي المبلغ المحدد';
+  static const String addPaymentAmountLabel = 'مبلغ الدفعة';
+  static const String addPaymentAmountHint = '٠٫٠٠';
+  static const String addPaymentSelectInvoices = 'اختر الفواتير غير المدفوعة';
+  static const String addPaymentInvoicesSelected = 'فواتير محددة';
+  static const String addPaymentSave = 'حفظ الدفعة';
+  static const String addPaymentSuccess = 'تم تسجيل الدفعة بنجاح';
+  static const String addPaymentStatusPartial = 'جزئي';
+  static const String addPaymentStatusDebt = 'آجل';
+  static const String addPaymentTotal = 'إجمالي الفاتورة: ';
+  static const String addPaymentInvoicePrefix = '#';
 }

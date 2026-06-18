@@ -71,7 +71,7 @@ class CustomerListHeader extends StatelessWidget {
                 ),
                 SizedBox(width: AppSizes.spacingSmall),
                 Text(
-                  '${AppStrings.customerDebtsLabel}: ${totalDebt.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                  '${AppStrings.customerDebtsLabel}: ${totalDebt.toInt()} ${AppStrings.currencyEg}',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: AppSizes.fontMedium,

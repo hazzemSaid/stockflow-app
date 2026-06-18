@@ -120,7 +120,15 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           SizedBox(height: AppSizes.spacingMedium),
                           CustomerActionButtons(
                             onNewInvoice: () {},
-                            onRecordPayment: () {},
+                            onRecordPayment: () async {
+                              final result = await context.push<bool>(
+                                AppRoutes.customerAddPaymentPath(widget.customerId),
+                                extra: customer.name,
+                              );
+                              if (result == true && mounted) {
+                                _cubit.loadCustomer(widget.customerId);
+                              }
+                            },
                           ),
                           SizedBox(height: AppSizes.spacingMedium),
                           _tabBar(),

@@ -56,7 +56,7 @@ class InvoiceDetailsProductsTable extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      '${item.unitPrice.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                      '${item.unitPrice.toInt()} ${AppStrings.currencyEg}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: AppSizes.fontMedium,
@@ -66,7 +66,7 @@ class InvoiceDetailsProductsTable extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      '${item.total.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                      '${item.total.toInt()} ${AppStrings.currencyEg}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: AppSizes.fontMedium,

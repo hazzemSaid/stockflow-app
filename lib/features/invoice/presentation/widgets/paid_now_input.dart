@@ -23,7 +23,7 @@ class _PaidNowInputState extends State<PaidNowInput> {
     _controller = TextEditingController();
     widget.cubit.stream.listen((_) {
       final text = widget.cubit.paidNow > 0
-          ? widget.cubit.paidNow.toStringAsFixed(0)
+          ? widget.cubit.paidNow.toInt().toString()
           : '';
       if (_controller.text != text) {
         _controller.value = TextEditingValue(
@@ -98,7 +98,7 @@ class _PaidNowInputState extends State<PaidNowInput> {
                   borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
                 ),
                 child: Text(
-                  '${AppStrings.remainingDebt}: ${remaining.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                  '${AppStrings.remainingDebt}: ${remaining.toInt()} ${AppStrings.currencyEg}',
                   style: TextStyle(
                     color: AppColors.primary,
                     fontSize: AppSizes.fontSmall,

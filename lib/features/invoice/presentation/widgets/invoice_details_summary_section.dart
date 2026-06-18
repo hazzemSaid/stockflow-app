@@ -36,14 +36,6 @@ class InvoiceDetailsSummarySection extends StatelessWidget {
             valueColor: AppColors.accent,
             bold: true,
           ),
-          if (invoice.paidAmount > 0) ...[
-            SizedBox(height: AppSizes.spacingSmall),
-            _SummaryRow(
-              label: AppStrings.paidNowLabel,
-              value: -invoice.paidAmount,
-              valueColor: AppColors.trendUp,
-            ),
-          ],
           if (invoice.remainingAmount > 0) ...[
             SizedBox(height: AppSizes.spacingSmall),
             _SummaryRow(
@@ -86,7 +78,7 @@ class _SummaryRow extends StatelessWidget {
           ),
         ),
         Text(
-          '${value >= 0 ? '' : '-'}${value.abs().toStringAsFixed(0)} ${AppStrings.currencyEg}',
+          '${value >= 0 ? '' : '-'}${value.abs().toInt()} ${AppStrings.currencyEg}',
           style: TextStyle(
             fontSize: AppSizes.fontLarge,
             fontWeight: bold ? FontWeight.w700 : FontWeight.w500,

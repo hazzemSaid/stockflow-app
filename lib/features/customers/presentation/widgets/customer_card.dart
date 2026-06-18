@@ -189,7 +189,7 @@ class _StatBox extends StatelessWidget {
               Text(
                 amount == 0 && amount.truncateToDouble() == 0
                     ? '0'
-                    : amount.toStringAsFixed(0),
+                    : amount.toInt().toString(),
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: AppSizes.fontXLarge,

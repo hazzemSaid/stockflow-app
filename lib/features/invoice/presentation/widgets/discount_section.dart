@@ -23,7 +23,7 @@ class _DiscountSectionState extends State<DiscountSection> {
     _controller = TextEditingController();
     widget.cubit.stream.listen((_) {
       final text = widget.cubit.discountValue > 0
-          ? widget.cubit.discountValue.toStringAsFixed(0)
+          ? widget.cubit.discountValue.toInt().toString()
           : '';
       if (_controller.text != text) {
         _controller.value = TextEditingValue(
@@ -113,7 +113,7 @@ class _DiscountSectionState extends State<DiscountSection> {
                   borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
                 ),
                 child: Text(
-                  '- ${widget.cubit.discountAmount.toStringAsFixed(0)} ${AppStrings.currencyEg}',
+                  '- ${widget.cubit.discountAmount.toInt()} ${AppStrings.currencyEg}',
                   style: TextStyle(
                     color: AppColors.accent,
                     fontWeight: FontWeight.w600,
