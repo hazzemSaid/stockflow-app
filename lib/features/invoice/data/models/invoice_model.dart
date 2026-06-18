@@ -16,7 +16,6 @@ class InvoiceModel {
   final double discountValue;
   final double discountAmount;
   final double totalAmount;
-  final double paidAmount;
   final double remainingAmount;
   final String paymentStatus;
   final DateTime? createdAt;
@@ -34,7 +33,6 @@ class InvoiceModel {
     this.discountValue = 0,
     this.discountAmount = 0,
     required this.totalAmount,
-    this.paidAmount = 0,
     this.remainingAmount = 0,
     this.paymentStatus = 'debt',
     this.createdAt,
@@ -44,9 +42,10 @@ class InvoiceModel {
     return InvoiceModel(
       id: json['id'] as String,
       customerId: json['customer_id'] as String,
-      customerName: json['customer_name'] as String? ??
+      customerName:
+          json['customer_name'] as String? ??
           (json['customers'] as Map<String, dynamic>?)?['name'] as String?,
-      createdBy: json['created_by'] as String?,
+      createdBy: json['created_by'] as String? ?? "",
       createdByName: json['created_by_name'] as String?,
       items:
           (json['invoice_items'] as List<dynamic>?)
@@ -63,7 +62,6 @@ class InvoiceModel {
       discountValue: (json['discount_value'] as num?)?.toDouble() ?? 0,
       discountAmount: (json['discount_amount'] as num?)?.toDouble() ?? 0,
       totalAmount: (json['total_amount'] as num).toDouble(),
-      paidAmount: (json['paid_amount'] as num?)?.toDouble() ?? 0,
       remainingAmount: (json['remaining_amount'] as num?)?.toDouble() ?? 0,
       paymentStatus: (json['payment_status'] as String?) ?? 'debt',
       createdAt: json['created_at'] != null
@@ -85,7 +83,6 @@ class InvoiceModel {
       'discount_value': discountValue,
       'discount_amount': discountAmount,
       'total_amount': totalAmount,
-      'paid_amount': paidAmount,
       'remaining_amount': remainingAmount,
       'payment_status': paymentStatus,
       if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
@@ -106,7 +103,6 @@ class InvoiceModel {
       discountValue: discountValue,
       discountAmount: discountAmount,
       totalAmount: totalAmount,
-      paidAmount: paidAmount,
       remainingAmount: remainingAmount,
       paymentStatus: _parseStatus(paymentStatus),
       createdAt: createdAt,
@@ -138,7 +134,6 @@ class InvoiceModel {
       discountValue: entity.discountValue,
       discountAmount: entity.discountAmount,
       totalAmount: entity.totalAmount,
-      paidAmount: entity.paidAmount,
       remainingAmount: entity.remainingAmount,
       paymentStatus: entity.paymentStatus.name,
       createdAt: entity.createdAt,
