@@ -98,8 +98,17 @@ class CustomerCard extends StatelessWidget {
       children: [
         Expanded(
           child: _StatBox(
+            label: AppStrings.customerTotalPurchases,
+            amount: customer.totalPurchases,
+            amountColor: AppColors.textPrimary,
+            bgColor: AppColors.chipBg,
+          ),
+        ),
+        SizedBox(width: AppSizes.spacingSmall),
+        Expanded(
+          child: _StatBox(
             label: AppStrings.customerPaidLabel,
-            amount: 0,
+            amount: customer.totalPaid,
             amountColor: AppColors.primary,
             bgColor: AppColors.lightPrimaryBg,
           ),

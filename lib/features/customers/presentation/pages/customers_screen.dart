@@ -57,17 +57,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
     }
   }
 
-  int get _paidCount =>
-      _cubit.state.customers.where((c) => c.totalDebt == 0).length;
-
-  int get _deferredCount =>
-      _cubit.state.customers.where((c) => c.totalDebt > 0).length;
-
-  double get _totalDebt =>
-      _cubit.state.customers.fold<double>(0, (sum, c) => sum + c.totalDebt);
-
   List<Customer> _filteredCustomers() {
     final all = _cubit.state.customers;
+    print(all);
     switch (_selectedFilter) {
       case 'paid':
         return all.where((c) => c.totalDebt == 0).toList();
@@ -97,8 +89,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
                       child: Column(
                         children: [
                           CustomerListHeader(
-                            totalCount: state.totalCount,
-                            totalDebt: _totalDebt,
+                            totalCount: state.filterCounts.totalCount,
+                            totalDebt: state.totalDebtSum,
                           ),
                           CustomerSearchBar(
                             controller: _searchController,
@@ -115,10 +107,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                             onFilterChanged: (filter) {
                               setState(() => _selectedFilter = filter);
                             },
-                            totalCount: state.totalCount,
-                            paidCount: _paidCount,
-                            partialCount: 0,
-                            deferredCount: _deferredCount,
+                            totalCount: state.filterCounts.totalCount,
+                            paidCount: state.filterCounts.paidCount,
+                            partialCount: state.filterCounts.partialCount,
+                            deferredCount: state.filterCounts.deferredCount,
                           ),
                         ],
                       ),

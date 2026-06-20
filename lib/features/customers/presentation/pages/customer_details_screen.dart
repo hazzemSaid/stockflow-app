@@ -116,13 +116,25 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                         children: [
                           CustomerDebtSummaryCard(
                             totalDebt: customer.totalDebt,
+                            totalPurchases: customer.totalPurchases,
+                            totalPaid: customer.totalPaid,
                           ),
                           SizedBox(height: AppSizes.spacingMedium),
                           CustomerActionButtons(
-                            onNewInvoice: () {},
+                            onNewInvoice: () {
+                              context.push(
+                                AppRoutes.invoiceCreate,
+                                extra: {
+                                  'customerId': widget.customerId,
+                                  'customerName': customer.name,
+                                },
+                              );
+                            },
                             onRecordPayment: () async {
                               final result = await context.push<bool>(
-                                AppRoutes.customerAddPaymentPath(widget.customerId),
+                                AppRoutes.customerAddPaymentPath(
+                                  widget.customerId,
+                                ),
                                 extra: customer.name,
                               );
                               if (result == true && mounted) {
@@ -133,7 +145,17 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           SizedBox(height: AppSizes.spacingMedium),
                           _tabBar(),
                           SizedBox(height: AppSizes.spacingSmall),
-                          CustomerTransactionList(selectedTab: _selectedTab),
+                          CustomerTransactionList(
+                            selectedTab: _selectedTab,
+                            transactions: customer.transactions,
+                            onViewAll: () => context.push(
+                              AppRoutes.customerInvoicesPath(widget.customerId),
+                              extra: customer.name,
+                            ),
+                            onInvoiceTap: (invoiceId) => context.push(
+                              AppRoutes.invoiceDetailsPath(invoiceId),
+                            ),
+                          ),
                           SizedBox(height: AppSizes.spacingLarge),
                         ],
                       ),
