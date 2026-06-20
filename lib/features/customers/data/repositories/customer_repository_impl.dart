@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:stockflow/core/error/failures.dart';
 import '../../domain/entities/customer.dart';
+import '../../domain/entities/customer_filter_counts.dart';
 import '../../domain/repositories/customer_repository.dart';
 import '../datasources/customer_remote_data_source.dart';
 
@@ -12,15 +13,25 @@ class CustomerRepositoryImpl implements CustomerRepository {
   @override
   Future<Either<Failure, List<Customer>>> listCustomers({
     String? query,
+    String? filter,
     int? limit,
     int? offset,
   }) async {
     final result = await dataSource.listCustomers(
       query: query,
+      filter: filter,
       limit: limit,
       offset: offset,
     );
     return result.map((models) => models.map((m) => m.toEntity()).toList());
+  }
+
+  @override
+  Future<Either<Failure, CustomerFilterCounts>> getCustomerFilterCounts({
+    String? query,
+  }) async {
+    final result = await dataSource.getFilterCounts(query: query);
+    return result.map((model) => model.toEntity());
   }
 
   @override
