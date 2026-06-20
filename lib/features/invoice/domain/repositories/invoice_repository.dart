@@ -23,5 +23,7 @@ abstract class InvoiceRepository {
   Future<Either<Failure, List<Invoice>>> getInvoices({
     List<String>? statusFilter,
     String? customerId,
+    int? limit,
+    int? offset,
   });
 }

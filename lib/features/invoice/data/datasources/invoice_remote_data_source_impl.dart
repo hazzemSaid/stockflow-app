@@ -150,36 +150,37 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
   Future<Either<Failure, List<InvoiceModel>>> getInvoices({
     List<String>? statusFilter,
     String? customerId,
+    int? limit,
+    int? offset,
   }) async {
     debugPrint(
-      '[getInvoices] statusFilter: $statusFilter, customerId: $customerId',
+      '[getInvoices] statusFilter: $statusFilter, customerId: $customerId, limit: $limit, offset: $offset',
     );
     try {
-      var query = _supabaseClient.from('invoices').select('''
+      dynamic query = _supabaseClient.from('invoices').select('''
           *,
           customers!inner(name)
         ''');
 
       if (statusFilter != null && statusFilter.isNotEmpty) {
-        debugPrint('[getInvoices] applying status filter: $statusFilter');
         query = query.inFilter('payment_status', statusFilter);
       }
 
       if (customerId != null && customerId.isNotEmpty) {
-        debugPrint('[getInvoices] applying customer filter: $customerId');
         query = query.eq('customer_id', customerId);
       }
 
-      final response = await query.order('created_at', ascending: false);
+      query = query.order('created_at', ascending: false);
+
+      if (limit != null && offset != null) {
+        query = query.range(offset, offset + limit - 1);
+      }
+
+      final response = await query;
       final list = (response as List<dynamic>)
           .map((e) => InvoiceModel.fromJson(e as Map<String, dynamic>))
           .toList();
       debugPrint('[getInvoices] response count: ${list.length}');
-      for (final inv in list) {
-        debugPrint(
-          '[getInvoices]   id=${inv.id}, status=${inv.paymentStatus}, customer=${inv.customerName}, total=${inv.totalAmount}',
-        );
-      }
       return Right(list);
     } on supabase.PostgrestException catch (error) {
       debugPrint('[getInvoices] PostgrestException: ${error.message}');

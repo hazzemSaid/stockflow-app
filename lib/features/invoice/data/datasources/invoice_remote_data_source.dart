@@ -18,5 +18,7 @@ abstract class InvoiceRemoteDataSource {
   Future<Either<Failure, List<InvoiceModel>>> getInvoices({
     List<String>? statusFilter,
     String? customerId,
+    int? limit,
+    int? offset,
   });
 }
