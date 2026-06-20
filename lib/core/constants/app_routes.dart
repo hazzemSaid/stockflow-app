@@ -19,10 +19,12 @@ class AppRoutes {
   static const String invoiceCreate = '/invoices/create';
   static const String invoiceDetails = '/invoices/:id';
   static const String customerAddPayment = '/customers/:id/payment';
+  static const String customerInvoices = '/customers/:id/invoices';
 
   static String customerDetailsPath(String id) => '/customers/$id';
   static String customerEditPath(String id) => '/customers/$id/edit';
   static String customerAddPaymentPath(String id) => '/customers/$id/payment';
+  static String customerInvoicesPath(String id) => '/customers/$id/invoices';
   static String productDetailsPath(String id) => '/products/$id';
   static String invoiceDetailsPath(String id) => '/invoices/$id';
 

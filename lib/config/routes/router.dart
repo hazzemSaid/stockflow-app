@@ -14,6 +14,7 @@ import '../../features/products/presentation/pages/product_details_screen.dart';
 import '../../features/customers/presentation/pages/customers_screen.dart';
 import '../../features/customers/presentation/pages/add_edit_customer_screen.dart';
 import '../../features/customers/presentation/pages/customer_details_screen.dart';
+import '../../features/customers/presentation/pages/customer_invoices_screen.dart';
 import '../../features/invoice/presentation/pages/invoices_screen.dart';
 import '../../features/invoice/presentation/pages/create_invoice_screen.dart';
 import '../../features/invoice/presentation/pages/add_payment_screen.dart';
@@ -39,6 +40,7 @@ final List<String> _protectedRoutes = [
   AppRoutes.invoiceCreate,
   AppRoutes.invoiceDetails,
   AppRoutes.customerAddPayment,
+  AppRoutes.customerInvoices,
 ];
 
 bool _isAuthRoute(String location) => _authRoutes.contains(location);
@@ -205,6 +207,21 @@ final GoRouter appRouter = GoRouter(
                     );
                   },
                 ),
+                GoRoute(
+                  path: 'invoices',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final id = state.pathParameters['id']!;
+                    final customerName = state.extra as String? ?? '';
+                    return _buildFullScreenPage(
+                      state,
+                      CustomerInvoicesScreen(
+                        customerId: id,
+                        customerName: customerName,
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ],
@@ -220,8 +237,19 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'create',
                   parentNavigatorKey: _rootNavigatorKey,
-                  pageBuilder: (context, state) =>
-                      _buildFullScreenPage(state, const CreateInvoiceScreen()),
+                  pageBuilder: (context, state) {
+                    final extra = state.extra as Map<String, String>?;
+                    final hasCustomer = extra != null &&
+                        extra.containsKey('customerId');
+                    return _buildFullScreenPage(
+                      state,
+                      CreateInvoiceScreen(
+                        preselectedCustomerId: extra?['customerId'],
+                        preselectedCustomerName: extra?['customerName'],
+                        lockCustomer: hasCustomer,
+                      ),
+                    );
+                  },
                 ),
                 GoRoute(
                   path: ':id',
