@@ -21,7 +21,9 @@ import 'package:stockflow/features/invoice/presentation/widgets/product_item_row
 import 'package:stockflow/features/invoice/presentation/widgets/products_section_header.dart';
 
 class CreateInvoiceForm extends StatelessWidget {
-  const CreateInvoiceForm({super.key});
+  final bool lockCustomer;
+
+  const CreateInvoiceForm({super.key, this.lockCustomer = false});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,9 @@ class CreateInvoiceForm extends StatelessWidget {
               children: [
                 CustomerSelectionCard(
                   cubit: cubit,
-                  onTap: () => _openCustomerPicker(context, cubit),
+                  onTap: lockCustomer
+                      ? null
+                      : () => _openCustomerPicker(context, cubit),
                 ),
                 SizedBox(height: AppSizes.spacingMedium),
                 ProductsSectionHeader(
