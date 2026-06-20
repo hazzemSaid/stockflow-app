@@ -11,10 +11,14 @@ class GetInvoicesUseCase {
   Future<Either<Failure, List<Invoice>>> call({
     List<String>? statusFilter,
     String? customerId,
+    int? limit,
+    int? offset,
   }) {
     return repository.getInvoices(
       statusFilter: statusFilter,
       customerId: customerId,
+      limit: limit,
+      offset: offset,
     );
   }
 }

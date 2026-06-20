@@ -6,12 +6,22 @@ import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
 import 'package:stockflow/core/di/service_locator.dart';
 import 'package:stockflow/core/widgets/app_snackbar.dart';
+import 'package:stockflow/features/customers/domain/entities/customer.dart';
 import 'package:stockflow/features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
 import 'package:stockflow/features/invoice/presentation/widgets/create_invoice_form.dart';
 import 'package:stockflow/features/invoice/presentation/widgets/create_invoice_loading.dart';
 
 class CreateInvoiceScreen extends StatefulWidget {
-  const CreateInvoiceScreen({super.key});
+  final String? preselectedCustomerId;
+  final String? preselectedCustomerName;
+  bool lockCustomer = false;
+
+  CreateInvoiceScreen({
+    super.key,
+    this.preselectedCustomerId,
+    this.preselectedCustomerName,
+    this.lockCustomer = false,
+  });
 
   @override
   State<CreateInvoiceScreen> createState() => _CreateInvoiceScreenState();
@@ -24,6 +34,15 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   void initState() {
     super.initState();
     _cubit = sl<CreateInvoiceCubit>();
+    if (widget.preselectedCustomerId != null &&
+        widget.preselectedCustomerName != null) {
+      _cubit.selectCustomer(
+        Customer(
+          id: widget.preselectedCustomerId!,
+          name: widget.preselectedCustomerName!,
+        ),
+      );
+    }
   }
 
   @override
@@ -72,7 +91,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
               body: state is CreateInvoiceLoading
                   ? const CreateInvoiceLoadingState()
-                  : CreateInvoiceForm(),
+                  : CreateInvoiceForm(lockCustomer: widget.lockCustomer),
             );
           },
         ),
@@ -80,4 +99,3 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     );
   }
 }
-

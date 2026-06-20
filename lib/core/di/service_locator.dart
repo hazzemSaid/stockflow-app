@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:stockflow/features/customers/domain/usecases/get_customer-filtercounts_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
@@ -154,6 +155,9 @@ Future<void> initServiceLocator() async {
     () =>
         CustomerRemoteDataSourceImpl(supabaseClient: Supabase.instance.client),
   );
+  sl.registerLazySingleton<GetCustomerFilterCountsUseCase>(
+    () => GetCustomerFilterCountsUseCase(sl<CustomerRepository>()),
+  );
 
   // Customers: Repositories
   sl.registerLazySingleton<CustomerRepository>(
@@ -179,7 +183,10 @@ Future<void> initServiceLocator() async {
 
   // Customers: Cubits
   sl.registerLazySingleton<CustomersCubit>(
-    () => CustomersCubit(getCustomersUseCase: sl<GetCustomersUseCase>()),
+    () => CustomersCubit(
+      getCustomersUseCase: sl<GetCustomersUseCase>(),
+      getCustomerFilterCountsUseCase: sl<GetCustomerFilterCountsUseCase>(),
+    ),
   );
 
   sl.registerFactory<AddEditCustomerCubit>(

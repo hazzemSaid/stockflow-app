@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'customer_transaction.dart';
 
 class Customer extends Equatable {
   final String id;
@@ -9,6 +10,9 @@ class Customer extends Equatable {
   final double totalDebt;
   final String? imageUrl;
   final DateTime? createdAt;
+  final double totalPurchases;
+  final double totalPaid;
+  final List<CustomerTransaction> transactions;
 
   const Customer({
     required this.id,
@@ -19,6 +23,9 @@ class Customer extends Equatable {
     this.totalDebt = 0,
     this.imageUrl,
     this.createdAt,
+    this.totalPurchases = 0,
+    this.totalPaid = 0,
+    this.transactions = const [],
   });
 
   Customer copyWith({
@@ -30,6 +37,9 @@ class Customer extends Equatable {
     double? totalDebt,
     String? imageUrl,
     DateTime? createdAt,
+    double? totalPurchases,
+    double? totalPaid,
+    List<CustomerTransaction>? transactions,
   }) {
     return Customer(
       id: id ?? this.id,
@@ -40,6 +50,9 @@ class Customer extends Equatable {
       totalDebt: totalDebt ?? this.totalDebt,
       imageUrl: imageUrl ?? this.imageUrl,
       createdAt: createdAt ?? this.createdAt,
+      totalPurchases: totalPurchases ?? this.totalPurchases,
+      totalPaid: totalPaid ?? this.totalPaid,
+      transactions: transactions ?? this.transactions,
     );
   }
 
@@ -53,5 +66,8 @@ class Customer extends Equatable {
     totalDebt,
     imageUrl,
     createdAt,
+    totalPurchases,
+    totalPaid,
+    transactions,
   ];
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -19,8 +18,7 @@ class CustomerDebtSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ratio =
-        totalPurchases > 0 ? (totalPaid / totalPurchases * 100) : 0.0;
+    final ratio = totalPurchases > 0 ? (totalPaid / totalPurchases * 100) : 0.0;
 
     return Container(
       width: double.infinity,
@@ -44,14 +42,13 @@ class CustomerDebtSummaryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                AppStrings.customerOutstandingBalance,
+                AppStrings.customerTotalPurchases,
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: AppSizes.fontSmall,
                   color: AppColors.textSecondary,
                 ),
               ),
-              _debtBadge(),
             ],
           ),
           SizedBox(height: 2.h),
@@ -67,34 +64,7 @@ class CustomerDebtSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _debtBadge() {
-    return Container(
-      width: 56.w,
-      height: 56.w,
-      decoration: BoxDecoration(
-        color: AppColors.lightOrange,
-        borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.warning_amber_rounded, size: 18.w, color: AppColors.accent),
-          SizedBox(height: 2.h),
-          Text(
-            AppStrings.customerDebtLabel,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 9.sp,
-              color: AppColors.accent,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _amountRow() {
-    final formatted = _formatCurrency(totalDebt);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -108,11 +78,13 @@ class CustomerDebtSummaryCard extends StatelessWidget {
         ),
         SizedBox(width: 4.w),
         Text(
-          formatted,
+          totalPurchases == 0 && totalPurchases.truncateToDouble() == 0
+              ? '0'
+              : totalPurchases.toInt().toString(),
           style: TextStyle(
             fontFamily: 'Cairo',
             fontSize: 24.sp,
-            color: AppColors.accent,
+            color: AppColors.primary,
           ),
         ),
       ],
@@ -167,29 +139,18 @@ class CustomerDebtSummaryCard extends StatelessWidget {
   }
 
   Widget _statBoxes() {
-    final purchasesFormatted = _formatCurrency(totalPurchases);
-    final paidFormatted = _formatCurrency(totalPaid);
-    final remainingFormatted = _formatCurrency(totalDebt);
-
     return Row(
       children: [
         _statBox(
-          AppStrings.customerTotalPurchases,
-          purchasesFormatted,
-          AppColors.chipBg,
-          AppColors.textPrimary,
-        ),
-        SizedBox(width: AppSizes.spacingSmall),
-        _statBox(
           AppStrings.customerPaidLabel,
-          paidFormatted,
+          totalPaid,
           AppColors.lightPrimaryBg,
           AppColors.primary,
         ),
         SizedBox(width: AppSizes.spacingSmall),
         _statBox(
           AppStrings.customerRemainingLabel,
-          remainingFormatted,
+          totalDebt,
           AppColors.lightOrange,
           AppColors.accent,
         ),
@@ -197,7 +158,7 @@ class CustomerDebtSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _statBox(String label, String amount, Color bg, Color amountColor) {
+  Widget _statBox(String label, double amount, Color bg, Color amountColor) {
     return Expanded(
       child: Container(
         padding: EdgeInsets.all(10.w),
@@ -206,44 +167,44 @@ class CustomerDebtSummaryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
-              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 9.sp,
                 color: AppColors.textSecondary,
               ),
             ),
-            SizedBox(height: 4.h),
-            Text(
-              amount,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: AppSizes.fontLarge,
-                color: amountColor,
-              ),
-            ),
-            Text(
-              AppStrings.currencyEg,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: AppSizes.fontSmall,
-                color: AppColors.textSecondary,
-              ),
+            SizedBox(height: 2.h),
+            Row(
+              children: [
+                Text(
+                  amount == 0 && amount.truncateToDouble() == 0
+                      ? '0'
+                      : amount.toInt().toString(),
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: AppSizes.fontXLarge,
+                    fontWeight: FontWeight.w600,
+                    color: amountColor,
+                  ),
+                ),
+                SizedBox(width: 2.w),
+                Text(
+                  AppStrings.currencyEg,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: AppSizes.fontSmall,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
-  }
-
-  String _formatCurrency(double value) {
-    final fmt = NumberFormat.decimalPattern('ar');
-    return fmt.format(value.round());
   }
 }

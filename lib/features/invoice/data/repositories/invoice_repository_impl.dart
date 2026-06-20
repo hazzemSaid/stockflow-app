@@ -58,10 +58,14 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   Future<Either<Failure, List<Invoice>>> getInvoices({
     List<String>? statusFilter,
     String? customerId,
+    int? limit,
+    int? offset,
   }) async {
     final result = await dataSource.getInvoices(
       statusFilter: statusFilter,
       customerId: customerId,
+      limit: limit,
+      offset: offset,
     );
     return result.map((models) => models.map((m) => m.toEntity()).toList());
   }

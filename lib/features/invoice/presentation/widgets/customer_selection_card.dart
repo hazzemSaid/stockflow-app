@@ -6,12 +6,12 @@ import 'package:stockflow/features/invoice/presentation/cubit/create_invoice/cre
 
 class CustomerSelectionCard extends StatelessWidget {
   final CreateInvoiceCubit cubit;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const CustomerSelectionCard({
     super.key,
     required this.cubit,
-    required this.onTap,
+    this.onTap,
   });
 
   @override

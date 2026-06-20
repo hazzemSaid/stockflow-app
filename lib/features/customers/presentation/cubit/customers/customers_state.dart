@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:stockflow/core/error/failures.dart';
 import '../../../domain/entities/customer.dart';
+import '../../../domain/entities/customer_filter_counts.dart';
 
 enum CustomersStatus { initial, loading, success, empty, error }
 
@@ -12,6 +13,8 @@ class CustomersState extends Equatable {
   final int totalCount;
   final bool hasMore;
   final bool isLoadingMore;
+  final CustomerFilterCounts filterCounts;
+  final double totalDebtSum;
 
   const CustomersState({
     this.status = CustomersStatus.initial,
@@ -21,6 +24,8 @@ class CustomersState extends Equatable {
     this.totalCount = 0,
     this.hasMore = true,
     this.isLoadingMore = false,
+    this.filterCounts = const CustomerFilterCounts.zero(),
+    this.totalDebtSum = 0,
   });
 
   CustomersState copyWith({
@@ -31,6 +36,8 @@ class CustomersState extends Equatable {
     int? totalCount,
     bool? hasMore,
     bool? isLoadingMore,
+    CustomerFilterCounts? filterCounts,
+    double? totalDebtSum,
   }) {
     return CustomersState(
       status: status ?? this.status,
@@ -40,6 +47,8 @@ class CustomersState extends Equatable {
       totalCount: totalCount ?? this.totalCount,
       hasMore: hasMore ?? this.hasMore,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      filterCounts: filterCounts ?? this.filterCounts,
+      totalDebtSum: totalDebtSum ?? this.totalDebtSum,
     );
   }
 
@@ -52,5 +61,7 @@ class CustomersState extends Equatable {
     totalCount,
     hasMore,
     isLoadingMore,
+    filterCounts,
+    totalDebtSum,
   ];
 }
