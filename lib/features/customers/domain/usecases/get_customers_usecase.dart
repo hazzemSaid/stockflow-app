@@ -10,11 +10,13 @@ class GetCustomersUseCase {
 
   Future<Either<Failure, List<Customer>>> call({
     String? query,
+    String? filter,
     int? limit,
     int? offset,
   }) {
     return repository.listCustomers(
       query: query,
+      filter: filter,
       limit: limit,
       offset: offset,
     );
