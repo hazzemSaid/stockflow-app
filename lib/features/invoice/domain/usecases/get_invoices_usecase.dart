@@ -9,12 +9,14 @@ class GetInvoicesUseCase {
   GetInvoicesUseCase(this.repository);
 
   Future<Either<Failure, List<Invoice>>> call({
+    required String companyId,
     List<String>? statusFilter,
     String? customerId,
     int? limit,
     int? offset,
   }) {
     return repository.getInvoices(
+      companyId: companyId,
       statusFilter: statusFilter,
       customerId: customerId,
       limit: limit,

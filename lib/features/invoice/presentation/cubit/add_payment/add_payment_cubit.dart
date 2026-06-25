@@ -20,10 +20,12 @@ class AddPaymentCubit extends Cubit<AddPaymentState> {
   Future<void> loadUnpaidInvoices({
     required String customerId,
     required String customerName,
+    required String companyId,
   }) async {
     emit(AddPaymentLoading());
 
     final result = await _getInvoicesUseCase(
+      companyId: companyId,
       statusFilter: ['debt', 'partial'],
       customerId: customerId,
     );
@@ -82,7 +84,7 @@ class AddPaymentCubit extends Cubit<AddPaymentState> {
         current.amountError == null;
   }
 
-  Future<void> submit(String createdBy) async {
+  Future<void> submit() async {
     final current = state;
     if (current is! AddPaymentLoaded) return;
 
@@ -113,7 +115,6 @@ class AddPaymentCubit extends Cubit<AddPaymentState> {
     final result = await _addPaymentUseCase(
       invoiceId: current.selectedInvoiceId!,
       amount: parsed,
-      createdBy: createdBy,
     );
 
     result.fold(

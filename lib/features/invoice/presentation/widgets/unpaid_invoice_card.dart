@@ -22,7 +22,7 @@ class UnpaidInvoiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('d MMMM yyyy', 'ar');
     final dateStr = invoice.createdAt != null
-        ? dateFormat.format(invoice.createdAt!)
+        ? dateFormat.format(invoice.createdAt!.toLocal())
         : '';
     final productCount = invoice.items.length;
 

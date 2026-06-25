@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
@@ -21,17 +22,6 @@ class _DiscountSectionState extends State<DiscountSection> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
-    widget.cubit.stream.listen((_) {
-      final text = widget.cubit.discountValue > 0
-          ? widget.cubit.discountValue.toInt().toString()
-          : '';
-      if (_controller.text != text) {
-        _controller.value = TextEditingValue(
-          text: text,
-          selection: TextSelection.collapsed(offset: text.length),
-        );
-      }
-    });
   }
 
   @override
@@ -42,89 +32,118 @@ class _DiscountSectionState extends State<DiscountSection> {
 
   @override
   Widget build(BuildContext context) {
-    final isPercentage = widget.cubit.discountType == 'percentage';
-    final suffix = isPercentage
-        ? AppStrings.discountPercentSuffix
-        : AppStrings.discountValueSuffix;
+    return BlocBuilder<CreateInvoiceCubit, CreateInvoiceState>(
+      buildWhen: (prev, next) => next is CreateInvoiceFormState,
+      builder: (context, state) {
+        if (state is! CreateInvoiceFormState) return const SizedBox.shrink();
+        final loaded = state;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppStrings.discountLabel,
-          style: TextStyle(
-            fontSize: AppSizes.fontXLarge,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textDark,
-          ),
-        ),
-        SizedBox(height: AppSizes.spacingSmall),
-        Row(
+        final text = loaded.discountValue > 0
+            ? loaded.discountValue.toInt().toString()
+            : '';
+        if (_controller.text != text) {
+          _controller.value = TextEditingValue(
+            text: text,
+            selection: TextSelection.collapsed(offset: text.length),
+          );
+        }
+
+        final isPercentage = loaded.discountType == 'percentage';
+        final suffix = isPercentage
+            ? AppStrings.discountPercentSuffix
+            : AppStrings.discountValueSuffix;
+
+        final discountError = isPercentage
+            ? (loaded.discountValue > 100 ? AppStrings.discountPercentError : null)
+            : (loaded.discountValue > loaded.subtotal && loaded.subtotal > 0
+                ? AppStrings.discountAmountError
+                : null);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _DiscountChip(
-              label: AppStrings.byAmount,
-              selected: !isPercentage,
-              onTap: () => widget.cubit.setDiscountType('fixed'),
-            ),
-            SizedBox(width: AppSizes.spacingSmall),
-            _DiscountChip(
-              label: AppStrings.byPercentage,
-              selected: isPercentage,
-              onTap: () => widget.cubit.setDiscountType('percentage'),
-            ),
-          ],
-        ),
-        SizedBox(height: AppSizes.spacingSmall),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: InputDecoration(
-                  suffixText: suffix,
-                  hintText: '0',
-                  filled: true,
-                  fillColor: AppColors.inputBackground,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
-                    borderSide: BorderSide(color: AppColors.inputBorder),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppSizes.spacingMedium,
-                    vertical: AppSizes.spacingSmall,
-                  ),
-                ),
-                onChanged: (value) {
-                  widget.cubit.setDiscountValue(double.tryParse(value) ?? 0);
-                },
+            Text(
+              AppStrings.discountLabel,
+              style: TextStyle(
+                fontSize: AppSizes.fontXLarge,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
               ),
             ),
-            if (widget.cubit.discountValue > 0) ...[
-              SizedBox(width: AppSizes.spacingSmall),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSizes.spacingSmall,
-                  vertical: AppSizes.spacingTiny,
+            SizedBox(height: AppSizes.spacingSmall),
+            Row(
+              children: [
+                _DiscountChip(
+                  label: AppStrings.byAmount,
+                  selected: !isPercentage,
+                  onTap: () => widget.cubit.setDiscountType('fixed'),
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.lightOrange,
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+                SizedBox(width: AppSizes.spacingSmall),
+                _DiscountChip(
+                  label: AppStrings.byPercentage,
+                  selected: isPercentage,
+                  onTap: () => widget.cubit.setDiscountType('percentage'),
                 ),
-                child: Text(
-                  '- ${widget.cubit.discountAmount.toInt()} ${AppStrings.currencyEg}',
-                  style: TextStyle(
-                    color: AppColors.accent,
-                    fontWeight: FontWeight.w600,
-                    fontSize: AppSizes.fontMedium,
+              ],
+            ),
+            SizedBox(height: AppSizes.spacingSmall),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: InputDecoration(
+                      suffixText: suffix,
+                      hintText: '0',
+                      filled: true,
+                      fillColor: AppColors.inputBackground,
+                      errorText: discountError,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+                        borderSide: BorderSide(
+                          color: discountError != null
+                              ? AppColors.error
+                              : AppColors.inputBorder,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: AppSizes.spacingMedium,
+                        vertical: AppSizes.spacingSmall,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      widget.cubit.setDiscountValue(double.tryParse(value) ?? 0);
+                    },
                   ),
                 ),
-              ),
-            ],
+                if (loaded.discountValue > 0) ...[
+                  SizedBox(width: AppSizes.spacingSmall),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSizes.spacingSmall,
+                      vertical: AppSizes.spacingTiny,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightOrange,
+                      borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+                    ),
+                    child: Text(
+                      '- ${loaded.discountAmount.toInt()} ${AppStrings.currencyEg}',
+                      style: TextStyle(
+                        color: AppColors.accent,
+                        fontWeight: FontWeight.w600,
+                        fontSize: AppSizes.fontMedium,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

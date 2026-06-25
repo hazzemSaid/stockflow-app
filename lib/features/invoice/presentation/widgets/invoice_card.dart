@@ -72,7 +72,7 @@ class InvoiceCard extends StatelessWidget {
                       Text(
                         DateFormat(
                           'yyyy/MM/dd – hh:mm a',
-                        ).format(invoice.createdAt!),
+                        ).format(invoice.createdAt!.toLocal()),
                         style: TextStyle(
                           fontSize: AppSizes.fontMedium,
                           color: AppColors.textSecondary,

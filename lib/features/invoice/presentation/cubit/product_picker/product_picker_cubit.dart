@@ -8,18 +8,22 @@ export 'product_picker_state.dart';
 
 class ProductPickerCubit extends Cubit<ProductPickerState> {
   final GetProductsUseCase _getProductsUseCase;
+  final String _companyId;
   String _searchQuery = '';
   String _selectedCategory = '';
 
   ProductPickerCubit({
     required GetProductsUseCase getProductsUseCase,
+    required String companyId,
   }) : _getProductsUseCase = getProductsUseCase,
+       _companyId = companyId,
        super(ProductPickerInitial());
 
   Future<void> loadProducts() async {
     emit(ProductPickerLoading());
 
     final result = await _getProductsUseCase(
+      companyId: _companyId,
       query: _searchQuery.isNotEmpty ? _searchQuery : null,
       limit: 50,
       offset: 0,

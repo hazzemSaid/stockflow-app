@@ -5,7 +5,6 @@ import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
 abstract class InvoiceRepository {
   Future<Either<Failure, String>> createInvoice({
     required String customerId,
-    required String createdBy,
     required List<Map<String, dynamic>> items,
     double paidNow = 0,
     String discountType = 'fixed',
@@ -15,12 +14,15 @@ abstract class InvoiceRepository {
   Future<Either<Failure, String>> addPayment({
     required String invoiceId,
     required double amount,
-    String? createdBy,
   });
 
-  Future<Either<Failure, Invoice>> getInvoice(String id);
+  Future<Either<Failure, Invoice>> getInvoice(
+    String id,
+    String companyId,
+  );
 
   Future<Either<Failure, List<Invoice>>> getInvoices({
+    required String companyId,
     List<String>? statusFilter,
     String? customerId,
     int? limit,

@@ -9,7 +9,6 @@ class CreateInvoiceUseCase {
 
   Future<Either<Failure, String>> call({
     required String customerId,
-    required String createdBy,
     required List<Map<String, dynamic>> items,
     double paidNow = 0,
     String discountType = 'fixed',
@@ -17,7 +16,6 @@ class CreateInvoiceUseCase {
   }) {
     return repository.createInvoice(
       customerId: customerId,
-      createdBy: createdBy,
       items: items,
       paidNow: paidNow,
       discountType: discountType,

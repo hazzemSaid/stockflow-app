@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
@@ -29,12 +31,14 @@ class InvoiceDetailsScreen extends StatefulWidget {
 
 class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
   late final InvoiceDetailsCubit _cubit;
+  late final String _companyId;
 
   @override
   void initState() {
     super.initState();
+    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _cubit = sl<InvoiceDetailsCubit>();
-    _cubit.loadInvoice(widget.invoiceId);
+    _cubit.loadInvoice(widget.invoiceId, _companyId);
   }
 
   @override
@@ -108,7 +112,7 @@ class _InvoiceDetailContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateStr = invoice.createdAt != null
-        ? DateFormat('yyyy/MM/dd').format(invoice.createdAt!)
+        ? DateFormat('yyyy/MM/dd').format(invoice.createdAt!.toLocal())
         : '--';
 
     final screenWidth = MediaQuery.sizeOf(context).width;

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_routes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
 import 'package:stockflow/core/di/service_locator.dart';
 import 'package:stockflow/core/widgets/app_snackbar.dart';
-import 'package:stockflow/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:stockflow/features/auth/presentation/cubit/auth_state.dart';
 import '../cubit/add_payment/add_payment_cubit.dart';
 import '../widgets/add_payment_amount_card.dart';
 import '../widgets/add_payment_header.dart';
@@ -30,17 +30,20 @@ class AddPaymentScreen extends StatefulWidget {
 
 class _AddPaymentScreenState extends State<AddPaymentScreen> {
   late final AddPaymentCubit _cubit;
+  late final String _companyId;
   late final TextEditingController _amountController;
   AddPaymentLoaded? _lastLoaded;
 
   @override
   void initState() {
     super.initState();
+    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _amountController = TextEditingController();
     _cubit = sl<AddPaymentCubit>();
     _cubit.loadUnpaidInvoices(
       customerId: widget.customerId,
       customerName: widget.customerName ?? '',
+      companyId: _companyId,
     );
   }
 
@@ -60,13 +63,6 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
     }
   }
 
-  String? _createdBy() {
-    final authState = sl<AuthCubit>().state;
-    if (authState is Authenticated) {
-      return authState.user.id;
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +147,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
             onPressed: () => _cubit.loadUnpaidInvoices(
               customerId: widget.customerId,
               customerName: widget.customerName ?? '',
+              companyId: _companyId,
             ),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             child: Text(
@@ -283,8 +280,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
         child: ElevatedButton(
           onPressed: canSubmit
               ? () {
-                  final createdBy = _createdBy();
-                  _cubit.submit(createdBy ?? '');
+                  _cubit.submit();
                 }
               : null,
           style: ElevatedButton.styleFrom(

@@ -18,9 +18,10 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
     InvoiceCreateDto inputDto,
   ) async {
     try {
+      final params = inputDto.toJson();
       final response = await _supabaseClient.rpc(
         'create_invoice_full',
-        params: inputDto.toJson(),
+        params: params,
       );
       return Right(response as String);
     } on supabase.PostgrestException catch (error) {
@@ -34,10 +35,8 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
   @override
   Future<Either<Failure, String>> addPayment(AddPaymentDto inputDto) async {
     try {
-      final response = await _supabaseClient.rpc(
-        'add_payment',
-        params: inputDto.toJson(),
-      );
+      final params = inputDto.toJson();
+      final response = await _supabaseClient.rpc('add_payment', params: params);
       final paymentId = response?.toString();
       if (paymentId == null || paymentId.isEmpty) {
         return Left(ServerFailure('لم يتم استلام معرف الدفعة من الخادم'));
@@ -124,7 +123,10 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, InvoiceModel>> getInvoice(String id) async {
+  Future<Either<Failure, InvoiceModel>> getInvoice(
+    String id,
+    String companyId,
+  ) async {
     try {
       final response = await _supabaseClient
           .from('invoices')
@@ -135,8 +137,9 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
           customers!inner(name)
         ''')
           .eq('id', id)
+          .eq('company_id', companyId)
           .single();
-      print('getInvoice response: $response');
+      // getInvoice response
 
       return Right(InvoiceModel.fromJson(response));
     } on supabase.PostgrestException catch (error) {
@@ -148,6 +151,7 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
 
   @override
   Future<Either<Failure, List<InvoiceModel>>> getInvoices({
+    required String companyId,
     List<String>? statusFilter,
     String? customerId,
     int? limit,
@@ -157,10 +161,13 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
       '[getInvoices] statusFilter: $statusFilter, customerId: $customerId, limit: $limit, offset: $offset',
     );
     try {
-      dynamic query = _supabaseClient.from('invoices').select('''
+      dynamic query = _supabaseClient
+          .from('invoices')
+          .select('''
           *,
           customers!inner(name)
-        ''');
+        ''')
+          .eq('company_id', companyId);
 
       if (statusFilter != null && statusFilter.isNotEmpty) {
         query = query.inFilter('payment_status', statusFilter);

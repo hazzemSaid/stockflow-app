@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
+import 'package:stockflow/features/customers/domain/entities/customer.dart';
 
 class CustomerSelectionCard extends StatelessWidget {
-  final CreateInvoiceCubit cubit;
+  final Customer? customer;
   final VoidCallback? onTap;
 
   const CustomerSelectionCard({
     super.key,
-    required this.cubit,
+    required this.customer,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final customer = cubit.selectedCustomer;
     final isSelected = customer != null;
 
     return GestureDetector(
@@ -48,16 +47,16 @@ class CustomerSelectionCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isSelected ? customer.name : AppStrings.selectCustomer,
+                    isSelected ? customer!.name : AppStrings.selectCustomer,
                     style: TextStyle(
                       fontSize: AppSizes.fontXLarge,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,
                     ),
                   ),
-                  if (isSelected && customer.nameOfficial != null)
+                  if (isSelected && customer!.nameOfficial != null)
                     Text(
-                      customer.nameOfficial!,
+                      customer!.nameOfficial!,
                       style: TextStyle(
                         fontSize: AppSizes.fontMedium,
                         color: AppColors.textSecondary,

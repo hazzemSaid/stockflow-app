@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
 import 'package:stockflow/core/di/service_locator.dart';
-import 'package:stockflow/core/widgets/app_snackbar.dart';
-import 'package:stockflow/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:stockflow/features/auth/presentation/cubit/auth_state.dart';
 import 'package:stockflow/features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
+import 'package:stockflow/features/invoice/presentation/cubit/customer_picker/customer_picker_cubit.dart';
 import 'package:stockflow/features/invoice/presentation/cubit/product_picker/product_picker_cubit.dart';
 import 'package:stockflow/features/invoice/presentation/pages/customer_picker_screen.dart';
 import 'package:stockflow/features/invoice/presentation/pages/product_picker_screen.dart';
@@ -28,6 +27,10 @@ class CreateInvoiceForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<CreateInvoiceCubit>();
+    final state = cubit.state;
+    final loaded = state is CreateInvoiceFormState
+        ? state
+        : CreateInvoiceLoaded();
 
     return Column(
       children: [
@@ -38,23 +41,23 @@ class CreateInvoiceForm extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomerSelectionCard(
-                  cubit: cubit,
+                  customer: loaded.selectedCustomer,
                   onTap: lockCustomer
                       ? null
                       : () => _openCustomerPicker(context, cubit),
                 ),
                 SizedBox(height: AppSizes.spacingMedium),
                 ProductsSectionHeader(
-                  cubit: cubit,
+                  productCount: loaded.products.length,
                   onAddProduct: () => _openProductPicker(context),
                 ),
                 SizedBox(height: AppSizes.spacingSmall),
-                if (cubit.products.isEmpty)
+                if (loaded.products.isEmpty)
                   EmptyProductsPlaceholder(
                     onTap: () => _openProductPicker(context),
                   )
                 else
-                  ...cubit.products.map(
+                  ...loaded.products.map(
                     (p) => Padding(
                       padding: EdgeInsets.only(
                         bottom: AppSizes.spacingSmall,
@@ -75,25 +78,13 @@ class CreateInvoiceForm extends StatelessWidget {
                 SizedBox(height: AppSizes.spacingMedium),
                 PaidNowInput(cubit: cubit),
                 SizedBox(height: AppSizes.spacingMedium),
-                InvoiceSummaryCard(cubit: cubit),
+                const InvoiceSummaryCard(),
               ],
             ),
           ),
         ),
         InvoiceBottomBar(
-          cubit: cubit,
-          onConfirm: () {
-            final authCubit = sl<AuthCubit>();
-            final authState = authCubit.state;
-            if (authState is Authenticated) {
-              cubit.submit(authState.user.id);
-            } else {
-              AppSnackbar.error(
-                context,
-                AppStrings.unexpectedError,
-              );
-            }
-          },
+          onConfirm: () => cubit.submit(),
         ),
       ],
     );
@@ -101,17 +92,32 @@ class CreateInvoiceForm extends StatelessWidget {
 }
 
 void _openCustomerPicker(BuildContext context, CreateInvoiceCubit cubit) {
+  final companyState = context.read<CompanyCubit>().state;
+  final companyId = (companyState as CompanySelected).companyId;
   Navigator.of(context).push(
-    MaterialPageRoute(builder: (_) => CustomerPickerScreen(createCubit: cubit)),
+    MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => CustomerPickerCubit(
+          getCustomersUseCase: sl(),
+          companyId: companyId,
+        ),
+        child: CustomerPickerScreen(createCubit: cubit),
+      ),
+    ),
   );
 }
 
 void _openProductPicker(BuildContext context) {
   final createCubit = context.read<CreateInvoiceCubit>();
+  final companyState = context.read<CompanyCubit>().state;
+  final companyId = (companyState as CompanySelected).companyId;
   Navigator.of(context).push(
     MaterialPageRoute(
       builder: (_) => BlocProvider(
-        create: (ctx) => ProductPickerCubit(getProductsUseCase: sl()),
+        create: (ctx) => ProductPickerCubit(
+          getProductsUseCase: sl(),
+          companyId: companyId,
+        ),
         child: ProductPickerScreen(createCubit: createCubit),
       ),
     ),

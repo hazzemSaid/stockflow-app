@@ -14,7 +14,6 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   @override
   Future<Either<Failure, String>> createInvoice({
     required String customerId,
-    required String createdBy,
     required List<Map<String, dynamic>> items,
     double paidNow = 0,
     String discountType = 'fixed',
@@ -25,7 +24,6 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
     }
     final dto = InvoiceCreateDto(
       customerId: customerId,
-      createdBy: createdBy,
       items: items,
       paidNow: paidNow,
       discountType: discountType,
@@ -38,30 +36,30 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   Future<Either<Failure, String>> addPayment({
     required String invoiceId,
     required double amount,
-    String? createdBy,
   }) async {
     final dto = AddPaymentDto(
       invoiceId: invoiceId,
       amount: amount,
-      createdBy: createdBy,
     );
     return dataSource.addPayment(dto);
   }
 
   @override
-  Future<Either<Failure, Invoice>> getInvoice(String id) async {
-    final result = await dataSource.getInvoice(id);
+  Future<Either<Failure, Invoice>> getInvoice(String id, String companyId) async {
+    final result = await dataSource.getInvoice(id, companyId);
     return result.map((model) => model.toEntity());
   }
 
   @override
   Future<Either<Failure, List<Invoice>>> getInvoices({
+    required String companyId,
     List<String>? statusFilter,
     String? customerId,
     int? limit,
     int? offset,
   }) async {
     final result = await dataSource.getInvoices(
+      companyId: companyId,
       statusFilter: statusFilter,
       customerId: customerId,
       limit: limit,

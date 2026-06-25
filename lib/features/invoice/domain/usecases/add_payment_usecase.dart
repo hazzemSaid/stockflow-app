@@ -10,12 +10,10 @@ class AddPaymentUseCase {
   Future<Either<Failure, String>> call({
     required String invoiceId,
     required double amount,
-    String? createdBy,
   }) {
     return repository.addPayment(
       invoiceId: invoiceId,
       amount: amount,
-      createdBy: createdBy,
     );
   }
 }
