@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/di/service_locator.dart';
+import 'package:stockflow/features/companies/data/models/company_model.dart';
+import 'package:stockflow/features/companies/domain/entities/company.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -25,7 +30,9 @@ class DashboardScreen extends StatelessWidget {
         ? (authCubit.state as Authenticated).user.name
         : '';
     final userInitial = userName.isNotEmpty ? userName[0] : 'م';
-
+    final Company? company = sl<CompanyCubit>().state is CompanySelected
+        ? (sl<CompanyCubit>().state as CompanySelected).company
+        : null;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: LayoutBuilder(
@@ -38,7 +45,11 @@ class DashboardScreen extends StatelessWidget {
           return ListView(
             padding: EdgeInsets.only(bottom: AppSizes.spacingXXLarge + 80.h),
             children: [
-              DashboardHeader(userName: userName, userInitial: userInitial),
+              DashboardHeader(
+                userName: userName,
+                userInitial: userInitial,
+                company: company,
+              ),
               SizedBox(height: AppSizes.spacingMedium),
               _MetricsGrid(metricWidth: metricWidth),
               SizedBox(height: AppSizes.spacingLarge),

@@ -29,7 +29,7 @@ class WeeklySalesChart extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textPrimary.withOpacity(0.04),
+            color: AppColors.textPrimary.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -104,3 +104,4 @@ class WeeklySalesChart extends StatelessWidget {
     );
   }
 }
+
