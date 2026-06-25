@@ -27,6 +27,10 @@ class AppColors {
   static const Color lightOrange = Color(0xFFFFF1E6);
   static const Color lightRed = Color(0xFFFEE2E2);
 
+  // Welcome / Onboarding gradient
+  static const Color welcomeGradientStart = Color(0xFF1A7A4A);
+  static const Color welcomeGradientEnd = Color(0xFF050F09);
+
   // Customer specific
   static const Color lightPrimaryBg = Color(0xFFE8F1EC);
   static const Color debtAmberBg = Color(0xFFFEF3C7);
@@ -42,5 +46,12 @@ class AppColors {
   static const Color amountGrey = Color(0xFF6B7280);
   static const Color chipBg = Color(0xFFF3F4F6);
   static const Color searchBg = Color(0xFFF5F5F5);
+  static const Color unselectedCardBg = Color(0xFFF9FAFB);
   static const Color redDark = Color(0xFFB91C1C);
+  static const Color blueLight = Color(0xFFEFF6FF);
+  static const Color bluePrimary = Color(0xFF1D4ED8);
+  static const Color greyMedium = Color(0xFF4B5563);
+
+  // Grip handle
+  static const Color gripColor = Color(0xFFD4D4D4);
 }

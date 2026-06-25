@@ -23,7 +23,7 @@ class AuthButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           elevation: 4,
-          shadowColor: AppColors.primary.withOpacity(0.25),
+          shadowColor: AppColors.primary.withValues(alpha: 0.25),
         ),
         child: isLoading
             ? SizedBox(
@@ -45,3 +45,4 @@ class AuthButton extends StatelessWidget {
     );
   }
 }
+

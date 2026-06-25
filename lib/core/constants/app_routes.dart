@@ -28,6 +28,16 @@ class AppRoutes {
   static String productDetailsPath(String id) => '/products/$id';
   static String invoiceDetailsPath(String id) => '/invoices/$id';
 
+  static const String companySelect = '/company-select';
+  static const String companyCreate = '/company-create';
+  static const String companySettings = '/company-settings';
+  static const String members = '/members';
+  // Onboarding / Welcome routes
+  static const String welcome = '/welcome';
+  static const String welcomeCreate = '/welcome/create';
+  static const String welcomeJoin = '/welcome/join';
+  static const String welcomePending = '/welcome/pending';
+
   static const List<String> shellRoutes = [
     dashboard,
     products,

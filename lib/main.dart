@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'config/theme/theme.dart';
 import 'config/routes/router.dart';
+import 'core/company/company_cubit.dart';
 import 'core/di/service_locator.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 
@@ -35,8 +36,11 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return BlocProvider(
-          create: (context) => sl<AuthCubit>(),
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => sl<AuthCubit>()),
+            BlocProvider<CompanyCubit>.value(value: sl<CompanyCubit>()),
+          ],
           child: MaterialApp.router(
             title: 'StockFlow',
             theme: AppTheme.lightTheme,

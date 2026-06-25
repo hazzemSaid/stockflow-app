@@ -1,0 +1,430 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/constants/app_colors.dart';
+import 'package:stockflow/core/constants/app_sizes.dart';
+import 'package:stockflow/core/constants/app_strings.dart';
+import 'package:stockflow/core/widgets/app_snackbar.dart';
+import 'package:stockflow/features/auth/presentation/widgets/logo_picker.dart';
+import 'package:stockflow/features/companies/domain/entities/company.dart';
+import 'package:stockflow/features/companies/presentation/cubit/company_settings_cubit.dart';
+
+class CompanySettingsPage extends StatefulWidget {
+  const CompanySettingsPage({super.key});
+
+  @override
+  State<CompanySettingsPage> createState() => _CompanySettingsPageState();
+}
+
+class _CompanySettingsPageState extends State<CompanySettingsPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  bool _initialized = false;
+  bool _dataLoaded = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      final companyState = context.read<CompanyCubit>().state;
+      if (companyState is CompanySelected) {
+        context.read<CompanySettingsCubit>().loadCompany(
+          companyState.companyId,
+        );
+      }
+    }
+  }
+
+  void _syncControllers(Company company) {
+    if (!_dataLoaded) {
+      _dataLoaded = true;
+      _nameController.text = company.name;
+      _phoneController.text = company.phone ?? '';
+      _addressController.text = company.address ?? '';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.surface,
+      body: BlocConsumer<CompanySettingsCubit, CompanySettingsState>(
+        listener: (context, state) {
+          if (state is CompanySettingsSuccess) {
+            AppSnackbar.success(context, state.message);
+            context.pop();
+          } else if (state is CompanySettingsError) {
+            AppSnackbar.error(context, state.message);
+          }
+        },
+        builder: (context, state) {
+          if (state is CompanySettingsInitial ||
+              state is CompanySettingsLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final data = state is CompanySettingsData ? state : null;
+          if (data != null) {
+            _syncControllers(data.company);
+
+            return SafeArea(
+              child: Column(
+                children: [
+                  _buildHeader(context),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                        AppSizes.spacingMedium,
+                        AppSizes.spacingSmall,
+                        AppSizes.spacingMedium,
+                        AppSizes.spacingMedium,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: _buildFormContent(
+                          context,
+                          data.company,
+                          data.imagePath,
+                          state is CompanySettingsUpdating,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSizes.spacingMedium,
+        AppSizes.spacingTiny,
+        AppSizes.spacingMedium,
+        AppSizes.spacingSmall,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: AppSizes.backButtonSize,
+            height: AppSizes.backButtonSize,
+            decoration: const BoxDecoration(
+              color: AppColors.chipBg,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.arrow_back_rounded,
+                size: AppSizes.backButtonSize / 2,
+                color: AppColors.textDark,
+              ),
+              onPressed: () => context.pop(),
+              padding: EdgeInsets.zero,
+            ),
+          ),
+          SizedBox(width: AppSizes.spacingSmall),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.companySettings,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: AppSizes.fontXLarge,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.secondary,
+                ),
+              ),
+              Text(
+                AppStrings.editCompanyData,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: AppSizes.fontMedium,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.amountGrey,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormContent(
+    BuildContext context,
+    Company company,
+    String? imagePath,
+    bool isLoading,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: LogoPicker(
+            imagePath: imagePath,
+            logoUrl: company.logoUrl,
+            onPickFromGallery: () =>
+                context.read<CompanySettingsCubit>().pickImageFromGallery(),
+            onPickFromCamera: () =>
+                context.read<CompanySettingsCubit>().pickImageFromCamera(),
+            onClear: () => context.read<CompanySettingsCubit>().clearImage(),
+          ),
+        ),
+        SizedBox(height: AppSizes.formFieldTopPadding),
+        _buildFormField(
+          label: AppStrings.companyName,
+          hint: AppStrings.companyNameHint,
+          icon: Icons.store_outlined,
+          controller: _nameController,
+          enabled: !isLoading,
+          validator: (v) => v == null || v.trim().isEmpty
+              ? AppStrings.companyNameRequired
+              : null,
+        ),
+        _buildFormField(
+          label: AppStrings.phone,
+          hint: '01XXXXXXXXX',
+          icon: Icons.phone_outlined,
+          controller: _phoneController,
+          enabled: !isLoading,
+          keyboardType: TextInputType.phone,
+        ),
+        _buildFormField(
+          label: AppStrings.address,
+          hint: AppStrings.addressHint,
+          icon: Icons.location_on_outlined,
+          controller: _addressController,
+          enabled: !isLoading,
+          maxLines: 2,
+        ),
+        SizedBox(height: AppSizes.spacingLarge),
+        _buildInfoCard(company),
+        SizedBox(height: AppSizes.spacingXLarge),
+        _buildSaveButton(context, company.id, isLoading),
+      ],
+    );
+  }
+
+  Widget _buildFormField({
+    required String label,
+    required String hint,
+    required IconData icon,
+    required TextEditingController controller,
+    bool enabled = true,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+    int maxLines = 1,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(top: AppSizes.spacingLarge),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: AppSizes.fontMedium,
+              fontWeight: FontWeight.w500,
+              color: AppColors.darkGrey,
+            ),
+          ),
+          SizedBox(height: AppSizes.spacingSmall),
+          Container(
+            constraints: BoxConstraints(minHeight: AppSizes.fieldHeight),
+            decoration: BoxDecoration(
+              color: AppColors.inputBackground,
+              border: Border.all(
+                color: AppColors.inputBorder,
+                width: AppSizes.borderWidthThin,
+              ),
+              borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+            ),
+            child: TextFormField(
+              controller: controller,
+              enabled: enabled,
+              keyboardType: keyboardType,
+              maxLines: maxLines,
+              validator: validator,
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: AppSizes.fontLarge,
+                  color: AppColors.hintText,
+                ),
+                prefixIcon: Icon(
+                  icon,
+                  size: AppSizes.fieldIconSize,
+                  color: AppColors.hintText,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppSizes.spacingSmall,
+                  vertical: maxLines > 1 ? AppSizes.spacingSmall : 0,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(Company company) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(AppSizes.spacingMedium),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+        border: Border.all(
+          color: AppColors.inputBorder,
+          width: AppSizes.borderWidthThin,
+        ),
+      ),
+      child: Column(
+        children: [
+          _buildInfoRow(AppStrings.subscriptionPlan, company.subscriptionPlan),
+          SizedBox(height: AppSizes.spacingSmall),
+          Divider(color: AppColors.inputBorder, height: 1),
+          SizedBox(height: AppSizes.spacingSmall),
+          _buildInfoRow(AppStrings.status, company.status),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: AppSizes.fontMedium,
+            color: AppColors.amountGrey,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: AppSizes.fontMedium,
+            fontWeight: FontWeight.w500,
+            color: AppColors.darkGrey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSaveButton(
+    BuildContext context,
+    String companyId,
+    bool isLoading,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: AppSizes.buttonBottomHeight,
+            child: OutlinedButton(
+              onPressed: isLoading ? null : () => context.pop(),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: AppColors.inputBorder,
+                  width: AppSizes.borderWidthThin,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+                ),
+              ),
+              child: Text(
+                AppStrings.cancelButton,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: AppSizes.fontLarge,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.darkGrey,
+                ),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: AppSizes.spacingSmall),
+        Expanded(
+          child: SizedBox(
+            height: AppSizes.buttonBottomHeight,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : () => _save(context, companyId),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
+                shadowColor: AppColors.primary.withValues(alpha: 0.25),
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+                ),
+              ),
+              child: isLoading
+                  ? SizedBox(
+                      width: AppSizes.iconMedium,
+                      height: AppSizes.iconMedium,
+                      child: CircularProgressIndicator(
+                        strokeWidth: AppSizes.strokeWidthMedium,
+                        color: AppColors.white,
+                      ),
+                    )
+                  : Text(
+                      AppStrings.save,
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: AppSizes.fontLarge,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.white,
+                      ),
+                    ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _save(BuildContext context, String companyId) {
+    if (!_formKey.currentState!.validate()) return;
+    context.read<CompanySettingsCubit>().updateCompany(
+      companyId: companyId,
+      name: _nameController.text.trim(),
+      phone: _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
+      address: _addressController.text.trim().isEmpty
+          ? null
+          : _addressController.text.trim(),
+    );
+  }
+}
+
