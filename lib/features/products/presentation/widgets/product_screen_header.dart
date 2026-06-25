@@ -13,7 +13,7 @@ class ProductScreenHeader extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppSizes.spacingMedium),
       child: Row(
-        mainAxisAlignment: .spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Expanded(
             child: Text(

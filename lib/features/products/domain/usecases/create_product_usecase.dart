@@ -8,7 +8,11 @@ class CreateProductUseCase {
 
   CreateProductUseCase(this.repository);
 
-  TaskEither<String, Product> call(ProductInput input, String userId) {
-    return repository.createProduct(input, userId);
+  TaskEither<String, Product> call(
+    ProductInput input,
+    String userId,
+    String companyId,
+  ) {
+    return repository.createProduct(input, userId, companyId);
   }
 }

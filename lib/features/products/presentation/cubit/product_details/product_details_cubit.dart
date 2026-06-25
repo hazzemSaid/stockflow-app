@@ -12,6 +12,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
   final DeleteProductUseCase _deleteProductUseCase;
   final UpdateProductQuantityUseCase? _updateQuantityUseCase;
   final GetInventoryMovementsUseCase? _getMovementsUseCase;
+  String _companyId = '';
 
   ProductDetailsCubit({
     required GetProductUseCase getProductUseCase,
@@ -24,10 +25,11 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
         _getMovementsUseCase = getMovementsUseCase,
         super(const ProductDetailsState());
 
-  Future<void> loadProduct(String id) async {
+  Future<void> loadProduct(String id, String companyId) async {
+    _companyId = companyId;
     emit(state.copyWith(status: ProductDetailsStatus.loading));
 
-    final result = await _getProductUseCase(id).run();
+    final result = await _getProductUseCase(id, companyId).run();
     result.fold(
       (error) => emit(state.copyWith(
         status: ProductDetailsStatus.error,
@@ -45,16 +47,17 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
 
   Future<void> _loadMovements(String productId) async {
     if (_getMovementsUseCase == null) return;
-    final result = await _getMovementsUseCase!(productId).run();
+    final result = await _getMovementsUseCase(productId, _companyId).run();
     result.fold(
       (_) {},
       (movements) => emit(state.copyWith(recentMovements: movements)),
     );
   }
 
-  Future<bool> deleteProduct(String id) async {
+  Future<bool> deleteProduct(String id, String companyId) async {
+    _companyId = companyId;
     emit(state.copyWith(isDeleting: true));
-    final result = await _deleteProductUseCase(id).run();
+    final result = await _deleteProductUseCase(id, companyId).run();
     return result.fold(
       (error) {
         emit(state.copyWith(
@@ -75,16 +78,19 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
     required int delta,
     String? note,
     required String userId,
+    required String companyId,
     QuantityAction action = QuantityAction.add,
   }) async {
+    _companyId = companyId;
     if (_updateQuantityUseCase == null) return false;
 
     emit(state.copyWith(isUpdatingQuantity: true));
-    final result = await _updateQuantityUseCase!(
+    final result = await _updateQuantityUseCase(
       productId: productId,
       delta: delta,
       note: note,
       userId: userId,
+      companyId: companyId,
     ).run();
 
     return result.fold(

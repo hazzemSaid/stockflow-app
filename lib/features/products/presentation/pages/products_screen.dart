@@ -1,12 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/service_locator.dart';
+import '../../../../core/permissions/permission_constants.dart';
+import '../../../../core/permissions/permission_gate.dart';
 import '../../../../shared/widgets/stockflow_search_field.dart';
 import '../cubit/products/products_cubit.dart';
 import '../widgets/product_card.dart';
@@ -26,39 +32,51 @@ class _ProductsScreenState extends State<ProductsScreen> {
   late final ProductsCubit _cubit;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  StreamSubscription? _companySubscription;
 
   @override
   void initState() {
     super.initState();
     _cubit = sl<ProductsCubit>();
-    _cubit.refresh();
+    _cubit.refresh(companyId: _currentCompanyId());
     _scrollController.addListener(_onScroll);
+    _companySubscription = context.read<CompanyCubit>().stream.listen((s) {
+      if (s is CompanySelected && mounted) {
+        _cubit.refresh(companyId: s.companyId);
+      }
+    });
   }
+
+  String _currentCompanyId() =>
+      (context.read<CompanyCubit>().state as CompanySelected).companyId;
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      _cubit.loadMore();
+      _cubit.loadMore(companyId: _currentCompanyId());
     }
   }
 
   @override
   void dispose() {
+    _companySubscription?.cancel();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _searchController.dispose();
+    _cubit.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final cid = _currentCompanyId();
     return BlocProvider.value(
       value: _cubit,
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
         body: SafeArea(
           child: RefreshIndicator(
-            onRefresh: () => _cubit.refresh(),
+            onRefresh: () => _cubit.refresh(companyId: cid),
             child: CustomScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
@@ -84,10 +102,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     child: StockFlowSearchField(
                       controller: _searchController,
                       hintText: AppStrings.productsSearchHint,
-                      onChanged: (query) => _cubit.updateSearchQuery(query),
+                      onChanged: (query) =>
+                          _cubit.updateSearchQuery(query, companyId: cid),
                       onClear: () {
                         _searchController.clear();
-                        _cubit.updateSearchQuery('');
+                        _cubit.updateSearchQuery('', companyId: cid);
                       },
                     ),
                   ),
@@ -101,7 +120,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         child: ProductErrorView(
                           message:
                               state.errorMessage ?? AppStrings.productLoadError,
-                          onRetry: () => _cubit.loadProducts(),
+                          onRetry: () => _cubit.loadProducts(companyId: cid),
                         ),
                       ),
                       ProductsStatus.empty => SliverFillRemaining(
@@ -130,8 +149,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             final product = state.products[index];
                             return ProductCard(
                               product: product,
-                              onTap: () =>
-                                  context.push(AppRoutes.productDetailsPath(product.id)),
+                              onTap: () => context.push(
+                                AppRoutes.productDetailsPath(product.id),
+                              ),
                             );
                           }, childCount: state.products.length),
                         ),
@@ -154,14 +174,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          heroTag: 'products_fab',
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.r),
+        floatingActionButton: PermissionGate(
+          permission: PermissionKeys.productsCreate,
+          child: FloatingActionButton(
+            heroTag: 'products_fab',
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32.r),
+            ),
+            backgroundColor: AppColors.accent,
+            onPressed: () => context.push(AppRoutes.productNew),
+            child: const Icon(Icons.add, color: AppColors.white),
           ),
-          backgroundColor: AppColors.accent,
-          onPressed: () => context.push(AppRoutes.productNew),
-          child: const Icon(Icons.add, color: AppColors.white),
         ),
       ),
     );

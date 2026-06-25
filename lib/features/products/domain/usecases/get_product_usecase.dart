@@ -7,7 +7,7 @@ class GetProductUseCase {
 
   GetProductUseCase(this.repository);
 
-  TaskEither<String, Product> call(String id) {
-    return repository.getProduct(id);
+  TaskEither<String, Product> call(String id, String companyId) {
+    return repository.getProduct(id, companyId);
   }
 }

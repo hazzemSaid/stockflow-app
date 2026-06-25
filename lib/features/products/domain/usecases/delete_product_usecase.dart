@@ -6,7 +6,7 @@ class DeleteProductUseCase {
 
   DeleteProductUseCase(this.repository);
 
-  TaskEither<String, void> call(String id) {
-    return repository.deleteProduct(id);
+  TaskEither<String, void> call(String id, String companyId) {
+    return repository.deleteProduct(id, companyId);
   }
 }

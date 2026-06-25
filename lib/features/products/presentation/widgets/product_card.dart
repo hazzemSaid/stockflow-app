@@ -37,7 +37,7 @@ class ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withOpacity(0.05),
+              color: AppColors.textPrimary.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -128,7 +128,7 @@ class ProductCard extends StatelessWidget {
       top: 0, left: 0, right: 0,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 6.w),
-        color: color.withOpacity(0.85),
+        color: color.withValues(alpha: 0.85),
         alignment: Alignment.center,
         child: Text(
           text,
@@ -147,7 +147,7 @@ class ProductCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.85),
+        color: color.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -199,3 +199,4 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
+

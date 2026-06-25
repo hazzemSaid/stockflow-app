@@ -16,11 +16,12 @@ class ProductsCubit extends Cubit<ProductsState> {
     : _getProductsUseCase = getProductsUseCase,
       super(const ProductsState());
 
-  Future<void> loadProducts() async {
+  Future<void> loadProducts({required String companyId}) async {
     _currentPage = 0;
     emit(state.copyWith(status: ProductsStatus.loading, isLoadingMore: false));
 
     final result = await _getProductsUseCase(
+      companyId: companyId,
       query: state.filter.hasQuery ? state.filter.query : null,
       limit: _pageSize,
       offset: 0,
@@ -47,7 +48,7 @@ class ProductsCubit extends Cubit<ProductsState> {
     );
   }
 
-  Future<void> loadMore() async {
+  Future<void> loadMore({required String companyId}) async {
     if (state.isLoadingMore || !state.hasMore) return;
     emit(state.copyWith(isLoadingMore: true));
 
@@ -55,6 +56,7 @@ class ProductsCubit extends Cubit<ProductsState> {
     final nextOffset = nextPage * _pageSize;
 
     final result = await _getProductsUseCase(
+      companyId: companyId,
       query: state.filter.hasQuery ? state.filter.query : null,
       limit: _pageSize,
       offset: nextOffset,
@@ -82,16 +84,17 @@ class ProductsCubit extends Cubit<ProductsState> {
     );
   }
 
-  void updateSearchQuery(String query) {
+  void updateSearchQuery(String query, {required String companyId}) {
     emit(state.copyWith(filter: state.filter.copyWith(query: query)));
     _debounce?.cancel();
+    final cid = companyId;
     _debounce = Timer(const Duration(milliseconds: 400), () {
-      loadProducts();
+      loadProducts(companyId: cid);
     });
   }
 
-  Future<void> refresh() async {
-    await loadProducts();
+  Future<void> refresh({required String companyId}) async {
+    await loadProducts(companyId: companyId);
   }
 
   @override

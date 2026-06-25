@@ -13,6 +13,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   @override
   TaskEither<String, List<ProductModel>> listProducts({
+    required String companyId,
     String? query,
     int? limit,
     int? offset,
@@ -20,7 +21,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     bool ascending = false,
   }) {
     return TaskEither.tryCatch(() async {
-      var request = _client.from('products').select();
+      var request = _client
+          .from('products')
+          .select()
+          .eq('company_id', companyId);
 
       if (query != null && query.trim().isNotEmpty) {
         request = request.ilike('name', '%$query%');
@@ -34,6 +38,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       }
 
       final data = await orderedRequest as List<dynamic>;
+      // fetched products
       return data
           .map((json) => ProductModel.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -41,12 +46,13 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  TaskEither<String, ProductModel> getProduct(String id) {
+  TaskEither<String, ProductModel> getProduct(String id, String companyId) {
     return TaskEither.tryCatch(() async {
       final data = await _client
           .from('products')
           .select()
           .filter('id', 'eq', id)
+          .filter('company_id', 'eq', companyId)
           .single();
       return ProductModel.fromJson(data);
     }, (error, stackTrace) => error.toString());
@@ -56,6 +62,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   TaskEither<String, ProductModel> createProduct(
     ProductInput input,
     String userId,
+    String companyId,
   ) {
     return TaskEither.tryCatch(() async {
       final model = ProductModel(
@@ -69,6 +76,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       );
       final data = model.toInsertJson();
       data.remove('id');
+      data['company_id'] = companyId;
       final response = await _client
           .from('products')
           .insert(data)
@@ -78,6 +86,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       if (input.quantity > 0) {
         await _client.from('inventory_logs').insert({
           'product_id': response['id'],
+          'company_id': companyId,
           'type': 'in',
           'quantity': input.quantity,
           'created_by': userId,
@@ -93,12 +102,14 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String id,
     ProductInput input,
     String userId,
+    String companyId,
   ) {
     return TaskEither.tryCatch(() async {
       final currentProduct = await _client
           .from('products')
           .select('quantity')
           .filter('id', 'eq', id)
+          .filter('company_id', 'eq', companyId)
           .single();
       final currentQty = currentProduct['quantity'] as int;
 
@@ -115,6 +126,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           .from('products')
           .update(model.toUpdateJson())
           .filter('id', 'eq', id)
+          .filter('company_id', 'eq', companyId)
           .select()
           .single();
 
@@ -122,6 +134,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       if (delta != 0) {
         await _client.from('inventory_logs').insert({
           'product_id': id,
+          'company_id': companyId,
           'type': delta > 0 ? 'in' : 'out',
           'quantity': delta.abs(),
           'created_by': userId,
@@ -133,9 +146,13 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  TaskEither<String, void> deleteProduct(String id) {
+  TaskEither<String, void> deleteProduct(String id, String companyId) {
     return TaskEither.tryCatch(() async {
-      await _client.from('products').delete().filter('id', 'eq', id);
+      await _client
+          .from('products')
+          .delete()
+          .filter('id', 'eq', id)
+          .filter('company_id', 'eq', companyId);
     }, (error, stackTrace) => error.toString());
   }
 
@@ -170,12 +187,14 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     required int delta,
     String? note,
     required String userId,
+    required String companyId,
   }) {
     return TaskEither.tryCatch(() async {
       final currentProduct = await _client
           .from('products')
           .select('quantity')
           .filter('id', 'eq', productId)
+          .filter('company_id', 'eq', companyId)
           .single();
       final currentQty = currentProduct['quantity'] as int;
 
@@ -190,10 +209,12 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       await _client
           .from('products')
           .update({'quantity': finalQuantity})
-          .filter('id', 'eq', productId);
+          .filter('id', 'eq', productId)
+          .filter('company_id', 'eq', companyId);
 
       await _client.from('inventory_logs').insert({
         'product_id': productId,
+        'company_id': companyId,
         'type': type,
         'quantity': delta,
         if (note != null) 'note': note,
@@ -207,6 +228,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   @override
   TaskEither<String, List<InventoryMovementModel>> getMovements(
     String productId,
+    String companyId,
   ) {
     return TaskEither.tryCatch(() async {
       final data =
@@ -214,6 +236,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
                   .from('inventory_logs')
                   .select()
                   .filter('product_id', 'eq', productId)
+                  .filter('company_id', 'eq', companyId)
                   .order('created_at', ascending: false)
                   .limit(20)
               as List<dynamic>;

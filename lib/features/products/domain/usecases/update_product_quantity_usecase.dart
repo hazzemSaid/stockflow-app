@@ -12,12 +12,14 @@ class UpdateProductQuantityUseCase {
     required int delta,
     String? note,
     required String userId,
+    required String companyId,
   }) {
     return repository.updateQuantity(
       productId: productId,
       delta: delta,
       note: note,
       userId: userId,
+      companyId: companyId,
     );
   }
 }

@@ -8,6 +8,7 @@ class GetProductsUseCase {
   GetProductsUseCase(this.repository);
 
   TaskEither<String, List<Product>> call({
+    required String companyId,
     String? query,
     int? limit,
     int? offset,
@@ -15,6 +16,7 @@ class GetProductsUseCase {
     bool ascending = false,
   }) {
     return repository.listProducts(
+      companyId: companyId,
       query: query,
       limit: limit,
       offset: offset,
