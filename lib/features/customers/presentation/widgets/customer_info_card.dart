@@ -24,7 +24,7 @@ class CustomerInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textPrimary.withOpacity(0.05),
+            color: AppColors.textPrimary.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -89,3 +89,4 @@ class CustomerInfoCard extends StatelessWidget {
     );
   }
 }
+

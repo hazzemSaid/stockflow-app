@@ -16,12 +16,14 @@ class CustomerRepositoryImpl implements CustomerRepository {
     String? filter,
     int? limit,
     int? offset,
+    required String companyId,
   }) async {
     final result = await dataSource.listCustomers(
       query: query,
       filter: filter,
       limit: limit,
       offset: offset,
+      companyId: companyId,
     );
     return result.map((models) => models.map((m) => m.toEntity()).toList());
   }
@@ -29,14 +31,18 @@ class CustomerRepositoryImpl implements CustomerRepository {
   @override
   Future<Either<Failure, CustomerFilterCounts>> getCustomerFilterCounts({
     String? query,
+    required String companyId,
   }) async {
-    final result = await dataSource.getFilterCounts(query: query);
+    final result = await dataSource.getFilterCounts(
+      query: query,
+      companyId: companyId,
+    );
     return result.map((model) => model.toEntity());
   }
 
   @override
-  Future<Either<Failure, Customer>> getCustomer(String id) async {
-    final result = await dataSource.getCustomer(id);
+  Future<Either<Failure, Customer>> getCustomer(String id, String companyId) async {
+    final result = await dataSource.getCustomer(id, companyId);
     return result.map((model) => model.toEntity());
   }
 
@@ -48,6 +54,7 @@ class CustomerRepositoryImpl implements CustomerRepository {
     String? address,
     double totalDebt = 0,
     String? imageUrl,
+    required String companyId,
   }) async {
     if (name.trim().isEmpty) {
       return Left(ServerFailure('يرجى إدخال اسم العميل'));
@@ -59,6 +66,7 @@ class CustomerRepositoryImpl implements CustomerRepository {
       address: address,
       totalDebt: totalDebt,
       imageUrl: imageUrl,
+      companyId: companyId,
     );
     return result.map((model) => model.toEntity());
   }
@@ -71,6 +79,7 @@ class CustomerRepositoryImpl implements CustomerRepository {
     String? phone,
     String? address,
     String? imageUrl,
+    required String companyId,
   }) async {
     if (name.trim().isEmpty) {
       return Left(ServerFailure('يرجى إدخال اسم العميل'));
@@ -82,6 +91,7 @@ class CustomerRepositoryImpl implements CustomerRepository {
       phone: phone,
       address: address,
       imageUrl: imageUrl,
+      companyId: companyId,
     );
     return result.map((model) => model.toEntity());
   }

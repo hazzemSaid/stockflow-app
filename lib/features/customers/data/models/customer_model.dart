@@ -119,8 +119,9 @@ class CustomerModel {
         inv['is_opening_balance'] == true ||
         inv['invoice_type'] == 'opening_balance');
     final computedDebt = (json['computed_debt'] as num?)?.toDouble();
-    final totalDebt = computedDebt ??
-        (hasOpeningInvoice
+    final totalDebt = computedDebt != null
+        ? computedDebt
+        : (hasOpeningInvoice
             ? (totalPurchases - totalPaid)
             : (openingDebt + totalPurchases - totalPaid));
     final createdAtStr = json['created_at'] as String?;

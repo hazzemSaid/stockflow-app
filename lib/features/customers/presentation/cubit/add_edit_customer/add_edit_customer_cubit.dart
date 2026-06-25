@@ -1,3 +1,4 @@
+import 'package:fpdart/fpdart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
 import 'package:stockflow/core/error/failures.dart';
@@ -27,10 +28,10 @@ class AddEditCustomerCubit extends Cubit<AddEditCustomerState> {
        _updateCustomerUseCase = updateCustomerUseCase,
        super(const AddEditCustomerState());
 
-  Future<void> loadForEdit(String customerId) async {
+  Future<void> loadForEdit(String customerId, String companyId) async {
     _customerId = customerId;
     emit(state.copyWith(status: AddEditCustomerStatus.loading));
-    final result = await _getCustomerUseCase!(customerId);
+    final result = await _getCustomerUseCase!(customerId, companyId);
     result.fold(
       (failure) => emit(
         state.copyWith(status: AddEditCustomerStatus.error, failure: failure),
@@ -65,7 +66,7 @@ class AddEditCustomerCubit extends Cubit<AddEditCustomerState> {
     emit(state.copyWith(imageLocalPath: null, imageUploadUrl: null));
   }
 
-  Future<bool> save() async {
+  Future<bool> save(String companyId) async {
     if (state.name.trim().isEmpty) {
       emit(
         state.copyWith(
@@ -115,27 +116,9 @@ class AddEditCustomerCubit extends Cubit<AddEditCustomerState> {
         phone: state.phone.isNotEmpty ? state.phone : null,
         address: state.address.isNotEmpty ? state.address : null,
         imageUrl: imageUrl,
+        companyId: companyId,
       );
-      return result.fold(
-        (failure) {
-          emit(
-            state.copyWith(
-              status: AddEditCustomerStatus.error,
-              failure: failure,
-            ),
-          );
-          return false;
-        },
-        (_) {
-          emit(
-            state.copyWith(
-              status: AddEditCustomerStatus.success,
-              successMessage: AppStrings.customerSaveSuccess,
-            ),
-          );
-          return true;
-        },
-      );
+      return _handleResult(result, AppStrings.customerSaveSuccess);
     } else {
       final result = await _createCustomerUseCase(
         name: state.name,
@@ -144,28 +127,33 @@ class AddEditCustomerCubit extends Cubit<AddEditCustomerState> {
         address: state.address.isNotEmpty ? state.address : null,
         totalDebt: debt,
         imageUrl: imageUrl,
+        companyId: companyId,
       );
-      return result.fold(
-        (failure) {
-          emit(
-            state.copyWith(
-              status: AddEditCustomerStatus.error,
-              failure: failure,
-            ),
-          );
-          return false;
-        },
-        (_) {
-          emit(
-            state.copyWith(
-              status: AddEditCustomerStatus.success,
-              successMessage: AppStrings.customerAddSuccess,
-            ),
-          );
-          return true;
-        },
-      );
+      return _handleResult(result, AppStrings.customerAddSuccess);
     }
+  }
+
+  bool _handleResult(Either<Failure, void> result, String message) {
+    return result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: AddEditCustomerStatus.error,
+            failure: failure,
+          ),
+        );
+        return false;
+      },
+      (_) {
+        emit(
+          state.copyWith(
+            status: AddEditCustomerStatus.success,
+            successMessage: message,
+          ),
+        );
+        return true;
+      },
+    );
   }
 
   void resetStatus() {

@@ -15,6 +15,7 @@ class CreateCustomerUseCase {
     String? address,
     double totalDebt = 0,
     String? imageUrl,
+    required String companyId,
   }) {
     return repository.createCustomer(
       name: name,
@@ -23,6 +24,7 @@ class CreateCustomerUseCase {
       address: address,
       totalDebt: totalDebt,
       imageUrl: imageUrl,
+      companyId: companyId,
     );
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_routes.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
@@ -33,9 +35,12 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
   @override
   void initState() {
     super.initState();
+    final companyState = context.read<CompanyCubit>().state;
+    final companyId = (companyState as CompanySelected).companyId;
     _cubit = CustomerInvoicesCubit(
       getInvoicesUseCase: sl<GetInvoicesUseCase>(),
       customerId: widget.customerId,
+      companyId: companyId,
       customerName: widget.customerName,
     );
     _cubit.loadInvoices();
@@ -79,8 +84,9 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
           builder: (context, state) {
             return switch (state.status) {
               CustomerInvoicesStatus.initial ||
-              CustomerInvoicesStatus.loading =>
-                const Center(child: CircularProgressIndicator()),
+              CustomerInvoicesStatus.loading => const Center(
+                child: CircularProgressIndicator(),
+              ),
               CustomerInvoicesStatus.error => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -101,8 +107,17 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
                 ),
               ),
               CustomerInvoicesStatus.loadingMore ||
-              CustomerInvoicesStatus.success =>
-                _buildList(state),
+              CustomerInvoicesStatus.success => _buildList(state),
+              CustomerInvoicesStatus.empty => Center(
+                child: Text(
+                  AppStrings.emptyInvoices,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: AppSizes.fontMedium,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
             };
           },
         ),
@@ -114,7 +129,7 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
     if (state.invoices.isEmpty) {
       return Center(
         child: Text(
-          AppStrings.emptyCustomers,
+          AppStrings.emptyInvoices,
           style: TextStyle(
             fontFamily: 'Cairo',
             fontSize: AppSizes.fontMedium,
@@ -150,9 +165,7 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
         : AppColors.primary;
 
     return GestureDetector(
-      onTap: () => context.push(
-        AppRoutes.invoiceDetailsPath(invoice.id),
-      ),
+      onTap: () => context.push(AppRoutes.invoiceDetailsPath(invoice.id)),
       child: Container(
         margin: EdgeInsets.only(bottom: AppSizes.spacingSmall),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -187,7 +200,7 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
                     children: [
                       Flexible(
                         child: Text(
-                          'فاتورة #${invoice.id.substring(0, invoice.id.length > 8 ? 8 : invoice.id.length)}',
+                          '${AppStrings.invoiceNo} #${invoice.id.substring(0, invoice.id.length > 8 ? 8 : invoice.id.length)}',
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontFamily: 'Cairo',
@@ -250,15 +263,15 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
     Color bgColor;
 
     if (isDebt) {
-      label = 'آجل';
+      label = AppStrings.customerDeferred;
       textColor = AppColors.redDark;
       bgColor = AppColors.lightRed;
     } else if (isPartial) {
-      label = 'جزئي';
+      label = AppStrings.addPaymentStatusPartial;
       textColor = AppColors.accent;
       bgColor = AppColors.lightOrange;
     } else {
-      label = 'مدفوع';
+      label = AppStrings.customerPaidFilter;
       textColor = AppColors.primary;
       bgColor = AppColors.lightPrimaryBg;
     }
@@ -284,6 +297,7 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.year}/${date.month}/${date.day}';
+    final local = date.toLocal();
+    return '${local.year}/${local.month}/${local.day}';
   }
 }

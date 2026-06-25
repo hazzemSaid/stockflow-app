@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/service_locator.dart';
@@ -23,6 +25,7 @@ class AddEditCustomerScreen extends StatefulWidget {
 
 class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
   late final AddEditCustomerCubit _cubit;
+  late final String _companyId;
   final _nameController = TextEditingController();
   final _nameOfficialController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -36,9 +39,10 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
   @override
   void initState() {
     super.initState();
+    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _cubit = sl<AddEditCustomerCubit>();
     if (_isEditMode) {
-      _cubit.loadForEdit(widget.customerId!);
+      _cubit.loadForEdit(widget.customerId!, _companyId);
     }
   }
 
@@ -88,7 +92,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
     _cubit.updatePhone(_phoneController.text);
     _cubit.updateAddress(_addressController.text);
     _cubit.updateDebt(_debtController.text);
-    await _cubit.save();
+    await _cubit.save(_companyId);
   }
 
   @override

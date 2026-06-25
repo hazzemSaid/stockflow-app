@@ -15,6 +15,7 @@ class UpdateCustomerUseCase {
     String? phone,
     String? address,
     String? imageUrl,
+    required String companyId,
   }) {
     return repository.updateCustomer(
       id: id,
@@ -23,6 +24,7 @@ class UpdateCustomerUseCase {
       phone: phone,
       address: address,
       imageUrl: imageUrl,
+      companyId: companyId,
     );
   }
 }

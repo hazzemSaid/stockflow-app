@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:fpdart/src/either.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:stockflow/core/error/failures.dart';
 import 'package:stockflow/features/customers/data/datasources/customer_remote_data_source.dart';
 import 'package:stockflow/features/customers/data/models/customer_model.dart';
@@ -21,9 +21,10 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
     String? address,
     double totalDebt = 0,
     String? imageUrl,
+    required String companyId,
   }) async {
     try {
-      final response = await _supabaseClient.rpc(
+      final customerId = await _supabaseClient.rpc(
         'create_customer_full',
         params: {
           'p_name': name,
@@ -33,9 +34,8 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
           'p_total_debt': totalDebt,
           'p_image_url': imageUrl,
         },
-      );
-      final customerId = response as String;
-      return getCustomer(customerId);
+      ) as String;
+      return getCustomer(customerId, companyId);
     } on supabase.PostgrestException catch (error) {
       if (error.code == '23505') {
         return Left(ServerFailure('هذا الاسم موجود مسبقاً'));
@@ -47,12 +47,13 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, CustomerModel>> getCustomer(String id) async {
+  Future<Either<Failure, CustomerModel>> getCustomer(String id, String companyId) async {
     try {
       final response = await _supabaseClient
           .from('customers')
           .select('*, invoices(*), payments(*)')
           .filter('id', 'eq', id)
+          .filter('company_id', 'eq', companyId)
           .single();
       return Right(CustomerModel.fromJson(response));
     } on supabase.PostgrestException catch (error) {
@@ -71,6 +72,7 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
     String? filter,
     int? limit,
     int? offset,
+    required String companyId,
   }) async {
     try {
       final response =
@@ -84,7 +86,6 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
                 },
               )
               as List<dynamic>;
-      print(response);
       final customers = response
           .map((json) => CustomerModel.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -99,12 +100,15 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
   @override
   Future<Either<Failure, CustomerFilterCountsModel>> getFilterCounts({
     String? query,
+    required String companyId,
   }) async {
     try {
       final response =
           await _supabaseClient.rpc(
                 'get_customer_filter_counts',
-                params: {'search_query': query},
+                params: {
+                  'search_query': query,
+                },
               )
               as List<dynamic>;
 
@@ -139,6 +143,7 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
     String? phone,
     String? address,
     String? imageUrl,
+    required String companyId,
   }) async {
     try {
       final body = <String, dynamic>{'name': name};
@@ -151,6 +156,7 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
           .from('customers')
           .update(body)
           .filter('id', 'eq', id)
+          .filter('company_id', 'eq', companyId)
           .select('*, invoices(*), payments(*)')
           .single();
       return Right(CustomerModel.fromJson(response));
@@ -188,7 +194,7 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
       if (error.statusCode == '409') {
         return Left(ServerFailure('الصورة موجودة مسبقاً'));
       }
-      return Left(ServerFailure(error.message ?? 'خطأ في رفع الصورة'));
+      return Left(ServerFailure(error.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

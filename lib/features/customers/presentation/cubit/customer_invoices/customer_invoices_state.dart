@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:stockflow/core/error/failures.dart';
 import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
 
-enum CustomerInvoicesStatus { initial, loading, loadingMore, success, error }
+enum CustomerInvoicesStatus { initial, loading, loadingMore, success, empty, error }
 
 class CustomerInvoicesState extends Equatable {
   final CustomerInvoicesStatus status;

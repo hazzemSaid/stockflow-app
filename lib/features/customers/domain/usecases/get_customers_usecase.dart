@@ -13,12 +13,14 @@ class GetCustomersUseCase {
     String? filter,
     int? limit,
     int? offset,
+    required String companyId,
   }) {
     return repository.listCustomers(
       query: query,
       filter: filter,
       limit: limit,
       offset: offset,
+      companyId: companyId,
     );
   }
 }
