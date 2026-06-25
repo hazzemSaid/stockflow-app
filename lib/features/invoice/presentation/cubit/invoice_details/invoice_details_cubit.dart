@@ -12,10 +12,10 @@ class InvoiceDetailsCubit extends Cubit<InvoiceDetailsState> {
   }) : _getInvoiceUseCase = getInvoiceUseCase,
        super(InvoiceDetailsInitial());
 
-  Future<void> loadInvoice(String id) async {
+  Future<void> loadInvoice(String id, String companyId) async {
     emit(InvoiceDetailsLoading());
 
-    final result = await _getInvoiceUseCase(id);
+    final result = await _getInvoiceUseCase(id, companyId);
 
     result.fold(
       (failure) => emit(InvoiceDetailsError(failure: failure)),

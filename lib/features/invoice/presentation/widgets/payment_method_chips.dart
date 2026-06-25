@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
@@ -11,40 +12,48 @@ class PaymentMethodChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppStrings.paymentMethod,
-          style: TextStyle(
-            fontSize: AppSizes.fontXLarge,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textDark,
-          ),
-        ),
-        SizedBox(height: AppSizes.spacingSmall),
-        Row(
+    return BlocBuilder<CreateInvoiceCubit, CreateInvoiceState>(
+      buildWhen: (prev, next) => next is CreateInvoiceFormState,
+      builder: (context, state) {
+        if (state is! CreateInvoiceFormState) return const SizedBox.shrink();
+        final loaded = state;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _MethodChip(
-              label: AppStrings.deferredPayment,
-              selected: cubit.paymentMethod == 'deferred',
-              onTap: () => cubit.setPaymentMethod('deferred'),
+            Text(
+              AppStrings.paymentMethod,
+              style: TextStyle(
+                fontSize: AppSizes.fontXLarge,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
             ),
-            SizedBox(width: AppSizes.spacingSmall),
-            _MethodChip(
-              label: AppStrings.partialPayment,
-              selected: cubit.paymentMethod == 'partial',
-              onTap: () => cubit.setPaymentMethod('partial'),
-            ),
-            SizedBox(width: AppSizes.spacingSmall),
-            _MethodChip(
-              label: AppStrings.fullPayment,
-              selected: cubit.paymentMethod == 'full',
-              onTap: () => cubit.setPaymentMethod('full'),
+            SizedBox(height: AppSizes.spacingSmall),
+            Row(
+              children: [
+                _MethodChip(
+                  label: AppStrings.deferredPayment,
+                  selected: loaded.paymentMethod == 'deferred',
+                  onTap: () => cubit.setPaymentMethod('deferred'),
+                ),
+                SizedBox(width: AppSizes.spacingSmall),
+                _MethodChip(
+                  label: AppStrings.partialPayment,
+                  selected: loaded.paymentMethod == 'partial',
+                  onTap: () => cubit.setPaymentMethod('partial'),
+                ),
+                SizedBox(width: AppSizes.spacingSmall),
+                _MethodChip(
+                  label: AppStrings.fullPayment,
+                  selected: loaded.paymentMethod == 'full',
+                  onTap: () => cubit.setPaymentMethod('full'),
+                ),
+              ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

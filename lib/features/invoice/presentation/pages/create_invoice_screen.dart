@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
+import 'package:stockflow/core/constants/app_routes.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
 import 'package:stockflow/core/di/service_locator.dart';
@@ -14,9 +15,9 @@ import 'package:stockflow/features/invoice/presentation/widgets/create_invoice_l
 class CreateInvoiceScreen extends StatefulWidget {
   final String? preselectedCustomerId;
   final String? preselectedCustomerName;
-  bool lockCustomer = false;
+  final bool lockCustomer;
 
-  CreateInvoiceScreen({
+  const CreateInvoiceScreen({
     super.key,
     this.preselectedCustomerId,
     this.preselectedCustomerName,
@@ -59,7 +60,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         listener: (context, state) {
           if (state is CreateInvoiceSuccess) {
             AppSnackbar.success(context, AppStrings.invoiceCreated);
-            context.pop();
+            // Navigate to the invoice details screen or show a success message
+            context.go(AppRoutes.invoiceDetailsPath(state.invoiceId));
           }
           if (state is CreateInvoiceError) {
             AppSnackbar.error(context, state.failure.message);

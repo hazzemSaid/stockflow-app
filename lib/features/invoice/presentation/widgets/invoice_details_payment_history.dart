@@ -40,7 +40,7 @@ class InvoiceDetailsPaymentHistory extends StatelessWidget {
                   Text(
                     DateFormat(
                       'yyyy/MM/dd – hh:mm a',
-                    ).format(payment.createdAt),
+                    ).format(payment.createdAt.toLocal()),
                     style: TextStyle(
                       fontSize: AppSizes.fontMedium,
                       color: AppColors.textSecondary,

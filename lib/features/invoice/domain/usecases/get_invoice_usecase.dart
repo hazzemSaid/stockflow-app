@@ -8,7 +8,7 @@ class GetInvoiceUseCase {
 
   GetInvoiceUseCase(this.repository);
 
-  Future<Either<Failure, Invoice>> call(String id) {
-    return repository.getInvoice(id);
+  Future<Either<Failure, Invoice>> call(String id, String companyId) {
+    return repository.getInvoice(id, companyId);
   }
 }

@@ -13,9 +13,13 @@ abstract class InvoiceRemoteDataSource {
     AddPaymentDto inputDto,
   );
 
-  Future<Either<Failure, InvoiceModel>> getInvoice(String id);
+  Future<Either<Failure, InvoiceModel>> getInvoice(
+    String id,
+    String companyId,
+  );
 
   Future<Either<Failure, List<InvoiceModel>>> getInvoices({
+    required String companyId,
     List<String>? statusFilter,
     String? customerId,
     int? limit,
