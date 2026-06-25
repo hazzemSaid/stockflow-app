@@ -12,6 +12,7 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   TaskEither<String, List<Product>> listProducts({
+    required String companyId,
     String? query,
     int? limit,
     int? offset,
@@ -20,6 +21,7 @@ class ProductRepositoryImpl implements ProductRepository {
   }) {
     return dataSource
         .listProducts(
+          companyId: companyId,
           query: query,
           limit: limit,
           offset: offset,
@@ -30,18 +32,18 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  TaskEither<String, Product> getProduct(String id) {
-    return dataSource.getProduct(id).map((model) => model.toEntity());
+  TaskEither<String, Product> getProduct(String id, String companyId) {
+    return dataSource.getProduct(id, companyId).map((model) => model.toEntity());
   }
 
   @override
-  TaskEither<String, Product> createProduct(ProductInput input, String userId) {
+  TaskEither<String, Product> createProduct(ProductInput input, String userId, String companyId) {
     final validationError = input.validate();
     if (validationError != null) {
       return TaskEither.left(validationError);
     }
     return dataSource
-        .createProduct(input, userId)
+        .createProduct(input, userId, companyId)
         .map((model) => model.toEntity());
   }
 
@@ -50,17 +52,18 @@ class ProductRepositoryImpl implements ProductRepository {
     String id,
     ProductInput input,
     String userId,
+    String companyId,
   ) {
     final validationError = input.validate();
     if (validationError != null) {
       return TaskEither.left(validationError);
     }
-    return dataSource.updateProduct(id, input, userId).map((model) => model.toEntity());
+    return dataSource.updateProduct(id, input, userId, companyId).map((model) => model.toEntity());
   }
 
   @override
-  TaskEither<String, void> deleteProduct(String id) {
-    return dataSource.deleteProduct(id);
+  TaskEither<String, void> deleteProduct(String id, String companyId) {
+    return dataSource.deleteProduct(id, companyId);
   }
 
   @override
@@ -74,6 +77,7 @@ class ProductRepositoryImpl implements ProductRepository {
     required int delta,
     String? note,
     required String userId,
+    required String companyId,
   }) {
     final type = delta > 0 ? 'in' : 'out';
     final absDelta = delta.abs();
@@ -86,18 +90,19 @@ class ProductRepositoryImpl implements ProductRepository {
           delta: absDelta,
           note: note,
           userId: userId,
+          companyId: companyId,
         )
         .flatMap((_) {
           return dataSource
-              .getProduct(productId)
+              .getProduct(productId, companyId)
               .map((model) => model.toEntity());
         });
   }
 
   @override
-  TaskEither<String, List<InventoryMovement>> getMovements(String productId) {
+  TaskEither<String, List<InventoryMovement>> getMovements(String productId, String companyId) {
     return dataSource
-        .getMovements(productId)
+        .getMovements(productId, companyId)
         .map((models) => models.map((m) => m.toEntity()).toList());
   }
 }

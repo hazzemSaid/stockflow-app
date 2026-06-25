@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/service_locator.dart';
@@ -23,12 +25,14 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late final ProductDetailsCubit _cubit;
+  late final String _companyId;
 
   @override
   void initState() {
     super.initState();
+    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _cubit = sl<ProductDetailsCubit>();
-    _cubit.loadProduct(widget.productId);
+    _cubit.loadProduct(widget.productId, _companyId);
   }
 
   @override
@@ -58,12 +62,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               case ProductDetailsStatus.error:
                 return ProductErrorView(
                   message: state.errorMessage ?? AppStrings.productLoadError,
-                  onRetry: () => _cubit.loadProduct(widget.productId),
+                  onRetry: () => _cubit.loadProduct(widget.productId, _companyId),
                 );
               case ProductDetailsStatus.success:
                 final product = state.product!;
                 return RefreshIndicator(
-                  onRefresh: () => _cubit.loadProduct(widget.productId),
+                  onRefresh: () => _cubit.loadProduct(widget.productId, _companyId),
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.all(AppSizes.spacingMedium),
@@ -80,7 +84,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               '/products/${product.id}/edit',
                             );
                             if (updated == true && mounted) {
-                              _cubit.loadProduct(widget.productId);
+                              _cubit.loadProduct(widget.productId, _companyId);
                             }
                           },
                           onDelete: () => _confirmDelete(context, product.id),
@@ -101,7 +105,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Future<void> _confirmDelete(BuildContext context, String id) async {
     final confirmed = await DeleteConfirmationDialog.show(context);
     if (confirmed == true && mounted) {
-      final success = await _cubit.deleteProduct(id);
+      final success = await _cubit.deleteProduct(id, _companyId);
       if (success && mounted) {
         AppSnackbar.success(context, AppStrings.productDeleted);
         context.pop();

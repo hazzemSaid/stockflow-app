@@ -26,10 +26,10 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
         _updateProductUseCase = updateProductUseCase,
         super(const AddEditProductState());
 
-  Future<void> loadForEdit(String productId) async {
+  Future<void> loadForEdit(String productId, String companyId) async {
     _productId = productId;
     emit(state.copyWith(status: AddEditProductStatus.loading));
-    final result = await _getProductUseCase!(productId).run();
+    final result = await _getProductUseCase!(productId, companyId).run();
     result.fold(
       (error) => emit(state.copyWith(
         status: AddEditProductStatus.error,
@@ -87,7 +87,7 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
     ));
   }
 
-  Future<bool> save(String userId) async {
+  Future<bool> save(String userId, String companyId) async {
     final price = double.tryParse(state.priceText.isNotEmpty ? state.priceText : '0');
     if (price == null || price < 0) {
       emit(state.copyWith(
@@ -142,7 +142,7 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
 
     if (state.isEditMode && _updateProductUseCase != null) {
       final result = await _updateProductUseCase(
-        _productId!, input, userId,
+        _productId!, input, userId, companyId,
       ).run();
       return result.fold(
         (error) {
@@ -161,7 +161,7 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
         },
       );
     } else {
-      final result = await _createProductUseCase(input, userId).run();
+      final result = await _createProductUseCase(input, userId, companyId).run();
       return result.fold(
         (error) {
           emit(state.copyWith(

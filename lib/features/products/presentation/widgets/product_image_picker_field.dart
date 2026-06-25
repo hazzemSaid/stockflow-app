@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/widgets/app_network_image.dart';
 import 'dashed_border_painter.dart';
 
 class ProductImagePickerField extends StatelessWidget {
@@ -69,8 +70,8 @@ class ProductImagePickerField extends StatelessWidget {
                   height: double.infinity,
                 )
               else
-                Image.network(
-                  imageUploadUrl!,
+                AppNetworkImage(
+                  imageUrl: imageUploadUrl!,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
@@ -170,7 +171,7 @@ class ProductImagePickerField extends StatelessWidget {
                 width: 40.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: AppColors.textSecondary.withOpacity(0.3),
+                  color: AppColors.textSecondary.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -240,3 +241,4 @@ class ProductImagePickerField extends StatelessWidget {
     }
   }
 }
+

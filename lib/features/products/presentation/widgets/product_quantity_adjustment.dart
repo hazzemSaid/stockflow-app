@@ -65,28 +65,26 @@ class _ProductQuantityAdjustmentState
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: widget.isLoading
-                        ? null
-                        : () {
-                            setState(() => _delta = 0);
-                            widget.onAdjust(0);
-                          },
-                    icon: const Icon(Icons.remove),
-                    label: Text(
-                      '${AppStrings.productQuantityOut} (${_delta > 0 ? _delta : 0})',
-                      style: const TextStyle(fontFamily: 'Cairo'),
+                      onPressed: widget.isLoading
+                          ? null
+                          : () {
+                              setState(() => _delta = -1);
+                            },
+                      icon: const Icon(Icons.remove),
+                      label: Text(
+                        '${AppStrings.productQuantityOut} (${_delta < 0 ? -_delta : 0})',
+                        style: const TextStyle(fontFamily: 'Cairo'),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: AppSizes.spacingSmall),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: widget.isLoading
-                        ? null
-                        : () {
-                            setState(() => _delta = 0);
-                            widget.onAdjust(0);
-                          },
+                  SizedBox(width: AppSizes.spacingSmall),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: widget.isLoading
+                          ? null
+                          : () {
+                              setState(() => _delta = 1);
+                            },
                     icon: const Icon(Icons.add),
                     label: Text(
                       '${AppStrings.productQuantityIn} (${_delta > 0 ? _delta : 0})',

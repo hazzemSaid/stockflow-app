@@ -7,7 +7,7 @@ class GetInventoryMovementsUseCase {
 
   GetInventoryMovementsUseCase(this.repository);
 
-  TaskEither<String, List<InventoryMovement>> call(String productId) {
-    return repository.getMovements(productId);
+  TaskEither<String, List<InventoryMovement>> call(String productId, String companyId) {
+    return repository.getMovements(productId, companyId);
   }
 }

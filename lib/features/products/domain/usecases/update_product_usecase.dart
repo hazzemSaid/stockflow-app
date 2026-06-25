@@ -12,7 +12,8 @@ class UpdateProductUseCase {
     String id,
     ProductInput input,
     String userId,
+    String companyId,
   ) {
-    return repository.updateProduct(id, input, userId);
+    return repository.updateProduct(id, input, userId, companyId);
   }
 }
