@@ -6,7 +6,7 @@ class AppTheme {
   static const Color primaryColor = AppColors.primary;
   static const Color secondaryColor = AppColors.secondary;
   static const Color accentColor = AppColors.accent;
-  static const Color backgroundColor = AppColors.background;
+  static const Color backgroundColor = AppColors.appBackground;
   static const Color surfaceColor = AppColors.surface;
   static const Color textPrimaryColor = AppColors.textPrimary;
   static const Color textSecondaryColor = AppColors.textSecondary;

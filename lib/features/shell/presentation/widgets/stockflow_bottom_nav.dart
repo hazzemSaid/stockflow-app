@@ -64,7 +64,7 @@ class StockFlowBottomNav extends StatelessWidget {
           color: AppColors.white,
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withOpacity(0.08),
+              color: AppColors.textPrimary.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -130,7 +130,7 @@ class _NavItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16.r),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accent.withOpacity(0.45),
+                        color: AppColors.accent.withValues(alpha: 0.45),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -195,3 +195,4 @@ class _NavItem extends StatelessWidget {
     );
   }
 }
+

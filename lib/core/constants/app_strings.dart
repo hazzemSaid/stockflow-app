@@ -24,7 +24,8 @@ class AppStrings {
   static const String emailRequired = 'يرجى إدخال البريد الإلكتروني';
   static const String emailInvalid = 'البريد الإلكتروني غير صالح';
   static const String passwordRequired = 'يرجى إدخال كلمة المرور';
-  static const String passwordMinLength = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+  static const String passwordMinLength =
+      'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
 
   static const String userDataNotFound = 'بيانات المستخدم غير موجودة';
   static const String unexpectedError = 'حدث خطأ غير متوقع';
@@ -36,7 +37,8 @@ class AppStrings {
   static const String passwordMismatch = 'كلمة المرور غير متطابقة';
   static const String registerTitle = 'إنشاء حساب';
   static const String registerWelcome = 'انضم إلينا';
-  static const String registerToContinue = 'أنشئ حساباً جديداً للمتابعة إلى StockFlow';
+  static const String registerToContinue =
+      'أنشئ حساباً جديداً للمتابعة إلى StockFlow';
   static const String registerButton = 'إنشاء حساب';
   static const String alreadyHaveAccount = 'لديك حساب بالفعل؟ ';
   static const String loginNow = 'سجل دخول';
@@ -56,6 +58,164 @@ class AppStrings {
   static const String searchEmpty = 'لا توجد نتائج';
   static const String searchError = 'حدث خطأ أثناء البحث';
   static const String actionComingSoon = 'قيد الإعداد';
+
+  // Company & Multi-Tenant
+  static const String selectCompany = 'اختر الشركة';
+  static const String selectCompanySubtitle = 'اختر الشركة التي تريد العمل بها';
+  static const String createNewCompany = 'إنشاء شركة جديدة';
+  static const String createCompany = 'إنشاء شركة';
+  static const String createCompanyButton = 'إنشاء الشركة';
+
+  // Create Business Screen
+  static const String createBusinessSubtitle = 'أدخل بيانات نشاطك التجاري';
+  static const String businessNameLabel = 'اسم النشاط التجاري';
+  static const String businessNameHint = 'مثال: مخزن أحمد للجملة';
+  static const String businessTypeLabel = 'نوع النشاط التجاري';
+  static const String createBusinessButton = 'إنشاء العمل';
+  static const String cancelButton = 'إلغاء';
+  static const String logoPickerLabel = 'شعار النشاط';
+  static const String businessNameRequired = 'يرجى إدخال اسم النشاط التجاري';
+  static const String uploadLogoError = 'فشل رفع الشعار';
+  static const String pickFromGallery = 'المعرض';
+  static const String pickFromCamera = 'الكاميرا';
+  // Business types (hardcoded)
+  static const String businessTypeWholesale = 'تجارة الجملة';
+  static const String businessTypeRetail = 'تجزئة';
+  static const String businessTypePharmacy = 'صيدلية';
+  static const String businessTypeSupermarket = 'سوبر ماركت';
+  static const String businessTypeRestaurant = 'مطعم';
+  static const String businessTypeOther = 'أخرى';
+
+  static const String companyName = 'اسم الشركة';
+  static const String companyNameHint = 'أدخل اسم الشركة';
+  static const String companyNameRequired = 'يرجى إدخال اسم الشركة';
+  static const String address = 'العنوان';
+  static const String addressHint = 'أدخل عنوان الشركة';
+  static const String phone = 'رقم الهاتف';
+  static const String phoneHint = 'أدخل رقم الهاتف';
+  static const String companySettings = 'إعدادات الشركة';
+  static const String editCompanyData = 'تعديل بيانات شركتك';
+  static const String subscriptionPlan = 'الخطة';
+  static const String status = 'الحالة';
+  static const String save = 'حفظ';
+  static const String retry = 'إعادة المحاولة';
+  static const String companyUpdated = 'تم تحديث الشركة بنجاح';
+  static const String teamMembers = 'فريق العمل';
+  static const String noMembersYet = 'لا يوجد أعضاء بعد';
+  static const String joinRequests = 'طلبات الانضمام';
+  static const String noJoinRequests = 'لا توجد طلبات انضمام';
+  static const String requestApproved = 'تم قبول الطلب';
+  static const String requestRejected = 'تم رفض الطلب';
+  static const String approve = 'قبول';
+  static const String reject = 'رفض';
+  static const String joinRequestFrom = 'طلب انضمام من';
+  static const String approveJoinConfirm =
+      'سيتم إضافة العضو إلى الفريق. هل أنت متأكد؟';
+  static const String rejectJoinConfirm =
+      'سيتم رفض طلب الانضمام. هل أنت متأكد؟';
+  static const String joinRequestPermissions = 'صلاحيات العضو';
+  static const String changeRole = 'تغيير الدور';
+  static const String noOtherRoles = 'لا توجد أدوار أخرى متاحة';
+  static const String selectRole = 'اختر الدور';
+  static const String doubleTapToExit = 'اضغط مرة أخرى للخروج';
+  static const String productsSection = 'المنتجات';
+  static const String viewProducts = 'عرض المنتجات';
+  static const String createProducts = 'إضافة منتجات';
+  static const String editProducts = 'تعديل المنتجات';
+  static const String deleteProducts = 'حذف المنتجات';
+  static const String salesSection = 'المبيعات';
+  static const String viewSales = 'عرض المبيعات';
+  static const String createSales = 'إضافة فاتورة مبيعات';
+  static const String purchasesSection = 'المشتريات';
+  static const String viewPurchases = 'عرض المشتريات';
+  static const String createPurchases = 'إضافة فاتورة مشتريات';
+  static const String otherSection = 'أخرى';
+  static const String viewInventory = 'عرض المخزون';
+  static const String viewCustomers = 'عرض العملاء';
+  static const String createCustomers = 'إضافة عملاء';
+  static const String viewReports = 'عرض التقارير';
+  static const String manageTeam = 'إدارة الفريق';
+  static const String manageSettings = 'إدارة الإعدادات';
+  static const String inviteMember = 'دعوة عضو';
+  static const String role = 'الدور';
+  static const String invite = 'دعوة';
+  static const String unknownUser = 'مستخدم غير معروف';
+  static const String removeMember = 'حذف عضو';
+  static const String removeMemberConfirm = 'هل أنت متأكد من حذف';
+  static const String remove = 'حذف';
+  static const String sectionProducts = 'المنتجات';
+  static const String sectionCustomers = 'العملاء';
+  static const String sectionInvoices = 'الفواتير';
+  static const String sectionPayments = 'المدفوعات';
+  static const String sectionReports = 'التقارير';
+  static const String sectionAdmin = 'الإدارة';
+  static const String permView = 'عرض المنتجات';
+  static const String permCreate = 'إضافة منتج جديد';
+  static const String permUpdate = 'تعديل بيانات المنتج';
+  static const String permDelete = 'حذف المنتجات';
+  static const String permCustomersView = 'عرض العملاء';
+  static const String permCustomersCreate = 'إضافة عميل جديد';
+  static const String permCustomersUpdate = 'تعديل بيانات العميل';
+  static const String permCustomersDelete = 'حذف العملاء';
+  static const String permInvoicesView = 'عرض الفواتير';
+  static const String permInvoicesCreate = 'إنشاء فاتورة';
+  static const String permInvoicesUpdate = 'تعديل الفاتورة';
+  static const String permInvoicesDelete = 'حذف الفاتورة';
+  static const String permPaymentsView = 'عرض المدفوعات';
+  static const String permPaymentsCreate = 'استلام مدفوعات';
+  static const String permPaymentsUpdate = 'تعديل المدفوعات';
+  static const String permReportsView = 'عرض تقارير المبيعات';
+  static const String permExportExcel = 'تصدير Excel';
+  static const String permManageTeam = 'إدارة الفريق';
+  static const String permSystemSettings = 'إعدادات النظام';
+  static const String permDashboardView = 'عرض لوحة البيانات';
+  static const String permUsersManage = 'إدارة المستخدمين';
+  static const String companyManagement = 'إدارة الشركة';
+  static const String customers = 'العملاء';
+  static const String products = 'المنتجات';
+  static const String invoices = 'الفواتير';
+  static const String payments = 'المدفوعات';
+  static const String other = 'أخرى';
+  static const String permissionView = 'عرض';
+  static const String permissionCreate = 'إضافة';
+  static const String permissionUpdate = 'تعديل';
+  static const String permissionDelete = 'حذف';
+  static const String permissionManage = 'إدارة';
+  static const String ownerRole = 'مالك';
+  static const String members = 'الأعضاء';
+  static const String switchCompany = 'تغيير الشركة';
+  static const String signOut = 'تسجيل الخروج';
+
+  // Onboarding / Welcome
+  static const String welcomeTitle = 'مرحباً بك في\nStockFlow';
+  static const String welcomeSubtitle =
+      'أدِر مخزونك ومبيعاتك وفريقك\nمن مكان واحد';
+  static const String welcomeAppSubtitle = 'نظام إدارة المخازن والفرق';
+  static const String createBusiness = 'إنشاء عمل تجاري';
+  static const String joinBusiness = 'الانضمام لعمل تجاري';
+  static const String selectBusiness = 'اختر العمل التجاري';
+  static const String createNewBusiness = 'إنشاء عمل تجاري جديد';
+  static const String joinByCode = 'الانضمام برمز دعوة';
+  static const String joinCompany = 'انضمام لشركة';
+  static const String businessType = 'نوع النشاط';
+  static const String businessTypeHint = 'اختر نوع النشاط التجاري';
+  static const String inviteCode = 'رمز الدعوة';
+  static const String inviteLink = 'رابط الدعوة';
+  static const String inviteCodeTitle = 'أدخل رمز الدعوة';
+  static const String inviteCodeSubtitle =
+      'قم بإدخال رمز الدعوة المرسل من مالك الشركة';
+  static const String inviteCodeRequired = 'يرجى إدخال رمز الدعوة';
+  static const String inviteCodeHint = 'XXXXXX';
+  static const String joinButton = 'انضمام';
+  static const String inviteLinkTitle = 'رابط الدعوة';
+  static const String inviteLinkSubtitle =
+      'انسخ الرابط من مالك الشركة والصقه هنا';
+  static const String inviteLinkHint = 'الصق الرابط هنا';
+  static const String pendingTitle = 'بانتظار الموافقة';
+  static const String pendingSubtitle =
+      'تم إرسال طلب الانضمام إلى مالك الشركة\nسيتم تحويلك إلى لوحة التحكم عند الموافقة';
+  static const String pendingChecking = 'جاري التحقق من حالة الطلب...';
+  static const String logoPickerHint = 'إضافة شعار';
 
   // Dashboard
   static const String dashboardGreeting = 'مرحباً';
@@ -121,7 +281,8 @@ class AppStrings {
   static const String productDeleteError = 'حدث خطأ أثناء حذف المنتج';
   static const String productImageError = 'حدث خطأ أثناء رفع الصورة';
   static const String productQuantityError = 'حدث خطأ أثناء تحديث الكمية';
-  static const String productNegativeQuantity = 'لا يمكن أن تصبح الكمية أقل من صفر';
+  static const String productNegativeQuantity =
+      'لا يمكن أن تصبح الكمية أقل من صفر';
   static const String productCount = 'عدد المنتجات';
   static const String productExpirationDateLabel = 'تاريخ انتهاء الصلاحية';
   static const String productExpirationDateHint = 'اختر تاريخ انتهاء الصلاحية';
@@ -229,6 +390,9 @@ class AppStrings {
   static const String invoiceItemsCount = 'منتجات';
   static const String discountAmount = 'قيمة الخصم';
   static const String discountNone = 'بدون خصم';
+  static const String discountPercentError = 'نسبة الخصم لا تتجاوز 100%';
+  static const String discountAmountError = 'قيمة الخصم لا تتجاوز إجمالي الفاتورة';
+  static const String paidNowExceedError = 'المدفوع الآن لا يتجاوز إجمالي الفاتورة';
 
   // Invoice — Product Picker
   static const String searchProduct = 'ابحث عن منتج بالاسم أو الباركود...';

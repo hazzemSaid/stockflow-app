@@ -1,6 +1,31 @@
 import 'package:get_it/get_it.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:stockflow/features/customers/domain/usecases/get_customer-filtercounts_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/permissions/permission_service.dart';
+import 'package:stockflow/core/permissions/permission_service_impl.dart';
+import 'package:stockflow/features/companies/data/datasources/company_remote_data_source.dart';
+import 'package:stockflow/features/companies/data/datasources/company_remote_data_source_impl.dart';
+import 'package:stockflow/features/companies/data/repositories/company_repository_impl.dart';
+import 'package:stockflow/features/companies/domain/repositories/company_repository.dart';
+import 'package:stockflow/features/companies/domain/usecases/create_company_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/get_company_members_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/get_company_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/get_user_companies_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/invite_member_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/remove_member_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/update_company_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/update_member_permissions_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/join_company_by_code_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/approve_join_request_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/reject_join_request_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/get_join_requests_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/check_join_request_status_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/create_company_full_usecase.dart';
+import 'package:stockflow/features/companies/presentation/cubit/join_company_cubit.dart';
+import 'package:stockflow/features/companies/presentation/cubit/company_members_cubit.dart';
+import 'package:stockflow/features/companies/presentation/cubit/company_settings_cubit.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
@@ -47,7 +72,9 @@ import '../../features/invoice/domain/usecases/get_invoice_usecase.dart';
 import '../../features/invoice/domain/usecases/get_invoices_usecase.dart';
 import '../../features/invoice/presentation/cubit/add_payment/add_payment_cubit.dart';
 import '../../features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
+import '../../features/invoice/presentation/cubit/customer_picker/customer_picker_cubit.dart';
 import '../../features/invoice/presentation/cubit/invoice_details/invoice_details_cubit.dart';
+import '../../features/invoice/presentation/cubit/invoices/invoices_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -128,7 +155,7 @@ Future<void> initServiceLocator() async {
   );
 
   // Products: Cubits
-  sl.registerLazySingleton<ProductsCubit>(
+  sl.registerFactory<ProductsCubit>(
     () => ProductsCubit(getProductsUseCase: sl<GetProductsUseCase>()),
   );
 
@@ -182,7 +209,7 @@ Future<void> initServiceLocator() async {
   );
 
   // Customers: Cubits
-  sl.registerLazySingleton<CustomersCubit>(
+  sl.registerFactory<CustomersCubit>(
     () => CustomersCubit(
       getCustomersUseCase: sl<GetCustomersUseCase>(),
       getCustomerFilterCountsUseCase: sl<GetCustomerFilterCountsUseCase>(),
@@ -235,10 +262,115 @@ Future<void> initServiceLocator() async {
     () => InvoiceDetailsCubit(getInvoiceUseCase: sl<GetInvoiceUseCase>()),
   );
 
+  sl.registerFactory<InvoicesCubit>(
+    () => InvoicesCubit(getInvoicesUseCase: sl<GetInvoicesUseCase>()),
+  );
+
+  sl.registerFactory<CustomerPickerCubit>(
+    () => CustomerPickerCubit(
+      getCustomersUseCase: sl<GetCustomersUseCase>(),
+      companyId: '',
+    ),
+  );
+
   sl.registerFactory<AddPaymentCubit>(
     () => AddPaymentCubit(
       getInvoicesUseCase: sl<GetInvoicesUseCase>(),
       addPaymentUseCase: sl<AddPaymentUseCase>(),
+    ),
+  );
+
+  // Companies: Data sources
+  sl.registerLazySingleton<CompanyRemoteDataSource>(
+    () => CompanyRemoteDataSourceImpl(Supabase.instance.client),
+  );
+
+  // Companies: Repository
+  sl.registerLazySingleton<CompanyRepository>(
+    () => CompanyRepositoryImpl(sl<CompanyRemoteDataSource>()),
+  );
+
+  // Companies: Use cases
+  sl.registerLazySingleton<GetUserCompaniesUseCase>(
+    () => GetUserCompaniesUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<CreateCompanyUseCase>(
+    () => CreateCompanyUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<GetCompanyUseCase>(
+    () => GetCompanyUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<UpdateCompanyUseCase>(
+    () => UpdateCompanyUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<GetCompanyMembersUseCase>(
+    () => GetCompanyMembersUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<InviteMemberUseCase>(
+    () => InviteMemberUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<UpdateMemberPermissionsUseCase>(
+    () => UpdateMemberPermissionsUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<RemoveMemberUseCase>(
+    () => RemoveMemberUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<JoinCompanyByCodeUseCase>(
+    () => JoinCompanyByCodeUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<ApproveJoinRequestUseCase>(
+    () => ApproveJoinRequestUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<RejectJoinRequestUseCase>(
+    () => RejectJoinRequestUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<GetJoinRequestsUseCase>(
+    () => GetJoinRequestsUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<CheckJoinRequestStatusUseCase>(
+    () => CheckJoinRequestStatusUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<CreateCompanyFullUseCase>(
+    () => CreateCompanyFullUseCase(sl<CompanyRepository>()),
+  );
+
+  // Join Company Cubit — must be a factory so each screen visit gets a fresh
+  // instance; a singleton gets closed on screen dispose and crashes on re-entry.
+  sl.registerFactory<JoinCompanyCubit>(
+    () => JoinCompanyCubit(
+      joinCompanyByCodeUseCase: sl<JoinCompanyByCodeUseCase>(),
+      checkJoinRequestStatusUseCase: sl<CheckJoinRequestStatusUseCase>(),
+    ),
+  );
+
+  // Company Members Cubit
+  sl.registerFactory<CompanyMembersCubit>(
+    () => CompanyMembersCubit(
+      getCompanyMembersUseCase: sl<GetCompanyMembersUseCase>(),
+      inviteMemberUseCase: sl<InviteMemberUseCase>(),
+      updateMemberPermissionsUseCase: sl<UpdateMemberPermissionsUseCase>(),
+      removeMemberUseCase: sl<RemoveMemberUseCase>(),
+    ),
+  );
+
+  // Company Settings Cubit
+  sl.registerFactory<CompanySettingsCubit>(
+    () => CompanySettingsCubit(
+      getCompanyUseCase: sl<GetCompanyUseCase>(),
+      updateCompanyUseCase: sl<UpdateCompanyUseCase>(),
+    ),
+  );
+
+  // Permission Service
+  sl.registerLazySingleton<PermissionService>(
+    () => PermissionServiceImpl(),
+  );
+
+  // Company Cubit
+  sl.registerLazySingleton<CompanyCubit>(
+    () => CompanyCubit(
+      getUserCompaniesUseCase: sl<GetUserCompaniesUseCase>(),
+      secureStorage: const FlutterSecureStorage(),
     ),
   );
 }
