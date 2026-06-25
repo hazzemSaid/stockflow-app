@@ -9,14 +9,17 @@ const int _pageSize = 20;
 class CustomerInvoicesCubit extends Cubit<CustomerInvoicesState> {
   final GetInvoicesUseCase _getInvoicesUseCase;
   final String _customerId;
+  final String _companyId;
   int _currentPage = 0;
 
   CustomerInvoicesCubit({
     required GetInvoicesUseCase getInvoicesUseCase,
     required String customerId,
+    required String companyId,
     String customerName = '',
   })  : _getInvoicesUseCase = getInvoicesUseCase,
         _customerId = customerId,
+        _companyId = companyId,
         super(CustomerInvoicesState(customerName: customerName));
 
   Future<void> loadInvoices() async {
@@ -24,6 +27,7 @@ class CustomerInvoicesCubit extends Cubit<CustomerInvoicesState> {
     emit(state.copyWith(status: CustomerInvoicesStatus.loading));
 
     final result = await _getInvoicesUseCase(
+      companyId: _companyId,
       customerId: _customerId,
       limit: _pageSize,
       offset: 0,
@@ -36,7 +40,7 @@ class CustomerInvoicesCubit extends Cubit<CustomerInvoicesState> {
       )),
       (invoices) => emit(state.copyWith(
         status: invoices.isEmpty
-            ? CustomerInvoicesStatus.success
+            ? CustomerInvoicesStatus.empty
             : CustomerInvoicesStatus.success,
         invoices: invoices,
         hasMore: invoices.length == _pageSize,
@@ -52,6 +56,7 @@ class CustomerInvoicesCubit extends Cubit<CustomerInvoicesState> {
     final nextOffset = nextPage * _pageSize;
 
     final result = await _getInvoicesUseCase(
+      companyId: _companyId,
       customerId: _customerId,
       limit: _pageSize,
       offset: nextOffset,

@@ -12,10 +12,10 @@ class CustomerDetailsCubit extends Cubit<CustomerDetailsState> {
   }) : _getCustomerUseCase = getCustomerUseCase,
        super(const CustomerDetailsState());
 
-  Future<void> loadCustomer(String id) async {
+  Future<void> loadCustomer(String id, String companyId) async {
     emit(state.copyWith(status: CustomerDetailsStatus.loading));
 
-    final result = await _getCustomerUseCase(id);
+    final result = await _getCustomerUseCase(id, companyId);
     result.fold(
       (failure) => emit(state.copyWith(
         status: CustomerDetailsStatus.error,

@@ -8,7 +8,7 @@ class GetCustomerUseCase {
 
   GetCustomerUseCase(this.repository);
 
-  Future<Either<Failure, Customer>> call(String id) {
-    return repository.getCustomer(id);
+  Future<Either<Failure, Customer>> call(String id, String companyId) {
+    return repository.getCustomer(id, companyId);
   }
 }

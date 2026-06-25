@@ -10,11 +10,7 @@ class CustomerCard extends StatelessWidget {
   final Customer customer;
   final VoidCallback? onTap;
 
-  const CustomerCard({
-    super.key,
-    required this.customer,
-    this.onTap,
-  });
+  const CustomerCard({super.key, required this.customer, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +87,9 @@ class CustomerCard extends StatelessWidget {
 
   Widget _buildStatBoxes() {
     final remaining = customer.totalDebt;
-    final remainingColor =
-        remaining > 0 ? AppColors.accent : AppColors.amountGrey;
+    final remainingColor = remaining > 0
+        ? AppColors.accent
+        : AppColors.amountGrey;
     return Row(
       textDirection: TextDirection.rtl,
       children: [
@@ -151,11 +148,7 @@ class CustomerCard extends StatelessWidget {
         color: AppColors.lightPrimaryBg,
         borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
       ),
-      child: Icon(
-        Icons.store_outlined,
-        size: 20.w,
-        color: AppColors.primary,
-      ),
+      child: Icon(Icons.store_outlined, size: 20.w, color: AppColors.primary),
     );
   }
 }

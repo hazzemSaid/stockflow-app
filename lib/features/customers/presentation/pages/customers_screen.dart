@@ -1,11 +1,16 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/company/company_cubit.dart';
+import '../../../../core/company/company_state.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/service_locator.dart';
+import '../../../../core/permissions/permission_constants.dart';
+import '../../../../core/permissions/permission_gate.dart';
 import '../../domain/entities/customer.dart';
 import '../cubit/customers/customers_cubit.dart';
 import '../../../../core/constants/app_routes.dart';
@@ -26,40 +31,58 @@ class _CustomersScreenState extends State<CustomersScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   String _selectedFilter = 'all';
+  StreamSubscription? _companySubscription;
+  String _companyId = '';
+
+  String get _cid => _companyId;
 
   @override
   void initState() {
     super.initState();
     _cubit = sl<CustomersCubit>();
-    _cubit.loadCustomers();
+    _companyId = _readCompanyId();
+    _cubit.loadCustomers(_companyId);
     _scrollController.addListener(_onScroll);
+    _companySubscription = context.read<CompanyCubit>().stream.listen((state) {
+      if (state is CompanySelected && mounted) {
+        _companyId = state.companyId;
+        _cubit.loadCustomers(_companyId);
+      }
+    });
+  }
+
+  String _readCompanyId() {
+    final state = context.read<CompanyCubit>().state;
+    return state is CompanySelected ? state.companyId : '';
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      _cubit.loadMore();
+      _cubit.loadMore(_cid);
     }
   }
 
   @override
   void dispose() {
+    _companySubscription?.cancel();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _searchController.dispose();
+    _cubit.close();
     super.dispose();
   }
 
   void _onAddCustomer() async {
     final added = await context.push<bool>(AppRoutes.customerNew);
     if (added == true && mounted) {
-      _cubit.refresh();
+      _cubit.refresh(_cid);
     }
   }
 
   List<Customer> _filteredCustomers() {
     final all = _cubit.state.customers;
-    print(all);
+    // all result
     switch (_selectedFilter) {
       case 'paid':
         return all.where((c) => c.totalDebt == 0).toList();
@@ -78,7 +101,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         backgroundColor: AppColors.appBackground,
         body: SafeArea(
           child: RefreshIndicator(
-            onRefresh: () => _cubit.refresh(),
+            onRefresh: () => _cubit.refresh(_cid),
             child: CustomScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
@@ -95,10 +118,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                           CustomerSearchBar(
                             controller: _searchController,
                             onChanged: (query) =>
-                                _cubit.updateSearchQuery(query),
+                                _cubit.updateSearchQuery(query, _cid),
                             onClear: () {
                               _searchController.clear();
-                              _cubit.updateSearchQuery('');
+                              _cubit.updateSearchQuery('', _cid);
                             },
                             onAdd: _onAddCustomer,
                           ),
@@ -136,7 +159,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               ),
                               SizedBox(height: AppSizes.spacingMedium),
                               TextButton(
-                                onPressed: () => _cubit.loadCustomers(),
+                                onPressed: () => _cubit.loadCustomers(_cid),
                                 child: const Text(
                                   AppStrings.productRetry,
                                   style: TextStyle(fontFamily: 'Cairo'),
@@ -197,7 +220,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                     AppRoutes.customerDetailsPath(customer.id),
                                   );
                                   if (updated == true && mounted) {
-                                    _cubit.refresh();
+                                    _cubit.refresh(_cid);
                                   }
                                 },
                               ),
@@ -225,14 +248,17 @@ class _CustomersScreenState extends State<CustomersScreen> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          heroTag: 'customers_fab',
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.r),
+        floatingActionButton: PermissionGate(
+          permission: PermissionKeys.customersCreate,
+          child: FloatingActionButton(
+            heroTag: 'customers_fab',
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32.r),
+            ),
+            backgroundColor: AppColors.accent,
+            onPressed: _onAddCustomer,
+            child: const Icon(Icons.add, color: AppColors.white),
           ),
-          backgroundColor: AppColors.accent,
-          onPressed: _onAddCustomer,
-          child: const Icon(Icons.add, color: AppColors.white),
         ),
       ),
     );

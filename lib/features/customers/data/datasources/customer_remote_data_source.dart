@@ -9,13 +9,18 @@ abstract class CustomerRemoteDataSource {
     String? filter,
     int? limit,
     int? offset,
+    required String companyId,
   });
 
   Future<Either<Failure, CustomerFilterCountsModel>> getFilterCounts({
     String? query,
+    required String companyId,
   });
 
-  Future<Either<Failure, CustomerModel>> getCustomer(String id);
+  Future<Either<Failure, CustomerModel>> getCustomer(
+    String id,
+    String companyId,
+  );
 
   Future<Either<Failure, CustomerModel>> createCustomer({
     required String name,
@@ -24,6 +29,7 @@ abstract class CustomerRemoteDataSource {
     String? address,
     double totalDebt = 0,
     String? imageUrl,
+    required String companyId,
   });
 
   Future<Either<Failure, CustomerModel>> updateCustomer({
@@ -33,6 +39,7 @@ abstract class CustomerRemoteDataSource {
     String? phone,
     String? address,
     String? imageUrl,
+    required String companyId,
   });
 
   Future<Either<Failure, String>> uploadImage(String filePath);

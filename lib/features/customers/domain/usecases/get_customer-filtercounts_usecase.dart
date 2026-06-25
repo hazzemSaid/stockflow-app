@@ -8,7 +8,7 @@ class GetCustomerFilterCountsUseCase {
 
   GetCustomerFilterCountsUseCase(this._customerRepository);
 
-  Future<Either<Failure, CustomerFilterCounts>> call({String? query}) async {
-    return _customerRepository.getCustomerFilterCounts(query: query);
+  Future<Either<Failure, CustomerFilterCounts>> call({String? query, required String companyId}) async {
+    return _customerRepository.getCustomerFilterCounts(query: query, companyId: companyId);
   }
 }

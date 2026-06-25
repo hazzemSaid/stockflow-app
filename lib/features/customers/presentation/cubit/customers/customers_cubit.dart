@@ -22,7 +22,7 @@ class CustomersCubit extends Cubit<CustomersState> {
         _getCustomerFilterCountsUseCase = getCustomerFilterCountsUseCase,
         super(const CustomersState());
 
-  Future<void> loadCustomers() async {
+  Future<void> loadCustomers(String companyId) async {
     _currentPage = 0;
     emit(state.copyWith(status: CustomersStatus.loading, isLoadingMore: false));
 
@@ -30,10 +30,12 @@ class CustomersCubit extends Cubit<CustomersState> {
       query: state.query.isNotEmpty ? state.query : null,
       limit: _pageSize,
       offset: 0,
+      companyId: companyId,
     );
 
     final countsResult = await _getCustomerFilterCountsUseCase(
       query: state.query.isNotEmpty ? state.query : null,
+      companyId: companyId,
     );
 
     customerResult.fold(
@@ -62,7 +64,7 @@ class CustomersCubit extends Cubit<CustomersState> {
     );
   }
 
-  Future<void> loadMore() async {
+  Future<void> loadMore(String companyId) async {
     if (state.isLoadingMore || !state.hasMore) return;
     emit(state.copyWith(isLoadingMore: true));
 
@@ -73,6 +75,7 @@ class CustomersCubit extends Cubit<CustomersState> {
       query: state.query.isNotEmpty ? state.query : null,
       limit: _pageSize,
       offset: nextOffset,
+      companyId: companyId,
     );
 
     result.fold(
@@ -96,16 +99,16 @@ class CustomersCubit extends Cubit<CustomersState> {
     );
   }
 
-  void updateSearchQuery(String query) {
+  void updateSearchQuery(String query, String companyId) {
     emit(state.copyWith(query: query));
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 400), () {
-      loadCustomers();
+      loadCustomers(companyId);
     });
   }
 
-  Future<void> refresh() async {
-    await loadCustomers();
+  Future<void> refresh(String companyId) async {
+    await loadCustomers(companyId);
   }
 
   @override

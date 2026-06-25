@@ -9,13 +9,18 @@ abstract class CustomerRepository {
     String? filter,
     int? limit,
     int? offset,
+    required String companyId,
   });
 
   Future<Either<Failure, CustomerFilterCounts>> getCustomerFilterCounts({
     String? query,
+    required String companyId,
   });
 
-  Future<Either<Failure, Customer>> getCustomer(String id);
+  Future<Either<Failure, Customer>> getCustomer(
+    String id,
+    String companyId,
+  );
 
   Future<Either<Failure, Customer>> createCustomer({
     required String name,
@@ -24,6 +29,7 @@ abstract class CustomerRepository {
     String? address,
     double totalDebt = 0,
     String? imageUrl,
+    required String companyId,
   });
 
   Future<Either<Failure, Customer>> updateCustomer({
@@ -33,6 +39,7 @@ abstract class CustomerRepository {
     String? phone,
     String? address,
     String? imageUrl,
+    required String companyId,
   });
 
   Future<Either<Failure, String>> uploadCustomerImage(String filePath);
