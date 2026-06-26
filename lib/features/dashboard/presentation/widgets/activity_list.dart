@@ -3,105 +3,56 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../models/activity_item.dart';
+import '../../domain/entities/activity_entry.dart';
+import 'activity_item_card.dart';
 
+/// Real-data activity list.
+/// Shows up to 5 recent entries from Supabase [get_activity_log] RPC.
 class ActivityList extends StatelessWidget {
-  final List<ActivityItem> items;
+  const ActivityList({super.key, required this.entries, this.onItemTap});
 
-  const ActivityList({super.key, required this.items});
+  final List<ActivityEntry> entries;
+  final void Function(ActivityEntry entry)? onItemTap;
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) {
-      return Text(
-        AppStrings.emptyActivity,
-        style: TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: AppSizes.fontMedium,
-          color: AppColors.textSecondary,
-        ),
-      );
+    if (entries.isEmpty) {
+      return _EmptyActivity();
     }
-
     return Column(
-      children: items.map((item) => _ActivityCard(item: item)).toList(),
+      children: entries
+          .map(
+            (e) => ActivityItemCard(
+              entry: e,
+              onTap: onItemTap != null ? () => onItemTap!(e) : null,
+            ),
+          )
+          .toList(),
     );
   }
 }
 
-class _ActivityCard extends StatelessWidget {
-  final ActivityItem item;
-
-  const _ActivityCard({required this.item});
-
+class _EmptyActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: AppSizes.spacingSmall),
-      padding: EdgeInsets.all(AppSizes.spacingSmall),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
-      ),
-      child: Row(
+      padding: EdgeInsets.symmetric(vertical: AppSizes.spacingXLarge),
+      child: Column(
         children: [
-          Container(
-            width: 36.w,
-            height: 36.w,
-            decoration: BoxDecoration(
-              color: item.iconBackground,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Icon(item.icon, color: item.iconColor, size: 18.w),
+          Icon(
+            Icons.history_outlined,
+            size: 40.w,
+            color: AppColors.textSecondary.withValues(alpha: 0.4),
           ),
-          SizedBox(width: AppSizes.spacingSmall),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.title,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: AppSizes.fontMedium,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  item.subtitle,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: AppSizes.fontSmall,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
+          SizedBox(height: AppSizes.spacingSmall),
+          Text(
+            AppStrings.emptyActivity,
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: AppSizes.fontMedium,
+              color: AppColors.textSecondary,
             ),
           ),
-          if (item.amount != null)
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: item.amount,
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: AppSizes.fontMedium,
-                      color: item.amountColor,
-                    ),
-                  ),
-                  const TextSpan(text: ' '),
-                  TextSpan(
-                    text: AppStrings.currencyEg,
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: AppSizes.fontSmall,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );
