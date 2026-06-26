@@ -219,7 +219,7 @@ class AppStrings {
 
   // Dashboard
   static const String dashboardGreeting = 'مرحباً';
-  static const String dashboardTodaySales = 'إجمالي المبيعات اليوم';
+  static const String dashboardTodaySales = 'تحصيلات اليوم';
   static const String dashboardProductsCount = 'عدد المنتجات';
   static const String dashboardTotalDebts = 'إجمالي الديون';
   static const String dashboardCustomersCount = 'عدد العملاء';
@@ -235,6 +235,19 @@ class AppStrings {
   static const String dashboardQuickActions = 'إجراءات سريعة';
   static const String dashboardRecentActivity = 'آخر النشاطات';
   static const String currencyEg = 'ج.م';
+  static const String defaultInitial = 'م';
+  static const String dashboardRecentActivitySubtitle =
+      'آخر ٥ عمليات تمت في النشاط';
+  static const String dashboardQuickCustomer = 'عميل';
+  static const String activityJustNow = 'الآن';
+  static const String activityMinutes = 'دقيقة';
+  static const String activityHours = 'ساعة';
+  static const String activityDays = 'يوم';
+  static const String dashboardErrorTitle = 'فشل تحميل بيانات لوحة التحكم';
+  static const String dashboardTodayBadge = 'اليوم';
+  static const String dashboardMonthlyPayments = 'مدفوعات الشهر';
+  static const String dashboardMonthlyPaymentsSubtitle =
+      'إجمالي المقبوضات النقدية';
 
   // Products
   static const String productsSearchHint = 'ابحث عن منتج...';
@@ -391,8 +404,10 @@ class AppStrings {
   static const String discountAmount = 'قيمة الخصم';
   static const String discountNone = 'بدون خصم';
   static const String discountPercentError = 'نسبة الخصم لا تتجاوز 100%';
-  static const String discountAmountError = 'قيمة الخصم لا تتجاوز إجمالي الفاتورة';
-  static const String paidNowExceedError = 'المدفوع الآن لا يتجاوز إجمالي الفاتورة';
+  static const String discountAmountError =
+      'قيمة الخصم لا تتجاوز إجمالي الفاتورة';
+  static const String paidNowExceedError =
+      'المدفوع الآن لا يتجاوز إجمالي الفاتورة';
 
   // Invoice — Product Picker
   static const String searchProduct = 'ابحث عن منتج بالاسم أو الباركود...';

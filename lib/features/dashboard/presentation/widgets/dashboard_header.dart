@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:stockflow/core/widgets/app_network_image.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/widgets/app_network_image.dart';
+import '../../../companies/domain/entities/company.dart';
 
+/// Dashboard top header — shows greeting, company card, and today's sales.
 class DashboardHeader extends StatelessWidget {
-  final String userName;
-  final String userInitial;
-  Company? company;
-
-  DashboardHeader({
-    this.company,
+  const DashboardHeader({
     super.key,
     required this.userName,
     required this.userInitial,
+    this.company,
+    required this.todaySales,
   });
+
+  final String userName;
+  final String userInitial;
+  final Company? company;
+
+  /// Live today's total sales (sum of invoices.total_amount for today).
+  final double todaySales;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +61,7 @@ class DashboardHeader extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: AppSizes.fontXLarge,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.white,
                       ),
                     ),
@@ -64,42 +71,100 @@ class DashboardHeader extends StatelessWidget {
               ],
             ),
             SizedBox(height: AppSizes.spacingMedium),
-            Container(
-              padding: EdgeInsets.all(AppSizes.spacingSmall),
-              decoration: BoxDecoration(
-                color: AppColors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(AppSizes.radiusLarge),
-                ),
-                border: Border.all(
-                  color: AppColors.white.withValues(alpha: 0.15),
-                  width: 1,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppStrings.dashboardTodaySales,
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: AppSizes.fontSmall,
-                      color: AppColors.white,
-                    ),
-                  ),
-                  SizedBox(height: AppSizes.spacingTiny),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const _TodaySalesAmount(),
-                      const _TodaySalesTrend(),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            _TodaySalesCard(todaySales: todaySales),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Today's Sales Card (real data)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _TodaySalesCard extends StatelessWidget {
+  const _TodaySalesCard({required this.todaySales});
+
+  final double todaySales;
+
+  @override
+  Widget build(BuildContext context) {
+    final formatted = NumberFormat('#,##0', 'ar').format(todaySales);
+
+    return Container(
+      padding: EdgeInsets.all(AppSizes.spacingSmall),
+      decoration: BoxDecoration(
+        color: AppColors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.all(Radius.circular(AppSizes.radiusLarge)),
+        border: Border.all(
+          color: AppColors.white.withValues(alpha: 0.15),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.dashboardTodaySales,
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: AppSizes.fontSmall,
+              color: AppColors.white.withValues(alpha: 0.8),
+            ),
+          ),
+          SizedBox(height: AppSizes.spacingTiny),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Amount display
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: formatted,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo',
+                        fontSize: AppSizes.fontXXLarge,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' ${AppStrings.currencyEg}',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: AppSizes.fontSmall,
+                        color: AppColors.white.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // "Today" badge
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSizes.spacingSmall,
+                  vertical: 4.h,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+                ),
+                child: Text(
+                  AppStrings.dashboardTodayBadge,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: AppSizes.fontSmall,
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -110,9 +175,9 @@ class DashboardHeader extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _CompanyInfoCard extends StatelessWidget {
-  final Company company;
-
   const _CompanyInfoCard({required this.company});
+
+  final Company company;
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +203,6 @@ class _CompanyInfoCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ── Logo / Initials avatar ───────────────────────────
           Container(
             width: 38.w,
             height: 38.w,
@@ -162,7 +226,6 @@ class _CompanyInfoCard extends StatelessWidget {
                 : _Initials(initial: initial),
           ),
           SizedBox(width: AppSizes.spacingSmall),
-          // ── Name + address ───────────────────────────────────
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,20 +243,6 @@ class _CompanyInfoCard extends StatelessWidget {
                     height: 1.3,
                   ),
                 ),
-                if (company.address != null && company.address!.isNotEmpty) ...[
-                  SizedBox(height: 2.h),
-                  Text(
-                    company.address!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: AppSizes.fontSmall,
-                      color: AppColors.white.withValues(alpha: 0.65),
-                      height: 1.3,
-                    ),
-                  ),
-                ],
                 if (company.businessType != null &&
                     company.businessType!.isNotEmpty) ...[
                   SizedBox(height: 4.h),
@@ -208,10 +257,10 @@ class _CompanyInfoCard extends StatelessWidget {
   }
 }
 
-/// Circular initials fallback shown when no logo URL is available.
 class _Initials extends StatelessWidget {
-  final String initial;
   const _Initials({required this.initial});
+
+  final String initial;
 
   @override
   Widget build(BuildContext context) {
@@ -229,10 +278,10 @@ class _Initials extends StatelessWidget {
   }
 }
 
-/// Small pill badge for the business type.
 class _BusinessTypeBadge extends StatelessWidget {
-  final String label;
   const _BusinessTypeBadge({required this.label});
+
+  final String label;
 
   @override
   Widget build(BuildContext context) {
@@ -253,66 +302,6 @@ class _BusinessTypeBadge extends StatelessWidget {
           height: 1.2,
         ),
       ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Today's sales widgets (unchanged)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _TodaySalesAmount extends StatelessWidget {
-  const _TodaySalesAmount();
-
-  @override
-  Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: '24,500',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Cairo',
-              fontSize: AppSizes.fontXXLarge,
-              color: AppColors.white,
-            ),
-          ),
-          const TextSpan(text: ' '),
-          TextSpan(
-            text: AppStrings.currencyEg,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: AppSizes.fontSmall,
-              color: AppColors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TodaySalesTrend extends StatelessWidget {
-  const _TodaySalesTrend();
-
-  @override
-  Widget build(BuildContext context) {
-    const trendColor = Color(0xFFFDBA74);
-
-    return Row(
-      children: [
-        Text(
-          '+12.4%',
-          style: TextStyle(
-            fontFamily: 'Cairo',
-            fontSize: AppSizes.fontSmall,
-            color: trendColor,
-          ),
-        ),
-        SizedBox(width: AppSizes.spacingTiny),
-        Icon(Icons.trending_up, size: 14.w, color: trendColor),
-      ],
     );
   }
 }
