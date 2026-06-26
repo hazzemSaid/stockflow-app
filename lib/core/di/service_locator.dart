@@ -75,6 +75,12 @@ import '../../features/invoice/presentation/cubit/create_invoice/create_invoice_
 import '../../features/invoice/presentation/cubit/customer_picker/customer_picker_cubit.dart';
 import '../../features/invoice/presentation/cubit/invoice_details/invoice_details_cubit.dart';
 import '../../features/invoice/presentation/cubit/invoices/invoices_cubit.dart';
+import '../../features/dashboard/data/datasources/dashboard_remote_data_source.dart';
+import '../../features/dashboard/data/datasources/dashboard_remote_data_source_impl.dart';
+import '../../features/dashboard/data/repositories/dashboard_repository_impl.dart';
+import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
+import '../../features/dashboard/domain/usecases/get_dashboard_stats_usecase.dart';
+import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -372,5 +378,25 @@ Future<void> initServiceLocator() async {
       getUserCompaniesUseCase: sl<GetUserCompaniesUseCase>(),
       secureStorage: const FlutterSecureStorage(),
     ),
+  );
+
+  // Dashboard: Data sources
+  sl.registerLazySingleton<DashboardRemoteDataSource>(
+    () => DashboardRemoteDataSourceImpl(Supabase.instance.client),
+  );
+
+  // Dashboard: Repositories
+  sl.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepositoryImpl(sl<DashboardRemoteDataSource>()),
+  );
+
+  // Dashboard: Use cases
+  sl.registerLazySingleton<GetDashboardStatsUseCase>(
+    () => GetDashboardStatsUseCase(sl<DashboardRepository>()),
+  );
+
+  // Dashboard: Cubits
+  sl.registerFactory<DashboardCubit>(
+    () => DashboardCubit(getDashboardStatsUseCase: sl<GetDashboardStatsUseCase>()),
   );
 }
