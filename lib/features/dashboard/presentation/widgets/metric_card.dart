@@ -1,21 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
-import '../models/dashboard_metric.dart';
+
+/// Metric value display model — now uses real [double] values.
+class MetricCardData {
+  const MetricCardData({
+    required this.title,
+    required this.value,
+    this.currency,
+    required this.icon,
+    required this.iconBackground,
+    required this.iconColor,
+    required this.valueColor,
+    this.isCount = false,
+  });
+
+  final String title;
+
+  /// Numeric value (count or monetary amount).
+  final double value;
+
+  /// Optional currency suffix (e.g. 'ج.م').
+  final String? currency;
+  final IconData icon;
+  final Color iconBackground;
+  final Color iconColor;
+  final Color valueColor;
+
+  /// If true, formats as integer (for counts like products/customers).
+  final bool isCount;
+}
 
 class MetricCard extends StatelessWidget {
-  final DashboardMetric metric;
+  const MetricCard({super.key, required this.data});
 
-  const MetricCard({
-    super.key,
-    required this.metric,
-  });
+  final MetricCardData data;
 
   @override
   Widget build(BuildContext context) {
+    final formatted = data.isCount
+        ? NumberFormat('#,##0', 'ar').format(data.value.toInt())
+        : NumberFormat('#,##0', 'ar').format(data.value);
+
     return Container(
-      padding:  EdgeInsets.all(AppSizes.spacingSmall),
+      padding: EdgeInsets.all(AppSizes.spacingSmall),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
@@ -31,25 +61,19 @@ class MetricCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 32.w,
-                height: 32.w,
-                decoration: BoxDecoration(
-                  color: metric.iconBackground,
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child:
-                    Icon(metric.icon, size: 16.w, color: metric.iconColor),
-              ),
-            ],
+          Container(
+            width: 36.w,
+            height: 36.w,
+            decoration: BoxDecoration(
+              color: data.iconBackground,
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Icon(data.icon, size: 18.w, color: data.iconColor),
           ),
           SizedBox(height: AppSizes.spacingSmall),
           Text(
-            metric.title,
-            style:  TextStyle(
+            data.title,
+            style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: AppSizes.fontSmall,
               color: AppColors.textSecondary,
@@ -60,19 +84,19 @@ class MetricCard extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: metric.value,
+                  text: formatted,
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: AppSizes.fontXLarge,
-                    color: metric.valueColor,
+                    color: data.valueColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (metric.currency != null) ...[
+                if (data.currency != null) ...[
                   const TextSpan(text: ' '),
                   TextSpan(
-                    text: metric.currency,
-                    style:  TextStyle(
+                    text: data.currency,
+                    style: TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: AppSizes.fontSmall,
                       color: AppColors.textSecondary,
@@ -88,4 +112,3 @@ class MetricCard extends StatelessWidget {
     );
   }
 }
-

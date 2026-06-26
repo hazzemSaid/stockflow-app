@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 
+/// Displays monthly payments received — real data, no hardcoded values.
 class ProfitSummaryCard extends StatelessWidget {
-  const ProfitSummaryCard({super.key});
+  const ProfitSummaryCard({super.key, required this.monthlyPayments});
+
+  final double monthlyPayments;
 
   @override
   Widget build(BuildContext context) {
+    final formatted =
+        NumberFormat('#,##0', 'ar').format(monthlyPayments);
+
     return Container(
       padding: EdgeInsets.all(AppSizes.spacingSmall),
       decoration: BoxDecoration(
@@ -29,15 +36,17 @@ class ProfitSummaryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  AppStrings.dashboardTodayProfit,
+                  AppStrings.dashboardMonthlyPayments,
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: AppSizes.fontLarge,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.secondary,
                   ),
                 ),
+                SizedBox(height: 2.h),
                 Text(
-                  AppStrings.dashboardTodayProfitSubtitle,
+                  AppStrings.dashboardMonthlyPaymentsSubtitle,
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: AppSizes.fontSmall,
@@ -48,15 +57,17 @@ class ProfitSummaryCard extends StatelessWidget {
             ),
           ),
           SizedBox(width: AppSizes.spacingSmall),
-          const _ProfitAmount(),
+          _AmountBadge(formatted: formatted),
         ],
       ),
     );
   }
 }
 
-class _ProfitAmount extends StatelessWidget {
-  const _ProfitAmount();
+class _AmountBadge extends StatelessWidget {
+  const _AmountBadge({required this.formatted});
+
+  final String formatted;
 
   @override
   Widget build(BuildContext context) {
@@ -69,16 +80,16 @@ class _ProfitAmount extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: '5,650',
+                  text: formatted,
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: AppSizes.fontXLarge,
+                    fontWeight: FontWeight.bold,
                     color: AppColors.primary,
                   ),
                 ),
-                TextSpan(text: ' '),
                 TextSpan(
-                  text: AppStrings.currencyEg,
+                  text: ' ${AppStrings.currencyEg}',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: AppSizes.fontSmall,
@@ -94,12 +105,12 @@ class _ProfitAmount extends StatelessWidget {
           width: 40.w,
           height: 40.w,
           decoration: BoxDecoration(
-            color: AppColors.lightOrange,
+            color: AppColors.lightGreen,
             borderRadius: BorderRadius.circular(14.r),
           ),
           child: const Icon(
-            Icons.trending_up,
-            color: AppColors.accent,
+            Icons.payments_outlined,
+            color: AppColors.primary,
             size: 20,
           ),
         ),
@@ -107,4 +118,3 @@ class _ProfitAmount extends StatelessWidget {
     );
   }
 }
-
