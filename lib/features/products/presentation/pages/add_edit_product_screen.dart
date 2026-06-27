@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
@@ -24,19 +23,25 @@ class AddEditProductScreen extends StatefulWidget {
   State<AddEditProductScreen> createState() => _AddEditProductScreenState();
 }
 
-class _AddEditProductScreenState extends State<AddEditProductScreen> {
+class _AddEditProductScreenState extends State<AddEditProductScreen>
+    with CompanyAwareState<AddEditProductScreen> {
   late final AddEditProductCubit _cubit;
-  late final String _companyId;
 
   bool get _isEditMode => widget.productId != null;
 
   @override
   void initState() {
     super.initState();
-    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _cubit = sl<AddEditProductCubit>();
     if (widget.productId != null) {
-      _cubit.loadForEdit(widget.productId!, _companyId);
+      _cubit.loadForEdit(widget.productId!, companyId);
+    }
+  }
+
+  @override
+  void onCompanyChanged(String companyId) {
+    if (widget.productId != null) {
+      _cubit.loadForEdit(widget.productId!, companyId);
     }
   }
 
@@ -127,6 +132,6 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
     final authState = context.read<AuthCubit>().state;
     final userId = authState is Authenticated ? authState.user.id : '';
     if (userId.isEmpty) return;
-    await _cubit.save(userId, _companyId);
+    await _cubit.save(userId, companyId);
   }
 }

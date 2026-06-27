@@ -269,7 +269,10 @@ Future<void> initServiceLocator() async {
   );
 
   sl.registerFactory<InvoicesCubit>(
-    () => InvoicesCubit(getInvoicesUseCase: sl<GetInvoicesUseCase>()),
+    () => InvoicesCubit(
+      getInvoicesUseCase: sl<GetInvoicesUseCase>(),
+      getCustomersUseCase: sl<GetCustomersUseCase>(),
+    ),
   );
 
   sl.registerFactory<CustomerPickerCubit>(

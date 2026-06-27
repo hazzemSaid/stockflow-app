@@ -1,10 +1,8 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/company/company_cubit.dart';
-import '../../../../core/company/company_state.dart';
+import '../../../../core/company/company_aware_state.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -26,46 +24,35 @@ class CustomersScreen extends StatefulWidget {
   State<CustomersScreen> createState() => _CustomersScreenState();
 }
 
-class _CustomersScreenState extends State<CustomersScreen> {
+class _CustomersScreenState extends State<CustomersScreen>
+    with CompanyAwareState<CustomersScreen> {
   late final CustomersCubit _cubit;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   String _selectedFilter = 'all';
-  StreamSubscription? _companySubscription;
-  String _companyId = '';
-
-  String get _cid => _companyId;
 
   @override
   void initState() {
     super.initState();
     _cubit = sl<CustomersCubit>();
-    _companyId = _readCompanyId();
-    _cubit.loadCustomers(_companyId);
+    _cubit.loadCustomers(companyId);
     _scrollController.addListener(_onScroll);
-    _companySubscription = context.read<CompanyCubit>().stream.listen((state) {
-      if (state is CompanySelected && mounted) {
-        _companyId = state.companyId;
-        _cubit.loadCustomers(_companyId);
-      }
-    });
   }
 
-  String _readCompanyId() {
-    final state = context.read<CompanyCubit>().state;
-    return state is CompanySelected ? state.companyId : '';
+  @override
+  void onCompanyChanged(String companyId) {
+    _cubit.loadCustomers(companyId);
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      _cubit.loadMore(_cid);
+      _cubit.loadMore(companyId);
     }
   }
 
   @override
   void dispose() {
-    _companySubscription?.cancel();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _searchController.dispose();
@@ -76,7 +63,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
   void _onAddCustomer() async {
     final added = await context.push<bool>(AppRoutes.customerNew);
     if (added == true && mounted) {
-      _cubit.refresh(_cid);
+      _cubit.refresh(companyId);
     }
   }
 
@@ -101,7 +88,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         backgroundColor: AppColors.appBackground,
         body: SafeArea(
           child: RefreshIndicator(
-            onRefresh: () => _cubit.refresh(_cid),
+            onRefresh: () => _cubit.refresh(companyId),
             child: CustomScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
@@ -118,10 +105,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                           CustomerSearchBar(
                             controller: _searchController,
                             onChanged: (query) =>
-                                _cubit.updateSearchQuery(query, _cid),
+                                _cubit.updateSearchQuery(query, companyId),
                             onClear: () {
                               _searchController.clear();
-                              _cubit.updateSearchQuery('', _cid);
+                              _cubit.updateSearchQuery('', companyId);
                             },
                             onAdd: _onAddCustomer,
                           ),
@@ -159,7 +146,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               ),
                               SizedBox(height: AppSizes.spacingMedium),
                               TextButton(
-                                onPressed: () => _cubit.loadCustomers(_cid),
+                                onPressed: () => _cubit.loadCustomers(companyId),
                                 child: const Text(
                                   AppStrings.productRetry,
                                   style: TextStyle(fontFamily: 'Cairo'),
@@ -220,7 +207,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                     AppRoutes.customerDetailsPath(customer.id),
                                   );
                                   if (updated == true && mounted) {
-                                    _cubit.refresh(_cid);
+                                    _cubit.refresh(companyId);
                                   }
                                 },
                               ),

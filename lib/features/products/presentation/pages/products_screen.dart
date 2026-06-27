@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_sizes.dart';
@@ -28,38 +25,34 @@ class ProductsScreen extends StatefulWidget {
   State<ProductsScreen> createState() => _ProductsScreenState();
 }
 
-class _ProductsScreenState extends State<ProductsScreen> {
+class _ProductsScreenState extends State<ProductsScreen>
+    with CompanyAwareState<ProductsScreen> {
   late final ProductsCubit _cubit;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  StreamSubscription? _companySubscription;
 
   @override
   void initState() {
     super.initState();
     _cubit = sl<ProductsCubit>();
-    _cubit.refresh(companyId: _currentCompanyId());
+    _cubit.refresh(companyId: companyId);
     _scrollController.addListener(_onScroll);
-    _companySubscription = context.read<CompanyCubit>().stream.listen((s) {
-      if (s is CompanySelected && mounted) {
-        _cubit.refresh(companyId: s.companyId);
-      }
-    });
   }
 
-  String _currentCompanyId() =>
-      (context.read<CompanyCubit>().state as CompanySelected).companyId;
+  @override
+  void onCompanyChanged(String companyId) {
+    _cubit.refresh(companyId: companyId);
+  }
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      _cubit.loadMore(companyId: _currentCompanyId());
+      _cubit.loadMore(companyId: companyId);
     }
   }
 
   @override
   void dispose() {
-    _companySubscription?.cancel();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _searchController.dispose();
@@ -69,14 +62,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cid = _currentCompanyId();
     return BlocProvider.value(
       value: _cubit,
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
         body: SafeArea(
           child: RefreshIndicator(
-            onRefresh: () => _cubit.refresh(companyId: cid),
+            onRefresh: () => _cubit.refresh(companyId: companyId),
             child: CustomScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
@@ -103,10 +95,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       controller: _searchController,
                       hintText: AppStrings.productsSearchHint,
                       onChanged: (query) =>
-                          _cubit.updateSearchQuery(query, companyId: cid),
+                          _cubit.updateSearchQuery(query, companyId: companyId),
                       onClear: () {
                         _searchController.clear();
-                        _cubit.updateSearchQuery('', companyId: cid);
+                        _cubit.updateSearchQuery('', companyId: companyId);
                       },
                     ),
                   ),
@@ -120,7 +112,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         child: ProductErrorView(
                           message:
                               state.errorMessage ?? AppStrings.productLoadError,
-                          onRetry: () => _cubit.loadProducts(companyId: cid),
+                          onRetry: () => _cubit.loadProducts(companyId: companyId),
                         ),
                       ),
                       ProductsStatus.empty => SliverFillRemaining(

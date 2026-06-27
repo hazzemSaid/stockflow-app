@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
@@ -23,11 +22,24 @@ class MembersPage extends StatefulWidget {
   State<MembersPage> createState() => _MembersPageState();
 }
 
-class _MembersPageState extends State<MembersPage> {
+class _MembersPageState extends State<MembersPage>
+    with CompanyAwareState<MembersPage> {
   late final CompanyMembersCubit _cubit = sl<CompanyMembersCubit>();
-  String? _companyId;
   List<JoinRequest>? _joinRequests;
   bool _joinRequestActionInProgress = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit.loadMembers(companyId);
+    _loadJoinRequests();
+  }
+
+  @override
+  void onCompanyChanged(String companyId) {
+    _cubit.loadMembers(companyId);
+    _loadJoinRequests();
+  }
 
   @override
   void dispose() {
@@ -35,26 +47,14 @@ class _MembersPageState extends State<MembersPage> {
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final companyState = context.read<CompanyCubit>().state;
-    if (companyState is CompanySelected && _companyId == null) {
-      _companyId = companyState.companyId;
-      _cubit.loadMembers(companyState.companyId);
-      _loadJoinRequests();
-    }
-  }
-
   Future<void> _loadJoinRequests() async {
-    if (_companyId == null) return;
+    if (companyId.isEmpty) return;
     final useCase = sl<GetJoinRequestsUseCase>();
-    final result = await useCase.call(_companyId!);
+    final result = await useCase.call(companyId);
     result.fold((_) {}, (requests) => setState(() => _joinRequests = requests));
   }
 
   Future<void> _approveRequest(String requestId) async {
-    if (_companyId == null) return;
     setState(() => _joinRequestActionInProgress = true);
 
     final result = await sl<ApproveJoinRequestUseCase>().call(requestId);
@@ -63,9 +63,7 @@ class _MembersPageState extends State<MembersPage> {
       (_) {
         AppSnackbar.success(context, AppStrings.requestApproved);
         _loadJoinRequests();
-        if (_companyId != null) {
-          _cubit.loadMembers(_companyId!);
-        }
+        _cubit.loadMembers(companyId);
       },
     );
 
@@ -86,12 +84,11 @@ class _MembersPageState extends State<MembersPage> {
   }
 
   void _showInviteDialog() {
-    if (_companyId == null) return;
     showDialog(
       context: context,
       builder: (_) => InviteMemberDialog(
         onInvite: (email) {
-          _cubit.inviteMember(_companyId!, email);
+          _cubit.inviteMember(companyId, email);
           Navigator.pop(context);
         },
       ),
@@ -153,10 +150,8 @@ class _MembersPageState extends State<MembersPage> {
 
       return RefreshIndicator(
         onRefresh: () async {
-          if (_companyId != null) {
-            _cubit.loadMembers(_companyId!);
-            await _loadJoinRequests();
-          }
+          _cubit.loadMembers(companyId);
+          await _loadJoinRequests();
         },
         child: ListView(
           padding: EdgeInsets.all(AppSizes.spacingMedium),
@@ -370,12 +365,10 @@ class _MembersPageState extends State<MembersPage> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              if (_companyId != null) {
-                _cubit.removeMember(
-                  _companyId!,
-                  member.id,
-                );
-              }
+              _cubit.removeMember(
+                companyId,
+                member.id,
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,

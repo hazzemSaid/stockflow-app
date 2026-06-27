@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_routes.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
@@ -28,15 +27,14 @@ class CustomerInvoicesScreen extends StatefulWidget {
   State<CustomerInvoicesScreen> createState() => _CustomerInvoicesScreenState();
 }
 
-class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
-  late final CustomerInvoicesCubit _cubit;
+class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen>
+    with CompanyAwareState<CustomerInvoicesScreen> {
+  late CustomerInvoicesCubit _cubit;
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    final companyState = context.read<CompanyCubit>().state;
-    final companyId = (companyState as CompanySelected).companyId;
     _cubit = CustomerInvoicesCubit(
       getInvoicesUseCase: sl<GetInvoicesUseCase>(),
       customerId: widget.customerId,
@@ -45,6 +43,19 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen> {
     );
     _cubit.loadInvoices();
     _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void onCompanyChanged(String companyId) {
+    _cubit.close();
+    _cubit = CustomerInvoicesCubit(
+      getInvoicesUseCase: sl<GetInvoicesUseCase>(),
+      customerId: widget.customerId,
+      companyId: companyId,
+      customerName: widget.customerName,
+    );
+    setState(() {});
+    _cubit.loadInvoices();
   }
 
   void _onScroll() {

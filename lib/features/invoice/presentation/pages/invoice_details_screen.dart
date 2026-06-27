@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
@@ -29,16 +28,20 @@ class InvoiceDetailsScreen extends StatefulWidget {
   State<InvoiceDetailsScreen> createState() => _InvoiceDetailsScreenState();
 }
 
-class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
+class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen>
+    with CompanyAwareState<InvoiceDetailsScreen> {
   late final InvoiceDetailsCubit _cubit;
-  late final String _companyId;
 
   @override
   void initState() {
     super.initState();
-    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _cubit = sl<InvoiceDetailsCubit>();
-    _cubit.loadInvoice(widget.invoiceId, _companyId);
+    _cubit.loadInvoice(widget.invoiceId, companyId);
+  }
+
+  @override
+  void onCompanyChanged(String companyId) {
+    _cubit.loadInvoice(widget.invoiceId, companyId);
   }
 
   @override
