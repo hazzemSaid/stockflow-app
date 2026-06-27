@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:stockflow/core/error/failures.dart';
+import 'package:stockflow/features/customers/domain/entities/customer.dart';
 import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
 import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
 
@@ -11,6 +12,7 @@ class InvoicesState extends Equatable {
   final Failure? failure;
   final InvoiceStatus? statusFilter;
   final String? customerId;
+  final List<Customer> customers;
 
   const InvoicesState({
     this.status = InvoicesStatus.initial,
@@ -18,6 +20,7 @@ class InvoicesState extends Equatable {
     this.failure,
     this.statusFilter,
     this.customerId,
+    this.customers = const [],
   });
 
   InvoicesState copyWith({
@@ -26,6 +29,7 @@ class InvoicesState extends Equatable {
     Failure? failure,
     InvoiceStatus? statusFilter,
     String? customerId,
+    List<Customer>? customers,
     bool clearFailure = false,
   }) {
     return InvoicesState(
@@ -34,6 +38,7 @@ class InvoicesState extends Equatable {
       failure: clearFailure ? null : (failure ?? this.failure),
       statusFilter: statusFilter ?? this.statusFilter,
       customerId: customerId ?? this.customerId,
+      customers: customers ?? this.customers,
     );
   }
 
@@ -44,5 +49,6 @@ class InvoicesState extends Equatable {
     failure,
     statusFilter,
     customerId,
+    customers,
   ];
 }

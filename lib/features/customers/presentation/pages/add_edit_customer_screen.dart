@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/service_locator.dart';
@@ -23,9 +22,9 @@ class AddEditCustomerScreen extends StatefulWidget {
   State<AddEditCustomerScreen> createState() => _AddEditCustomerScreenState();
 }
 
-class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
+class _AddEditCustomerScreenState extends State<AddEditCustomerScreen>
+    with CompanyAwareState<AddEditCustomerScreen> {
   late final AddEditCustomerCubit _cubit;
-  late final String _companyId;
   final _nameController = TextEditingController();
   final _nameOfficialController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -39,10 +38,16 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
   @override
   void initState() {
     super.initState();
-    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _cubit = sl<AddEditCustomerCubit>();
     if (_isEditMode) {
-      _cubit.loadForEdit(widget.customerId!, _companyId);
+      _cubit.loadForEdit(widget.customerId!, companyId);
+    }
+  }
+
+  @override
+  void onCompanyChanged(String companyId) {
+    if (_isEditMode) {
+      _cubit.loadForEdit(widget.customerId!, companyId);
     }
   }
 
@@ -92,7 +97,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
     _cubit.updatePhone(_phoneController.text);
     _cubit.updateAddress(_addressController.text);
     _cubit.updateDebt(_debtController.text);
-    await _cubit.save(_companyId);
+    await _cubit.save(companyId);
   }
 
   @override

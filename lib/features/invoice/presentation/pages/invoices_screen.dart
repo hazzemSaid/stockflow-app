@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
 import 'package:stockflow/core/constants/app_routes.dart';
-import 'package:stockflow/core/di/service_locator.dart';
 import 'package:stockflow/core/permissions/permission_constants.dart';
 import 'package:stockflow/core/permissions/permission_gate.dart';
-import 'package:stockflow/features/customers/domain/entities/customer.dart';
-import 'package:stockflow/features/customers/domain/usecases/get_customers_usecase.dart';
 import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
 import 'package:stockflow/features/invoice/presentation/cubit/invoices/invoices_cubit.dart';
 import 'package:stockflow/features/invoice/presentation/widgets/invoice_card.dart';
@@ -25,62 +21,61 @@ class InvoicesScreen extends StatefulWidget {
   State<InvoicesScreen> createState() => _InvoicesScreenState();
 }
 
-class _InvoicesScreenState extends State<InvoicesScreen> {
-  final _getCustomersUseCase = sl<GetCustomersUseCase>();
-  late final String _companyId;
-
+class _InvoicesScreenState extends State<InvoicesScreen>
+    with CompanyAwareState<InvoicesScreen> {
   InvoiceStatus? _selectedStatus;
-  Customer? _selectedCustomer;
-  List<Customer> _customers = [];
+  String? _selectedCustomerId;
 
   @override
   void initState() {
     super.initState();
-    final companyState = context.read<CompanyCubit>().state;
-    _companyId = (companyState as CompanySelected).companyId;
-    _loadCustomers();
-    context.read<InvoicesCubit>().loadInvoices(_companyId);
+    final cubit = context.read<InvoicesCubit>();
+    cubit.loadCustomers(companyId);
+    cubit.loadInvoices(companyId);
   }
 
-  Future<void> _loadCustomers() async {
-    final result = await _getCustomersUseCase(companyId: _companyId);
-    result.fold(
-      (_) {},
-      (customers) => setState(() => _customers = customers),
-    );
+  @override
+  void onCompanyChanged(String companyId) {
+    setState(() {
+      _selectedStatus = null;
+      _selectedCustomerId = null;
+    });
+    final cubit = context.read<InvoicesCubit>();
+    cubit.loadCustomers(companyId);
+    cubit.loadInvoices(companyId);
   }
 
   void _setStatusFilter(InvoiceStatus? status) {
     final newStatus = _selectedStatus == status ? null : status;
     setState(() => _selectedStatus = newStatus);
     context.read<InvoicesCubit>().setFilter(
-      companyId: _companyId,
+      companyId: companyId,
       statusFilter: newStatus,
-      customerId: _selectedCustomer?.id,
+      customerId: _selectedCustomerId,
     );
   }
 
-  void _setCustomerFilter(Customer? customer) {
-    setState(() => _selectedCustomer = customer);
+  void _setCustomerFilter(String? customerId) {
+    setState(() => _selectedCustomerId = customerId);
     context.read<InvoicesCubit>().setFilter(
-      companyId: _companyId,
+      companyId: companyId,
       statusFilter: _selectedStatus,
-      customerId: customer?.id,
+      customerId: customerId,
     );
   }
 
   void _clearFilters() {
     setState(() {
       _selectedStatus = null;
-      _selectedCustomer = null;
+      _selectedCustomerId = null;
     });
-    context.read<InvoicesCubit>().clearFilters(_companyId);
+    context.read<InvoicesCubit>().clearFilters(companyId);
   }
 
   @override
   Widget build(BuildContext context) {
     final hasActiveFilter =
-        _selectedStatus != null || _selectedCustomer != null;
+        _selectedStatus != null || _selectedCustomerId != null;
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
@@ -98,7 +93,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            context.read<InvoicesCubit>().refresh(_companyId),
+            context.read<InvoicesCubit>().refresh(companyId),
         child: Column(
           children: [
             _buildFilters(hasActiveFilter),
@@ -204,7 +199,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                         InvoiceFilterChip(
                           label: AppStrings.customerAllFilter,
                           selected: _selectedStatus == null &&
-                              _selectedCustomer == null,
+                              _selectedCustomerId == null,
                           onTap: _clearFilters,
                         ),
                         InvoiceFilterChip(
@@ -233,7 +228,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                         InvoiceFilterChip(
                           label: AppStrings.customerAllFilter,
                           selected: _selectedStatus == null &&
-                              _selectedCustomer == null,
+                              _selectedCustomerId == null,
                           onTap: _clearFilters,
                         ),
                         SizedBox(width: AppSizes.spacingSmall),
@@ -272,37 +267,42 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
   }
 
   Widget _buildCustomerDropdown() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: AppSizes.spacingMedium),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
-        border: Border.all(color: AppColors.inputBorder),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<Customer>(
-          value: _selectedCustomer,
-          isExpanded: true,
-          hint: Text(
-            AppStrings.customerSection,
-            style: TextStyle(color: AppColors.textSecondary),
+    return BlocBuilder<InvoicesCubit, InvoicesState>(
+      buildWhen: (prev, curr) => prev.customers != curr.customers,
+      builder: (context, state) {
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: AppSizes.spacingMedium),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+            border: Border.all(color: AppColors.inputBorder),
           ),
-          items: [
-            DropdownMenuItem<Customer>(
-              value: null,
-              child: Text(
-                AppStrings.customerAllFilter,
-                style: TextStyle(color: AppColors.textDark),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _selectedCustomerId,
+              isExpanded: true,
+              hint: Text(
+                AppStrings.customerSection,
+                style: TextStyle(color: AppColors.textSecondary),
               ),
+              items: [
+                const DropdownMenuItem<String>(
+                  value: null,
+                  child: Text(
+                    AppStrings.customerAllFilter,
+                    style: TextStyle(color: AppColors.textDark),
+                  ),
+                ),
+                ...state.customers.map(
+                  (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
+                ),
+              ],
+              onChanged: (id) => _setCustomerFilter(id),
             ),
-            ..._customers.map(
-              (c) => DropdownMenuItem(value: c, child: Text(c.name)),
-            ),
-          ],
-          onChanged: (c) => _setCustomerFilter(c),
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

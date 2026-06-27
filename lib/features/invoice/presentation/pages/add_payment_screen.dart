@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_routes.dart';
@@ -28,22 +27,30 @@ class AddPaymentScreen extends StatefulWidget {
   State<AddPaymentScreen> createState() => _AddPaymentScreenState();
 }
 
-class _AddPaymentScreenState extends State<AddPaymentScreen> {
+class _AddPaymentScreenState extends State<AddPaymentScreen>
+    with CompanyAwareState<AddPaymentScreen> {
   late final AddPaymentCubit _cubit;
-  late final String _companyId;
   late final TextEditingController _amountController;
   AddPaymentLoaded? _lastLoaded;
 
   @override
   void initState() {
     super.initState();
-    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _amountController = TextEditingController();
     _cubit = sl<AddPaymentCubit>();
     _cubit.loadUnpaidInvoices(
       customerId: widget.customerId,
       customerName: widget.customerName ?? '',
-      companyId: _companyId,
+      companyId: companyId,
+    );
+  }
+
+  @override
+  void onCompanyChanged(String companyId) {
+    _cubit.loadUnpaidInvoices(
+      customerId: widget.customerId,
+      customerName: widget.customerName ?? '',
+      companyId: companyId,
     );
   }
 
@@ -147,7 +154,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
             onPressed: () => _cubit.loadUnpaidInvoices(
               customerId: widget.customerId,
               customerName: widget.customerName ?? '',
-              companyId: _companyId,
+              companyId: companyId,
             ),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             child: Text(

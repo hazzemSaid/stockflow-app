@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import 'package:stockflow/core/company/company_cubit.dart';
 import 'package:stockflow/core/company/company_state.dart';
 import 'package:stockflow/core/di/service_locator.dart';
@@ -22,24 +23,33 @@ class DashboardView extends StatefulWidget {
   State<DashboardView> createState() => _DashboardViewState();
 }
 
-class _DashboardViewState extends State<DashboardView> {
-  StreamSubscription? _companySubscription;
+class _DashboardViewState extends State<DashboardView>
+    with CompanyAwareState<DashboardView> {
   StreamSubscription? _authSubscription;
   String _userName = '';
   Company? _company;
-  String? _lastCompanyId;
 
   @override
   void initState() {
     super.initState();
     _syncState();
-    _subscribe();
+    _subscribeAuth();
+    _triggerLoad();
+  }
+
+  @override
+  void onCompanyChanged(String companyId) {
+    setState(() {
+      final companyState = sl<CompanyCubit>().state;
+      if (companyState is CompanySelected) {
+        _company = companyState.company;
+      }
+    });
     _triggerLoad();
   }
 
   @override
   void dispose() {
-    _companySubscription?.cancel();
     _authSubscription?.cancel();
     super.dispose();
   }
@@ -52,19 +62,10 @@ class _DashboardViewState extends State<DashboardView> {
     final companyState = sl<CompanyCubit>().state;
     if (companyState is CompanySelected) {
       _company = companyState.company;
-      _lastCompanyId = _company!.id;
     }
   }
 
-  void _subscribe() {
-    _companySubscription = sl<CompanyCubit>().stream.listen((state) {
-      if (state is CompanySelected && mounted) {
-        if (state.company.id == _lastCompanyId) return;
-        _lastCompanyId = state.company.id;
-        setState(() => _company = state.company);
-        _triggerLoad();
-      }
-    });
+  void _subscribeAuth() {
     _authSubscription = context.read<AuthCubit>().stream.listen((state) {
       if (state is Authenticated && mounted) {
         setState(() => _userName = state.user.name);

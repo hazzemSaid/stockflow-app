@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
+import 'package:stockflow/core/company/company_aware_state.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_sizes.dart';
@@ -25,17 +24,21 @@ class CustomerDetailsScreen extends StatefulWidget {
   State<CustomerDetailsScreen> createState() => _CustomerDetailsScreenState();
 }
 
-class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
+class _CustomerDetailsScreenState extends State<CustomerDetailsScreen>
+    with CompanyAwareState<CustomerDetailsScreen> {
   late final CustomerDetailsCubit _cubit;
-  late final String _companyId;
   int _selectedTab = 0;
 
   @override
   void initState() {
     super.initState();
-    _companyId = (context.read<CompanyCubit>().state as CompanySelected).companyId;
     _cubit = sl<CustomerDetailsCubit>();
-    _cubit.loadCustomer(widget.customerId, _companyId);
+    _cubit.loadCustomer(widget.customerId, companyId);
+  }
+
+  @override
+  void onCompanyChanged(String companyId) {
+    _cubit.loadCustomer(widget.customerId, companyId);
   }
 
   @override
@@ -79,7 +82,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       ),
                       SizedBox(height: AppSizes.spacingMedium),
                       ElevatedButton(
-                        onPressed: () => _cubit.loadCustomer(widget.customerId, _companyId),
+                        onPressed: () => _cubit.loadCustomer(widget.customerId, companyId),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                         ),
@@ -107,7 +110,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                               AppRoutes.customerEditPath(widget.customerId),
                             );
                             if (updated == true && mounted) {
-                              _cubit.loadCustomer(widget.customerId, _companyId);
+                              _cubit.loadCustomer(widget.customerId, companyId);
                             }
                           },
                         ),
@@ -142,7 +145,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                 extra: customer.name,
                               );
                               if (result == true && mounted) {
-                                _cubit.loadCustomer(widget.customerId, _companyId);
+                                _cubit.loadCustomer(widget.customerId, companyId);
                               }
                             },
                           ),

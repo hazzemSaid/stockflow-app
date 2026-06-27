@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stockflow/features/customers/domain/usecases/get_customers_usecase.dart';
 import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
 import 'package:stockflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
 import 'invoices_state.dart';
@@ -9,10 +10,13 @@ const int _pageSize = 20;
 
 class InvoicesCubit extends Cubit<InvoicesState> {
   final GetInvoicesUseCase _getInvoicesUseCase;
+  final GetCustomersUseCase _getCustomersUseCase;
 
   InvoicesCubit({
     required GetInvoicesUseCase getInvoicesUseCase,
+    required GetCustomersUseCase getCustomersUseCase,
   })  : _getInvoicesUseCase = getInvoicesUseCase,
+        _getCustomersUseCase = getCustomersUseCase,
         super(const InvoicesState());
 
   Future<void> loadInvoices(String companyId) async {
@@ -69,5 +73,13 @@ class InvoicesCubit extends Cubit<InvoicesState> {
 
   Future<void> refresh(String companyId) async {
     await loadInvoices(companyId);
+  }
+
+  Future<void> loadCustomers(String companyId) async {
+    final result = await _getCustomersUseCase(companyId: companyId);
+    result.fold(
+      (_) => emit(state.copyWith(customers: const [])),
+      (customers) => emit(state.copyWith(customers: customers)),
+    );
   }
 }
