@@ -36,13 +36,11 @@ class _CompanySwitcherState extends State<CompanySwitcher> {
     return BlocBuilder<CompanyCubit, CompanyState>(
       builder: (context, state) {
         Company? selectedCompany;
-        bool? isOwnerMember;
 
         if (state is CompaniesLoaded) {
           selectedCompany = null;
         } else if (state is CompanySelected) {
           selectedCompany = state.company;
-          isOwnerMember = state.membership?.isOwner;
         }
 
         return GestureDetector(
@@ -84,14 +82,6 @@ class _CompanySwitcherState extends State<CompanySwitcher> {
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      if (isOwnerMember == true)
-                        Text(
-                          AppStrings.ownerRole,
-                          style: TextStyle(
-                            fontSize: AppSizes.fontSmall,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
                     ],
                   ),
                 ),
@@ -116,11 +106,6 @@ class _CompanySwitcherState extends State<CompanySwitcher> {
       CompanySelected(:final company) => company,
       _ => null,
     };
-    final isOwnerMember = switch (state) {
-      CompanySelected(:final membership) => membership?.isOwner,
-      _ => null,
-    };
-
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -189,7 +174,6 @@ class _CompanySwitcherState extends State<CompanySwitcher> {
                                 child: CompanyCard(
                                   company: company,
                                   isSelected: isSelected,
-                                  roleName: isSelected && isOwnerMember == true ? AppStrings.ownerRole : null,
                                   onTap: () {
                                     final router = GoRouter.of(context);
                                     context.read<CompanyCubit>().switchCompany(

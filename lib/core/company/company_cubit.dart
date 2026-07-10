@@ -22,7 +22,7 @@ class CompanyCubit extends Cubit<CompanyState> {
        _secureStorage = secureStorage ?? const FlutterSecureStorage(),
        super(const CompanyInitial());
 
-  Future<void> loadCompanies() async {
+  Future<void> loadCompanies({String? selectCompanyId}) async {
     emit(const CompanyLoading());
     final result = await _getUserCompaniesUseCase();
     result.fold((failure) => emit(CompanyError(failure.message)), (companies) async {
@@ -31,9 +31,9 @@ class CompanyCubit extends Cubit<CompanyState> {
         return;
       }
 
-      final lastCompanyId = await _secureStorage.read(key: _lastCompanyKey);
-      final company = lastCompanyId != null
-          ? companies.where((c) => c.id == lastCompanyId).firstOrNull
+      final targetCompanyId = selectCompanyId ?? await _secureStorage.read(key: _lastCompanyKey);
+      final company = targetCompanyId != null
+          ? companies.where((c) => c.id == targetCompanyId).firstOrNull
           : null;
 
       if (company != null) {
@@ -62,7 +62,7 @@ class CompanyCubit extends Cubit<CompanyState> {
       await sl<PermissionService>().loadPermissions(
         company.id,
         m.id,
-        m.permissions,
+        Map<String, dynamic>.from(m.permissions),
         isOwner: m.isOwner,
       );
       debugPrint('[CompanyCubit] permissions loaded successfully');
