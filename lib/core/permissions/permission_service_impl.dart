@@ -1,7 +1,7 @@
 import 'package:stockflow/core/permissions/permission_service.dart';
 
 class PermissionServiceImpl implements PermissionService {
-  Map<String, bool>? _cachedPermissions;
+  Map<String, dynamic>? _cachedPermissions;
   bool _isOwner = false;
 
   PermissionServiceImpl();
@@ -10,7 +10,7 @@ class PermissionServiceImpl implements PermissionService {
   Future<void> loadPermissions(
     String companyId,
     String memberId,
-    Map<String, bool>? memberPermissions, {
+    Map<String, dynamic>? memberPermissions, {
     bool isOwner = false,
   }) async {
     _cachedPermissions = memberPermissions ?? {};
@@ -21,7 +21,19 @@ class PermissionServiceImpl implements PermissionService {
   bool hasPermission(String key) {
     if (_isOwner) return true;
     if (_cachedPermissions == null) return false;
-    return _cachedPermissions![key] ?? false;
+
+    final parts = key.split('.');
+    dynamic current = _cachedPermissions;
+
+    for (final part in parts) {
+      if (current is! Map<String, dynamic>) return false;
+      final value = current[part];
+      if (value == null) return false;
+      current = value;
+    }
+
+    if (current is bool) return current;
+    return false;
   }
 
   @override

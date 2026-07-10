@@ -1,63 +1,61 @@
 import 'package:stockflow/core/constants/app_strings.dart';
 
-/// Maps permission keys to their Arabic display labels.
+/// Maps permission dotted-path keys to their Arabic display labels.
 const Map<String, String> permissionLabels = {
+  // Dashboard
+  'dashboard': AppStrings.permDashboardView,
+  // Products
   'products.view': AppStrings.permView,
   'products.create': AppStrings.permCreate,
-  'products.update': AppStrings.permUpdate,
+  'products.edit': AppStrings.permUpdate,
   'products.delete': AppStrings.permDelete,
+  // Customers
   'customers.view': AppStrings.permCustomersView,
   'customers.create': AppStrings.permCustomersCreate,
-  'customers.update': AppStrings.permCustomersUpdate,
+  'customers.edit': AppStrings.permCustomersUpdate,
   'customers.delete': AppStrings.permCustomersDelete,
+  // Invoices
   'invoices.view': AppStrings.permInvoicesView,
   'invoices.create': AppStrings.permInvoicesCreate,
-  'invoices.update': AppStrings.permInvoicesUpdate,
+  'invoices.edit': AppStrings.permInvoicesUpdate,
   'invoices.delete': AppStrings.permInvoicesDelete,
+  // Payments
   'payments.view': AppStrings.permPaymentsView,
   'payments.create': AppStrings.permPaymentsCreate,
-  'payments.update': AppStrings.permPaymentsUpdate,
+  // Reports
   'reports.view': AppStrings.permReportsView,
   'reports.export': AppStrings.permExportExcel,
-  'roles.manage': AppStrings.permManageTeam,
-  'company.manage': AppStrings.permSystemSettings,
-  'dashboard.view': AppStrings.permDashboardView,
-  'users.manage': AppStrings.permUsersManage,
 };
 
-/// Groups permission keys by section for display.
+/// Groups permission keys by section for display in the permission editor.
 const Map<String, List<String>> permissionSections = {
+  AppStrings.sectionDashboard: [
+    'dashboard',
+  ],
   AppStrings.sectionProducts: [
     'products.view',
     'products.create',
-    'products.update',
+    'products.edit',
     'products.delete',
   ],
   AppStrings.sectionCustomers: [
     'customers.view',
     'customers.create',
-    'customers.update',
+    'customers.edit',
     'customers.delete',
   ],
   AppStrings.sectionInvoices: [
     'invoices.view',
     'invoices.create',
-    'invoices.update',
+    'invoices.edit',
     'invoices.delete',
   ],
   AppStrings.sectionPayments: [
     'payments.view',
     'payments.create',
-    'payments.update',
   ],
   AppStrings.sectionReports: [
-    'dashboard.view',
     'reports.view',
     'reports.export',
-  ],
-  AppStrings.sectionAdmin: [
-    'roles.manage',
-    'company.manage',
-    'users.manage',
   ],
 };
