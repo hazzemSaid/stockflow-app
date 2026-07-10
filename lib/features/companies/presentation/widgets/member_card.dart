@@ -6,96 +6,247 @@ import 'package:stockflow/features/companies/domain/entities/company_member.dart
 
 class MemberCard extends StatelessWidget {
   final CompanyMember member;
+  final VoidCallback? onEditPermissions;
+  final VoidCallback? onDeactivate;
+  final VoidCallback? onReactivate;
   final VoidCallback? onRemove;
+  final VoidCallback? onPromote;
+  final VoidCallback? onDemote;
+  final bool isLastOwner;
 
   const MemberCard({
     super.key,
     required this.member,
+    this.onEditPermissions,
+    this.onDeactivate,
+    this.onReactivate,
     this.onRemove,
+    this.onPromote,
+    this.onDemote,
+    this.isLastOwner = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final initials = (member.userName ?? member.userId).isNotEmpty
+        ? (member.userName ?? member.userId)[0].toUpperCase()
+        : '?';
+
     return Card(
+      margin: EdgeInsets.only(bottom: AppSizes.spacingSmall),
+      elevation: 0,
       color: AppColors.white,
-      child: ListTile(
-        contentPadding: EdgeInsets.all(AppSizes.spacingMedium),
-        leading: CircleAvatar(
-          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-          child: Text(
-            (member.userName ?? member.userId)[0].toUpperCase(),
-            style: TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        title: Row(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+        side: BorderSide(color: AppColors.inputBorder),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(AppSizes.spacingMedium),
+        child: Row(
           children: [
-            Flexible(
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: AppColors.primary.withAlpha(25),
               child: Text(
-                member.userName ?? AppStrings.unknownUser,
-                overflow: TextOverflow.ellipsis,
+                initials,
                 style: TextStyle(
-                  fontSize: AppSizes.fontLarge,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
                 ),
               ),
             ),
-            if (member.isOwner) ...[
-              SizedBox(width: AppSizes.spacingTiny),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSizes.spacingSmall,
-                  vertical: AppSizes.spacingTiny,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
-                ),
-                  child: Text(
-                    AppStrings.ownerRole,
-                  style: TextStyle(
-                    fontSize: AppSizes.fontSmall,
-                    color: AppColors.primary,
+            SizedBox(width: AppSizes.spacingMedium),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          member.userName ?? AppStrings.unknownUser,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: AppSizes.fontLarge,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      if (member.isOwner) ...[
+                        SizedBox(width: AppSizes.spacingTiny),
+                        _buildBadge(
+                          AppStrings.ownerRole,
+                          AppColors.primary,
+                        ),
+                      ],
+                      if (!member.isActive) ...[
+                        SizedBox(width: AppSizes.spacingTiny),
+                        _buildBadge(
+                          'غير نشط',
+                          AppColors.error,
+                        ),
+                      ],
+                    ],
                   ),
-                ),
-              ),
-            ],
-          ],
-        ),
-        subtitle: member.userEmail != null
-            ? Text(
-                member.userEmail!,
-                style: TextStyle(
-                  fontSize: AppSizes.fontSmall,
-                  color: AppColors.textSecondary,
-                ),
-              )
-            : null,
-        trailing: onRemove != null
-            ? PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert, color: AppColors.textSecondary),
-                onSelected: (value) {
-                  if (value == 'remove') onRemove?.call();
-                },
-                itemBuilder: (_) => [
-                  if (onRemove != null)
-                    PopupMenuItem(
-                      value: 'remove',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete_outline, size: 20, color: AppColors.error),
-                          SizedBox(width: 8),
-                          Text(AppStrings.remove),
-                        ],
+                  if (member.userEmail != null)
+                    Text(
+                      member.userEmail!,
+                      style: TextStyle(
+                        fontSize: AppSizes.fontSmall,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  if (member.isOwner)
+                    Text(
+                      'صلاحية كاملة',
+                      style: TextStyle(
+                        fontSize: AppSizes.fontSmall,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  if (!member.isOwner && member.isActive)
+                    Text(
+                      'موظف',
+                      style: TextStyle(
+                        fontSize: AppSizes.fontSmall,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                 ],
-              )
-            : null,
+              ),
+            ),
+            _buildPopupMenu(),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildBadge(String text, Color color) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSizes.spacingSmall,
+        vertical: AppSizes.spacingTiny,
+      ),
+      decoration: BoxDecoration(
+        color: color.withAlpha(25),
+        borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: AppSizes.fontSmall,
+          color: color,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPopupMenu() {
+    return PopupMenuButton<String>(
+      icon: Icon(Icons.more_vert, color: AppColors.textSecondary),
+      onSelected: (value) {
+        switch (value) {
+          case 'edit_permissions':
+            onEditPermissions?.call();
+            break;
+          case 'deactivate':
+            onDeactivate?.call();
+            break;
+          case 'reactivate':
+            onReactivate?.call();
+            break;
+          case 'remove':
+            onRemove?.call();
+            break;
+          case 'promote':
+            onPromote?.call();
+            break;
+          case 'demote':
+            onDemote?.call();
+            break;
+        }
+      },
+      itemBuilder: (_) {
+        final items = <PopupMenuEntry<String>>[];
+
+        if (member.isOwner) {
+          if (!isLastOwner) {
+            items.add(
+              PopupMenuItem(
+                value: 'demote',
+                child: Row(
+                  children: [
+                    Icon(Icons.arrow_downward, size: 20, color: AppColors.error),
+                    SizedBox(width: 8),
+                    Text('تنزيل إلى موظف'),
+                  ],
+                ),
+              ),
+            );
+          }
+        } else if (member.isActive) {
+          items.addAll([
+            PopupMenuItem(
+              value: 'edit_permissions',
+              child: Row(
+                children: [
+                  Icon(Icons.lock_outline, size: 20, color: AppColors.primary),
+                  SizedBox(width: 8),
+                  Text('الصلاحيات'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'deactivate',
+              child: Row(
+                children: [
+                  Icon(Icons.block, size: 20, color: AppColors.error),
+                  SizedBox(width: 8),
+                  Text('إلغاء التنشيط'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'remove',
+              child: Row(
+                children: [
+                  Icon(Icons.delete_outline, size: 20, color: AppColors.error),
+                  SizedBox(width: 8),
+                  Text(AppStrings.remove),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'promote',
+              child: Row(
+                children: [
+                  Icon(Icons.arrow_upward, size: 20, color: AppColors.trendUp),
+                  SizedBox(width: 8),
+                  Text('ترقية إلى مالك'),
+                ],
+              ),
+            ),
+          ]);
+        } else {
+          items.add(
+            PopupMenuItem(
+              value: 'reactivate',
+              child: Row(
+                children: [
+                  Icon(Icons.refresh, size: 20, color: AppColors.trendUp),
+                  SizedBox(width: 8),
+                  Text('إعادة تنشيط'),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return items;
+      },
     );
   }
 }
