@@ -4,6 +4,7 @@ class Company {
   final String? address;
   final String? phone;
   final String subscriptionPlan;
+  final String? subscriptionPlanName;
   final String status;
   final String? businessType;
   final String? logoUrl;
@@ -17,6 +18,7 @@ class Company {
     this.address,
     this.phone,
     this.subscriptionPlan = 'free',
+    this.subscriptionPlanName,
     this.status = 'active',
     this.businessType,
     this.logoUrl,

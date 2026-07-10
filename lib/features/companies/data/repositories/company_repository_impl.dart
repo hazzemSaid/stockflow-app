@@ -101,7 +101,7 @@ class CompanyRepositoryImpl implements CompanyRepository {
   Future<Either<Failure, void>> updateMemberPermissions(
     String companyId,
     String memberId,
-    Map<String, bool> permissions,
+    Map<String, dynamic> permissions,
   ) async {
     try {
       await _dataSource.updateMemberPermissions(companyId, memberId, permissions);
@@ -201,6 +201,118 @@ class CompanyRepositoryImpl implements CompanyRepository {
     try {
       final result = await _dataSource.getJoinRequestStatus(requestId);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  // ============ New RPC methods ============
+
+  @override
+  Future<Either<Failure, void>> cancelJoinRequest(String requestId) async {
+    try {
+      await _dataSource.cancelJoinRequest(requestId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> getCompanyJoinCode() async {
+    try {
+      final code = await _dataSource.getCompanyJoinCode();
+      return Right(code);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> regenerateCompanyJoinCode() async {
+    try {
+      final code = await _dataSource.regenerateCompanyJoinCode();
+      return Right(code);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deactivateMember(String memberId) async {
+    try {
+      await _dataSource.deactivateMember(memberId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> reactivateMember(String memberId) async {
+    try {
+      await _dataSource.reactivateMember(memberId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> removeCompanyMemberRpc(String memberId) async {
+    try {
+      await _dataSource.removeCompanyMemberRpc(memberId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> promoteMemberToOwner(String memberId) async {
+    try {
+      await _dataSource.promoteMemberToOwner(memberId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> demoteOwnerToMember(String memberId, Map<String, dynamic> permissions) async {
+    try {
+      await _dataSource.demoteOwnerToMember(memberId, permissions);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> getMemberPermissions(String memberId) async {
+    try {
+      final permissions = await _dataSource.getMemberPermissions(memberId);
+      return Right(permissions);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> leaveCompany() async {
+    try {
+      await _dataSource.leaveCompany();
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteCompany(String companyId) async {
+    try {
+      await _dataSource.deleteCompany(companyId);
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     }

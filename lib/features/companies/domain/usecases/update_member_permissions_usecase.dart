@@ -10,7 +10,7 @@ class UpdateMemberPermissionsUseCase {
   Future<Either<Failure, void>> call(
     String companyId,
     String memberId,
-    Map<String, bool> permissions,
+    Map<String, dynamic> permissions,
   ) {
     return _repository.updateMemberPermissions(companyId, memberId, permissions);
   }
