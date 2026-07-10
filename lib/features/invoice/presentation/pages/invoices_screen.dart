@@ -24,7 +24,7 @@ class InvoicesScreen extends StatefulWidget {
 class _InvoicesScreenState extends State<InvoicesScreen>
     with CompanyAwareState<InvoicesScreen> {
   InvoiceStatus? _selectedStatus;
-  String? _selectedCustomerId;
+  String _selectedCustomerId = '';
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class _InvoicesScreenState extends State<InvoicesScreen>
   void onCompanyChanged(String companyId) {
     setState(() {
       _selectedStatus = null;
-      _selectedCustomerId = null;
+      _selectedCustomerId = '';
     });
     final cubit = context.read<InvoicesCubit>();
     cubit.loadCustomers(companyId);
@@ -55,19 +55,21 @@ class _InvoicesScreenState extends State<InvoicesScreen>
     );
   }
 
-  void _setCustomerFilter(String? customerId) {
-    setState(() => _selectedCustomerId = customerId);
+void _setCustomerFilter(String? customerId) {
+    final resolvedId = customerId?.isEmpty == true ? null : customerId;
+    debugPrint('[_setCustomerFilter] raw: $customerId, resolved: $resolvedId, status: $_selectedStatus');
+    setState(() => _selectedCustomerId = resolvedId ?? '');
     context.read<InvoicesCubit>().setFilter(
       companyId: companyId,
       statusFilter: _selectedStatus,
-      customerId: customerId,
+      customerId: resolvedId,
     );
   }
 
   void _clearFilters() {
     setState(() {
       _selectedStatus = null;
-      _selectedCustomerId = null;
+      _selectedCustomerId = '';
     });
     context.read<InvoicesCubit>().clearFilters(companyId);
   }
@@ -75,7 +77,7 @@ class _InvoicesScreenState extends State<InvoicesScreen>
   @override
   Widget build(BuildContext context) {
     final hasActiveFilter =
-        _selectedStatus != null || _selectedCustomerId != null;
+        _selectedStatus != null || _selectedCustomerId.isNotEmpty;
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
@@ -92,8 +94,7 @@ class _InvoicesScreenState extends State<InvoicesScreen>
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () =>
-            context.read<InvoicesCubit>().refresh(companyId),
+        onRefresh: () => context.read<InvoicesCubit>().refresh(companyId),
         child: Column(
           children: [
             _buildFilters(hasActiveFilter),
@@ -106,8 +107,7 @@ class _InvoicesScreenState extends State<InvoicesScreen>
                       return SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: SizedBox(
-                          height:
-                              MediaQuery.of(context).size.height * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.6,
                           child: const Center(
                             child: CircularProgressIndicator(),
                           ),
@@ -117,11 +117,11 @@ class _InvoicesScreenState extends State<InvoicesScreen>
                       return SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: SizedBox(
-                          height:
-                              MediaQuery.of(context).size.height * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.6,
                           child: Center(
                             child: Text(
-                              state.failure?.message ?? 'Error loading invoices',
+                              state.failure?.message ??
+                                  'Error loading invoices',
                               style: TextStyle(color: AppColors.redDark),
                             ),
                           ),
@@ -132,10 +132,10 @@ class _InvoicesScreenState extends State<InvoicesScreen>
                         physics: const AlwaysScrollableScrollPhysics(),
                         children: [
                           SizedBox(
-                            height:
-                                MediaQuery.of(context).size.height * 0.6,
-                            child:
-                                InvoicesEmptyState(hasFilter: hasActiveFilter),
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            child: InvoicesEmptyState(
+                              hasFilter: hasActiveFilter,
+                            ),
                           ),
                         ],
                       );
@@ -198,28 +198,25 @@ class _InvoicesScreenState extends State<InvoicesScreen>
                       children: [
                         InvoiceFilterChip(
                           label: AppStrings.customerAllFilter,
-                          selected: _selectedStatus == null &&
+                          selected:
+                              _selectedStatus == null &&
                               _selectedCustomerId == null,
                           onTap: _clearFilters,
                         ),
                         InvoiceFilterChip(
                           label: AppStrings.customerPaidFilter,
                           selected: _selectedStatus == InvoiceStatus.paid,
-                          onTap: () =>
-                              _setStatusFilter(InvoiceStatus.paid),
+                          onTap: () => _setStatusFilter(InvoiceStatus.paid),
                         ),
                         InvoiceFilterChip(
                           label: AppStrings.customerPartialFilter,
-                          selected:
-                              _selectedStatus == InvoiceStatus.partial,
-                          onTap: () =>
-                              _setStatusFilter(InvoiceStatus.partial),
+                          selected: _selectedStatus == InvoiceStatus.partial,
+                          onTap: () => _setStatusFilter(InvoiceStatus.partial),
                         ),
                         InvoiceFilterChip(
                           label: AppStrings.customerDeferredFilter,
                           selected: _selectedStatus == InvoiceStatus.debt,
-                          onTap: () =>
-                              _setStatusFilter(InvoiceStatus.debt),
+                          onTap: () => _setStatusFilter(InvoiceStatus.debt),
                         ),
                       ],
                     )
@@ -227,33 +224,28 @@ class _InvoicesScreenState extends State<InvoicesScreen>
                       children: [
                         InvoiceFilterChip(
                           label: AppStrings.customerAllFilter,
-                          selected: _selectedStatus == null &&
+                          selected:
+                              _selectedStatus == null &&
                               _selectedCustomerId == null,
                           onTap: _clearFilters,
                         ),
                         SizedBox(width: AppSizes.spacingSmall),
                         InvoiceFilterChip(
                           label: AppStrings.customerPaidFilter,
-                          selected:
-                              _selectedStatus == InvoiceStatus.paid,
-                          onTap: () =>
-                              _setStatusFilter(InvoiceStatus.paid),
+                          selected: _selectedStatus == InvoiceStatus.paid,
+                          onTap: () => _setStatusFilter(InvoiceStatus.paid),
                         ),
                         SizedBox(width: AppSizes.spacingSmall),
                         InvoiceFilterChip(
                           label: AppStrings.customerPartialFilter,
-                          selected:
-                              _selectedStatus == InvoiceStatus.partial,
-                          onTap: () =>
-                              _setStatusFilter(InvoiceStatus.partial),
+                          selected: _selectedStatus == InvoiceStatus.partial,
+                          onTap: () => _setStatusFilter(InvoiceStatus.partial),
                         ),
                         SizedBox(width: AppSizes.spacingSmall),
                         InvoiceFilterChip(
                           label: AppStrings.customerDeferredFilter,
-                          selected:
-                              _selectedStatus == InvoiceStatus.debt,
-                          onTap: () =>
-                              _setStatusFilter(InvoiceStatus.debt),
+                          selected: _selectedStatus == InvoiceStatus.debt,
+                          onTap: () => _setStatusFilter(InvoiceStatus.debt),
                         ),
                       ],
                     );
@@ -288,7 +280,7 @@ class _InvoicesScreenState extends State<InvoicesScreen>
               ),
               items: [
                 const DropdownMenuItem<String>(
-                  value: null,
+                  value: '',
                   child: Text(
                     AppStrings.customerAllFilter,
                     style: TextStyle(color: AppColors.textDark),

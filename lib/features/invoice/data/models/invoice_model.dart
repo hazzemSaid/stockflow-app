@@ -39,12 +39,11 @@ class InvoiceModel {
   });
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
+    final customer = json['customer'] as Map<String, dynamic>?;
     return InvoiceModel(
       id: json['id'] as String,
-      customerId: json['customer_id'] as String,
-      customerName:
-          json['customer_name'] as String? ??
-          (json['customers'] as Map<String, dynamic>?)?['name'] as String?,
+      customerId: customer?['id'] as String? ?? json['customer_id'] as String,
+      customerName: customer?['name'] as String?,
       createdBy: json['created_by'] as String? ?? "",
       createdByName: json['created_by_name'] as String?,
       items:
@@ -57,17 +56,32 @@ class InvoiceModel {
               ?.map((e) => PaymentModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      subtotal: (json['subtotal'] as num).toDouble(),
+      subtotal:
+          (json['subtotal'] as num?)?.toDouble() ??
+          (json['total_amount'] as num).toDouble(),
       discountType: json['discount_type'] as String?,
       discountValue: (json['discount_value'] as num?)?.toDouble() ?? 0,
       discountAmount: (json['discount_amount'] as num?)?.toDouble() ?? 0,
       totalAmount: (json['total_amount'] as num).toDouble(),
       remainingAmount: (json['remaining_amount'] as num?)?.toDouble() ?? 0,
-      paymentStatus: (json['payment_status'] as String?) ?? 'debt',
+      paymentStatus: _resolvePaymentStatus(json),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'] as String)
           : null,
     );
+  }
+
+  static String _resolvePaymentStatus(Map<String, dynamic> json) {
+    final status =
+        (json['payment_status'] as String?) ?? (json['status'] as String?);
+    if (status == 'paid' || status == 'partial' || status == 'debt') {
+      return status ?? 'debt';
+    }
+    final remaining = (json['remaining_amount'] as num?)?.toDouble() ?? 0;
+    final total = (json['total_amount'] as num?)?.toDouble() ?? 0;
+    if (remaining <= 0) return 'paid';
+    if (remaining < total) return 'partial';
+    return 'debt';
   }
 
   Map<String, dynamic> toJson() {

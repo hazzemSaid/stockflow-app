@@ -19,17 +19,20 @@ class InvoicesCubit extends Cubit<InvoicesState> {
         _getCustomersUseCase = getCustomersUseCase,
         super(const InvoicesState());
 
-  Future<void> loadInvoices(String companyId) async {
+  Future<void> _loadWithParams({
+    required String companyId,
+    InvoiceStatus? statusFilter,
+    String? customerId,
+  }) async {
     emit(state.copyWith(status: InvoicesStatus.loading, clearFailure: true));
 
-    final statusFilterNames = state.statusFilter != null
-        ? [state.statusFilter!.name]
-        : null;
+    final statusFilterNames =
+        statusFilter != null ? [statusFilter.name] : null;
 
     final result = await _getInvoicesUseCase(
       companyId: companyId,
       statusFilter: statusFilterNames,
-      customerId: state.customerId,
+      customerId: customerId,
       limit: _pageSize,
       offset: 0,
     );
@@ -51,24 +54,34 @@ class InvoicesCubit extends Cubit<InvoicesState> {
     );
   }
 
+  Future<void> loadInvoices(String companyId) async {
+    await _loadWithParams(
+      companyId: companyId,
+      statusFilter: state.statusFilter,
+      customerId: state.customerId,
+    );
+  }
+
   void setFilter({
     required String companyId,
     InvoiceStatus? statusFilter,
     String? customerId,
   }) {
-    emit(state.copyWith(
+    emit(state.copyWith(statusFilter: statusFilter, customerId: customerId));
+    _loadWithParams(
+      companyId: companyId,
       statusFilter: statusFilter,
       customerId: customerId,
-    ));
-    loadInvoices(companyId);
+    );
   }
 
   void clearFilters(String companyId) {
-    emit(state.copyWith(
+    emit(state.copyWith(statusFilter: null, customerId: null));
+    _loadWithParams(
+      companyId: companyId,
       statusFilter: null,
       customerId: null,
-    ));
-    loadInvoices(companyId);
+    );
   }
 
   Future<void> refresh(String companyId) async {

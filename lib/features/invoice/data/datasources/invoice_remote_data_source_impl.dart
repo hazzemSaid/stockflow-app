@@ -23,7 +23,11 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
         'create_invoice_full',
         params: params,
       );
-      return Right(response as String);
+      final invoiceId = response?.toString();
+      if (invoiceId == null || invoiceId.isEmpty) {
+        return Left(ServerFailure('لم يتم استلام معرف الفاتورة من الخادم'));
+      }
+      return Right(invoiceId);
     } on supabase.PostgrestException catch (error) {
       final items = inputDto.items;
       return Left(ServerFailure(_translateError(error.message, items)));
@@ -52,6 +56,14 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
   }
 
   String _translatePaymentError(String message) {
+    if (message.contains('Permission denied') ||
+        message.contains('Access denied') ||
+        message.contains('row-level security')) {
+      return 'ليس لديك صلاحية تنفيذ هذا الإجراء';
+    }
+    if (message.contains('No active company selected')) {
+      return 'لم يتم تحديد شركة';
+    }
     if (message.contains('Payment amount must be greater than 0')) {
       return 'يجب أن يكون مبلغ الدفعة أكبر من 0';
     }
@@ -67,13 +79,30 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
     if (message.contains('foreign key constraint')) {
       return 'العامل أو العميل المحدد غير موجود';
     }
-    if (message.contains('row-level security')) {
-      return 'ليس لديك صلاحية تنفيذ هذا الإجراء';
-    }
     return 'حدث خطأ غير متوقع';
   }
 
   String _translateError(String message, [List<Map<String, dynamic>>? items]) {
+    if (message.contains('Permission denied') ||
+        message.contains('Access denied') ||
+        message.contains('row-level security')) {
+      return 'ليس لديك صلاحية تنفيذ هذا الإجراء';
+    }
+    if (message.contains('No active company selected')) {
+      return 'لم يتم تحديد شركة';
+    }
+    if (message.contains('Customer not found')) {
+      return 'العميل غير موجود في هذه الشركة';
+    }
+    if (message.contains('Invoice must contain at least one item')) {
+      return 'يجب أن تحتوي الفاتورة على عنصر واحد على الأقل';
+    }
+    if (message.contains('Paid amount cannot be negative')) {
+      return 'المبلغ المدفوع لا يمكن أن يكون سالباً';
+    }
+    if (message.contains('Payment cannot exceed invoice total')) {
+      return 'المبلغ المدفوع لا يمكن أن يتجاوز إجمالي الفاتورة';
+    }
     if (message.contains('Discount cannot exceed')) {
       return 'الخصم لا يمكن أن يتجاوز إجمالي قيمة المنتجات';
     }
@@ -87,9 +116,6 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
     }
     if (message.contains('foreign key constraint')) {
       return 'العميل أو المنتج المحدد غير موجود';
-    }
-    if (message.contains('row-level security')) {
-      return 'ليس لديك صلاحية تنفيذ هذا الإجراء';
     }
     if (message.contains('violates')) {
       return 'عملية غير مصرح بها';
@@ -128,21 +154,15 @@ class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {
     String companyId,
   ) async {
     try {
-      final response = await _supabaseClient
-          .from('invoices')
-          .select('''
-          *,
-          invoice_items(*, products(name, image_url)),
-          payments(*),
-          customers!inner(name)
-        ''')
-          .eq('id', id)
-          .eq('company_id', companyId)
-          .single();
-      // getInvoice response
-
-      return Right(InvoiceModel.fromJson(response));
+      final response = await _supabaseClient.rpc(
+        'get_invoice_by_id',
+        params: {'p_invoice_id': id},
+      );
+      return Right(InvoiceModel.fromJson(response as Map<String, dynamic>));
     } on supabase.PostgrestException catch (error) {
+      if (error.message.contains('Invoice not found')) {
+        return Left(ServerFailure('الفاتورة غير موجودة'));
+      }
       return Left(ServerFailure(error.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));

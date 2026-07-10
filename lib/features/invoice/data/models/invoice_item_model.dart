@@ -28,8 +28,10 @@ class InvoiceItemModel {
       quantity: (json['quantity'] as num).toInt(),
       unitPrice: (json['unit_price'] as num).toDouble(),
       totalPrice: (json['total_price'] as num).toDouble(),
-      productName: json['products']?['name'] as String,
-      productImageUrl: json['products']?['image_url'] as String?,
+      productName: (json['product_name'] as String?) ??
+          (json['products']?['name'] as String? ?? ''),
+      productImageUrl: (json['product_image_url'] as String?) ??
+          (json['products']?['image_url'] as String?),
     );
   }
 
