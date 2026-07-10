@@ -1,4 +1,4 @@
-package com.example.stockflow
+package com.stockflow.app
 
 import io.flutter.embedding.android.FlutterActivity
 
