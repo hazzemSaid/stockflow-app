@@ -38,26 +38,25 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MultiBlocProvider(
           providers: [
-            BlocProvider(create: (context) => sl<AuthCubit>()),
+            BlocProvider<AuthCubit>.value(value: sl<AuthCubit>()),
             BlocProvider<CompanyCubit>.value(value: sl<CompanyCubit>()),
           ],
-          child: MaterialApp.router(
-            title: 'StockFlow',
-            theme: AppTheme.lightTheme,
-            routerConfig: appRouter,
-
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [Locale('ar', 'EG')],
-            locale: const Locale('ar', 'EG'),
-
-            debugShowCheckedModeBanner: false,
-          ),
+          child: child!,
         );
       },
+      child: MaterialApp.router(
+        title: 'StockFlow',
+        theme: AppTheme.lightTheme,
+        routerConfig: appRouter,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('ar', 'EG')],
+        locale: const Locale('ar', 'EG'),
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
