@@ -9,7 +9,7 @@ abstract class CompanyRemoteDataSource {
   Future<void> updateCompany(String companyId, {String? name, String? address, String? phone, String? logoUrl});
   Future<List<CompanyMemberModel>> getCompanyMembers(String companyId);
   Future<CompanyMemberModel> inviteMember(String companyId, String userEmail);
-  Future<void> updateMemberPermissions(String companyId, String memberId, Map<String, bool> permissions);
+  Future<void> updateMemberPermissions(String companyId, String memberId, Map<String, dynamic> permissions);
   Future<void> removeMember(String companyId, String memberId);
 
   Future<CompanyModel> createCompanyFull({
@@ -24,4 +24,17 @@ abstract class CompanyRemoteDataSource {
   Future<String> approveJoinRequest(String requestId);
   Future<void> rejectJoinRequest(String requestId);
   Future<Map<String, dynamic>> getJoinRequestStatus(String requestId);
+
+  // New RPC methods
+  Future<void> cancelJoinRequest(String requestId);
+  Future<String> getCompanyJoinCode();
+  Future<String> regenerateCompanyJoinCode();
+  Future<void> deactivateMember(String memberId);
+  Future<void> reactivateMember(String memberId);
+  Future<void> removeCompanyMemberRpc(String memberId);
+  Future<void> promoteMemberToOwner(String memberId);
+  Future<void> demoteOwnerToMember(String memberId, Map<String, dynamic> permissions);
+  Future<Map<String, dynamic>> getMemberPermissions(String memberId);
+  Future<void> leaveCompany();
+  Future<void> deleteCompany(String companyId);
 }

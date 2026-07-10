@@ -46,6 +46,7 @@ app.*.map.json
 db_password.txt
 .env
 supabase
+supabase v2
 .agents
 .specify
 specs

@@ -136,18 +136,18 @@ class AppStrings {
   static const String viewReports = 'عرض التقارير';
   static const String manageTeam = 'إدارة الفريق';
   static const String manageSettings = 'إدارة الإعدادات';
-  static const String inviteMember = 'دعوة عضو';
-  static const String role = 'الدور';
-  static const String invite = 'دعوة';
   static const String unknownUser = 'مستخدم غير معروف';
   static const String removeMember = 'حذف عضو';
   static const String removeMemberConfirm = 'هل أنت متأكد من حذف';
   static const String remove = 'حذف';
+  static const String companyLeft = 'تم الخروج من الشركة بنجاح';
+  static const String companyDeleted = 'تم حذف الشركة بنجاح';
   static const String sectionProducts = 'المنتجات';
   static const String sectionCustomers = 'العملاء';
   static const String sectionInvoices = 'الفواتير';
   static const String sectionPayments = 'المدفوعات';
   static const String sectionReports = 'التقارير';
+  static const String sectionDashboard = 'لوحة البيانات';
   static const String sectionAdmin = 'الإدارة';
   static const String permView = 'عرض المنتجات';
   static const String permCreate = 'إضافة منتج جديد';
@@ -200,17 +200,12 @@ class AppStrings {
   static const String businessType = 'نوع النشاط';
   static const String businessTypeHint = 'اختر نوع النشاط التجاري';
   static const String inviteCode = 'رمز الدعوة';
-  static const String inviteLink = 'رابط الدعوة';
   static const String inviteCodeTitle = 'أدخل رمز الدعوة';
   static const String inviteCodeSubtitle =
       'قم بإدخال رمز الدعوة المرسل من مالك الشركة';
   static const String inviteCodeRequired = 'يرجى إدخال رمز الدعوة';
   static const String inviteCodeHint = 'XXXXXX';
   static const String joinButton = 'انضمام';
-  static const String inviteLinkTitle = 'رابط الدعوة';
-  static const String inviteLinkSubtitle =
-      'انسخ الرابط من مالك الشركة والصقه هنا';
-  static const String inviteLinkHint = 'الصق الرابط هنا';
   static const String pendingTitle = 'بانتظار الموافقة';
   static const String pendingSubtitle =
       'تم إرسال طلب الانضمام إلى مالك الشركة\nسيتم تحويلك إلى لوحة التحكم عند الموافقة';

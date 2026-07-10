@@ -49,15 +49,13 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
   @override
   Future<Either<Failure, CustomerModel>> getCustomer(String id, String companyId) async {
     try {
-      final response = await _supabaseClient
-          .from('customers')
-          .select('*, invoices(*), payments(*)')
-          .filter('id', 'eq', id)
-          .filter('company_id', 'eq', companyId)
-          .single();
-      return Right(CustomerModel.fromJson(response));
+      final response = await _supabaseClient.rpc(
+        'get_customer_by_id',
+        params: {'p_customer_id': id},
+      );
+      return Right(CustomerModel.fromJson(response as Map<String, dynamic>));
     } on supabase.PostgrestException catch (error) {
-      if (error.code == 'PGRST116') {
+      if (error.message.contains('Customer not found')) {
         return Left(ServerFailure('العميل غير موجود'));
       }
       return Left(ServerFailure(error.message));
@@ -150,16 +148,15 @@ class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {
       if (nameOfficial != null) body['name_official'] = nameOfficial;
       if (phone != null) body['phone'] = phone;
       if (address != null) body['address'] = address;
-      body['image_url'] = imageUrl;
+      if (imageUrl != null) body['image_url'] = imageUrl;
 
-      final response = await _supabaseClient
+      await _supabaseClient
           .from('customers')
           .update(body)
           .filter('id', 'eq', id)
-          .filter('company_id', 'eq', companyId)
-          .select('*, invoices(*), payments(*)')
-          .single();
-      return Right(CustomerModel.fromJson(response));
+          .filter('company_id', 'eq', companyId);
+
+      return getCustomer(id, companyId);
     } on supabase.PostgrestException catch (error) {
       if (error.code == 'PGRST116') {
         return Left(ServerFailure('العميل غير موجود'));

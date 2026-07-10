@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:stockflow/features/companies/domain/usecases/check_join_request_status_usecase.dart';
 import 'package:stockflow/features/companies/domain/usecases/join_company_by_code_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/cancel_join_request_usecase.dart';
 
 sealed class JoinCompanyState extends Equatable {
   const JoinCompanyState();
@@ -63,6 +64,15 @@ final class JoinCompanyApproved extends JoinCompanyState {
   List<Object?> get props => [companyId];
 }
 
+final class JoinCompanyRejected extends JoinCompanyState {
+  final String companyId;
+
+  const JoinCompanyRejected({required this.companyId});
+
+  @override
+  List<Object?> get props => [companyId];
+}
+
 final class JoinCompanyError extends JoinCompanyState {
   final String message;
 
@@ -75,13 +85,16 @@ final class JoinCompanyError extends JoinCompanyState {
 class JoinCompanyCubit extends Cubit<JoinCompanyState> {
   final JoinCompanyByCodeUseCase _joinCompanyByCodeUseCase;
   final CheckJoinRequestStatusUseCase _checkJoinRequestStatusUseCase;
+  final CancelJoinRequestUseCase _cancelJoinRequestUseCase;
   Timer? _pollTimer;
 
   JoinCompanyCubit({
     required JoinCompanyByCodeUseCase joinCompanyByCodeUseCase,
     required CheckJoinRequestStatusUseCase checkJoinRequestStatusUseCase,
+    required CancelJoinRequestUseCase cancelJoinRequestUseCase,
   }) : _joinCompanyByCodeUseCase = joinCompanyByCodeUseCase,
        _checkJoinRequestStatusUseCase = checkJoinRequestStatusUseCase,
+       _cancelJoinRequestUseCase = cancelJoinRequestUseCase,
        super(const JoinCompanyInitial());
 
   Future<void> joinByCode(String inviteCode) async {
@@ -99,6 +112,21 @@ class JoinCompanyCubit extends Cubit<JoinCompanyState> {
     });
   }
 
+  void resumePolling({
+    required String requestId,
+    required String companyId,
+    required String companyName,
+    String? companyLogo,
+  }) {
+    emit(JoinCompanyPending(
+      requestId: requestId,
+      companyId: companyId,
+      companyName: companyName,
+      companyLogo: companyLogo,
+    ));
+    _startPolling(requestId, companyId);
+  }
+
   void _startPolling(String requestId, String companyId) {
     _pollTimer?.cancel();
     _pollTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
@@ -108,19 +136,31 @@ class JoinCompanyCubit extends Cubit<JoinCompanyState> {
         if (status == 'approved') {
           _pollTimer?.cancel();
           emit(JoinCompanyApproved(companyId: companyId));
+        } else if (status == 'rejected') {
+          _pollTimer?.cancel();
+          emit(JoinCompanyRejected(companyId: companyId));
         } else if (state is JoinCompanyRequestData) {
-          final data = state as JoinCompanyRequestData;
+          final current = state as JoinCompanyRequestData;
           emit(
             JoinCompanyPending(
               requestId: requestId,
               companyId: companyId,
-              companyName: data.companyName,
-              companyLogo: data.companyLogo,
+              companyName: current.companyName,
+              companyLogo: current.companyLogo,
             ),
           );
         }
       });
     });
+  }
+
+  Future<void> cancelJoinRequest(String requestId) async {
+    _pollTimer?.cancel();
+    final result = await _cancelJoinRequestUseCase.call(requestId);
+    result.fold(
+      (failure) => emit(JoinCompanyError(failure.message)),
+      (_) => emit(const JoinCompanyInitial()),
+    );
   }
 
   void stopPolling() {

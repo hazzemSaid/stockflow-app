@@ -23,6 +23,17 @@ import 'package:stockflow/features/companies/domain/usecases/reject_join_request
 import 'package:stockflow/features/companies/domain/usecases/get_join_requests_usecase.dart';
 import 'package:stockflow/features/companies/domain/usecases/check_join_request_status_usecase.dart';
 import 'package:stockflow/features/companies/domain/usecases/create_company_full_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/cancel_join_request_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/get_company_join_code_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/regenerate_company_join_code_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/deactivate_member_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/reactivate_member_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/remove_company_member_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/promote_member_to_owner_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/demote_owner_to_member_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/get_member_permissions_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/leave_company_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/delete_company_usecase.dart';
 import 'package:stockflow/features/companies/presentation/cubit/join_company_cubit.dart';
 import 'package:stockflow/features/companies/presentation/cubit/company_members_cubit.dart';
 import 'package:stockflow/features/companies/presentation/cubit/company_settings_cubit.dart';
@@ -342,6 +353,39 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton<CreateCompanyFullUseCase>(
     () => CreateCompanyFullUseCase(sl<CompanyRepository>()),
   );
+  sl.registerLazySingleton<CancelJoinRequestUseCase>(
+    () => CancelJoinRequestUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<GetCompanyJoinCodeUseCase>(
+    () => GetCompanyJoinCodeUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<RegenerateCompanyJoinCodeUseCase>(
+    () => RegenerateCompanyJoinCodeUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<DeactivateMemberUseCase>(
+    () => DeactivateMemberUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<ReactivateMemberUseCase>(
+    () => ReactivateMemberUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<RemoveCompanyMemberUseCase>(
+    () => RemoveCompanyMemberUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<PromoteMemberToOwnerUseCase>(
+    () => PromoteMemberToOwnerUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<DemoteOwnerToMemberUseCase>(
+    () => DemoteOwnerToMemberUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<GetMemberPermissionsUseCase>(
+    () => GetMemberPermissionsUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<LeaveCompanyUseCase>(
+    () => LeaveCompanyUseCase(sl<CompanyRepository>()),
+  );
+  sl.registerLazySingleton<DeleteCompanyUseCase>(
+    () => DeleteCompanyUseCase(sl<CompanyRepository>()),
+  );
 
   // Join Company Cubit — must be a factory so each screen visit gets a fresh
   // instance; a singleton gets closed on screen dispose and crashes on re-entry.
@@ -349,6 +393,7 @@ Future<void> initServiceLocator() async {
     () => JoinCompanyCubit(
       joinCompanyByCodeUseCase: sl<JoinCompanyByCodeUseCase>(),
       checkJoinRequestStatusUseCase: sl<CheckJoinRequestStatusUseCase>(),
+      cancelJoinRequestUseCase: sl<CancelJoinRequestUseCase>(),
     ),
   );
 
@@ -359,14 +404,23 @@ Future<void> initServiceLocator() async {
       inviteMemberUseCase: sl<InviteMemberUseCase>(),
       updateMemberPermissionsUseCase: sl<UpdateMemberPermissionsUseCase>(),
       removeMemberUseCase: sl<RemoveMemberUseCase>(),
+      removeCompanyMemberUseCase: sl<RemoveCompanyMemberUseCase>(),
+      deactivateMemberUseCase: sl<DeactivateMemberUseCase>(),
+      reactivateMemberUseCase: sl<ReactivateMemberUseCase>(),
+      promoteMemberToOwnerUseCase: sl<PromoteMemberToOwnerUseCase>(),
+      demoteOwnerToMemberUseCase: sl<DemoteOwnerToMemberUseCase>(),
+      getMemberPermissionsUseCase: sl<GetMemberPermissionsUseCase>(),
     ),
   );
 
   // Company Settings Cubit
   sl.registerFactory<CompanySettingsCubit>(
     () => CompanySettingsCubit(
-      getCompanyUseCase: sl<GetCompanyUseCase>(),
       updateCompanyUseCase: sl<UpdateCompanyUseCase>(),
+      getCompanyJoinCodeUseCase: sl<GetCompanyJoinCodeUseCase>(),
+      regenerateCompanyJoinCodeUseCase: sl<RegenerateCompanyJoinCodeUseCase>(),
+      leaveCompanyUseCase: sl<LeaveCompanyUseCase>(),
+      deleteCompanyUseCase: sl<DeleteCompanyUseCase>(),
     ),
   );
 

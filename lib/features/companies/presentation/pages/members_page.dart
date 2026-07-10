@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stockflow/core/company/company_aware_state.dart';
+import 'package:stockflow/features/companies/presentation/pages/edit_member_permissions_page.dart';
+import 'package:stockflow/core/company/company_cubit.dart';
+import 'package:stockflow/core/company/company_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
@@ -12,8 +15,9 @@ import 'package:stockflow/features/companies/domain/usecases/approve_join_reques
 import 'package:stockflow/features/companies/domain/usecases/get_join_requests_usecase.dart';
 import 'package:stockflow/features/companies/domain/usecases/reject_join_request_usecase.dart';
 import 'package:stockflow/features/companies/presentation/cubit/company_members_cubit.dart';
-import 'package:stockflow/features/companies/presentation/widgets/invite_member_dialog.dart';
+import 'package:stockflow/features/companies/presentation/cubit/company_settings_cubit.dart';
 import 'package:stockflow/features/companies/presentation/widgets/member_card.dart';
+import 'package:stockflow/features/companies/presentation/widgets/share_code_widget.dart';
 
 class MembersPage extends StatefulWidget {
   const MembersPage({super.key});
@@ -27,6 +31,7 @@ class _MembersPageState extends State<MembersPage>
   late final CompanyMembersCubit _cubit = sl<CompanyMembersCubit>();
   List<JoinRequest>? _joinRequests;
   bool _joinRequestActionInProgress = false;
+  bool _joinRequestsExpanded = true;
 
   @override
   void initState() {
@@ -56,7 +61,6 @@ class _MembersPageState extends State<MembersPage>
 
   Future<void> _approveRequest(String requestId) async {
     setState(() => _joinRequestActionInProgress = true);
-
     final result = await sl<ApproveJoinRequestUseCase>().call(requestId);
     result.fold(
       (_) => AppSnackbar.error(context, AppStrings.unexpectedError),
@@ -66,37 +70,310 @@ class _MembersPageState extends State<MembersPage>
         _cubit.loadMembers(companyId);
       },
     );
-
     setState(() => _joinRequestActionInProgress = false);
   }
 
   Future<void> _rejectRequest(String requestId) async {
     setState(() => _joinRequestActionInProgress = true);
-    final useCase = sl<RejectJoinRequestUseCase>();
-    final result = await useCase.call(requestId);
-    result.fold((_) => AppSnackbar.error(context, AppStrings.unexpectedError), (
-      _,
-    ) {
-      AppSnackbar.success(context, AppStrings.requestRejected);
-      _loadJoinRequests();
-    });
+    final result = await sl<RejectJoinRequestUseCase>().call(requestId);
+    result.fold(
+      (_) => AppSnackbar.error(context, AppStrings.unexpectedError),
+      (_) {
+        AppSnackbar.success(context, AppStrings.requestRejected);
+        _loadJoinRequests();
+      },
+    );
     setState(() => _joinRequestActionInProgress = false);
   }
 
-  void _showInviteDialog() {
-    showDialog(
+  void _showShareCodeSheet() async {
+    final settingsCubit = context.read<CompanySettingsCubit>();
+    final code = await settingsCubit.getJoinCode();
+    if (!mounted) return;
+    if (code == null) {
+      AppSnackbar.error(context, 'فشل تحميل رمز الدعوة');
+      return;
+    }
+
+    showModalBottomSheet(
       context: context,
-      builder: (_) => InviteMemberDialog(
-        onInvite: (email) {
-          _cubit.inviteMember(companyId, email);
-          Navigator.pop(context);
-        },
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusXLarge)),
+      ),
+      builder: (_) => Padding(
+        padding: EdgeInsets.all(AppSizes.spacingLarge),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'رمز الدعوة',
+              style: TextStyle(
+                fontSize: AppSizes.fontXLarge,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            SizedBox(height: AppSizes.spacingMedium),
+            ShareCodeWidget(
+              code: code,
+              onCopy: () {
+                AppSnackbar.success(context, 'تم نسخ الرمز');
+                Navigator.pop(context);
+              },
+              onRegenerate: () async {
+                Navigator.pop(context);
+                _confirmRegenerateCode();
+              },
+            ),
+            SizedBox(height: AppSizes.spacingMedium),
+          ],
+        ),
       ),
     );
   }
 
+  void _confirmRegenerateCode() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('تغيير رمز الدعوة'),
+        content: Text('سيتم تعطيل الرمز الحالي وإنشاء رمز جديد. هل أنت متأكد؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text('تأكيد'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final settingsCubit = context.read<CompanySettingsCubit>();
+      final newCode = await settingsCubit.regenerateJoinCode();
+      if (mounted) {
+        if (newCode != null) {
+          AppSnackbar.success(context, 'تم تغيير رمز الدعوة');
+        } else {
+          AppSnackbar.error(context, 'فشل تغيير رمز الدعوة');
+        }
+      }
+    }
+  }
+
+  // --- Confirmation dialogs ---
+
+  void _confirmApprove(String requestId) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(AppStrings.approve),
+        content: Text(AppStrings.approveJoinConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _approveRequest(requestId);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.trendUp,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text(AppStrings.approve),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmReject(String requestId) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('رفض طلب الانضمام'),
+        content: Text(AppStrings.rejectJoinConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _rejectRequest(requestId);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text(AppStrings.reject),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeactivate(CompanyMember member) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('إلغاء تنشيط العضو'),
+        content: Text('سيتم تعطيل حساب ${member.userName ?? member.userId}. هل أنت متأكد؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _cubit.deactivateMember(companyId, member.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text('إلغاء التنشيط'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmReactivate(CompanyMember member) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('إعادة تنشيط العضو'),
+        content: Text('سيتم إعادة تفعيل حساب ${member.userName ?? member.userId}. هل أنت متأكد؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _cubit.reactivateMember(companyId, member.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.trendUp,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text('إعادة تنشيط'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmRemove(CompanyMember member) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(
+          AppStrings.removeMember,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          '${AppStrings.removeMemberConfirm} ${member.userName ?? member.userId}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _cubit.removeMember(companyId, member.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text(AppStrings.remove),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmPromote(CompanyMember member) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('ترقية إلى مالك'),
+        content: Text('سيتم ترقية ${member.userName ?? member.userId} إلى مالك. هل أنت متأكد؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _cubit.promoteToOwner(companyId, member.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.trendUp,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text('ترقية'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDemote(CompanyMember member) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('تنزيل إلى موظف'),
+        content: Text('سيتم تحويل ${member.userName ?? member.userId} من مالك إلى موظف. هل أنت متأكد؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _cubit.demoteToMember(companyId, member.id, {});
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text('تنزيل'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Build ---
+
   @override
   Widget build(BuildContext context) {
+    final companyState = context.read<CompanyCubit>().state;
+    final currentMembership = companyState is CompanySelected
+        ? companyState.membership
+        : null;
+    final isOwner = currentMembership?.isOwner ?? false;
+
     return BlocProvider.value(
       value: _cubit,
       child: BlocConsumer<CompanyMembersCubit, CompanyMembersState>(
@@ -106,33 +383,37 @@ class _MembersPageState extends State<MembersPage>
           }
         },
         builder: (context, state) {
-
           return Scaffold(
             backgroundColor: AppColors.appBackground,
             appBar: AppBar(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.white,
-              title: Text(AppStrings.teamMembers, style: TextStyle()),
+              title: Text('فريق العمل'),
               actions: [
                 IconButton(
-                  icon: Icon(Icons.person_add),
-                  onPressed: _showInviteDialog,
+                  icon: Icon(Icons.share),
+                  onPressed: _showShareCodeSheet,
                 ),
               ],
             ),
-            body: _buildBody(state),
+            body: _buildBody(state, isOwner),
           );
         },
       ),
     );
   }
 
-  Widget _buildBody(CompanyMembersState state) {
+  Widget _buildBody(CompanyMembersState state, bool isOwner) {
     if (state is CompanyMembersLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (state is CompanyMembersLoaded) {
+      final owners = state.members.where((m) => m.isOwner).toList();
+      final activeEmployees =
+          state.members.where((m) => !m.isOwner && m.isActive).toList();
+      final inactiveMembers =
+          state.members.where((m) => !m.isActive).toList();
       final hasJoinRequests =
           _joinRequests != null && _joinRequests!.isNotEmpty;
 
@@ -156,17 +437,72 @@ class _MembersPageState extends State<MembersPage>
         child: ListView(
           padding: EdgeInsets.all(AppSizes.spacingMedium),
           children: [
-            if (hasJoinRequests) ...[
-              _buildJoinRequestsHeader(),
-              ...(_joinRequests!.map((req) => _buildJoinRequestCard(req))),
-              SizedBox(height: AppSizes.spacingMedium),
-              Divider(color: AppColors.inputBorder),
+            // Join Requests
+            if (isOwner && hasJoinRequests) ...[
+              _buildCollapsibleSection(
+                title: '${AppStrings.joinRequests} (${_joinRequests!.length})',
+                expanded: _joinRequestsExpanded,
+                onToggle: () => setState(
+                  () => _joinRequestsExpanded = !_joinRequestsExpanded,
+                ),
+                children: _joinRequests!.map(_buildJoinRequestCard).toList(),
+              ),
               SizedBox(height: AppSizes.spacingMedium),
             ],
-            ...state.members.map((member) => MemberCard(
-              member: member,
-              onRemove: () => _confirmRemove(member),
-            )),
+
+            // Owners
+            if (owners.isNotEmpty) ...[
+              SectionHeader(title: 'المالكين'),
+              ...owners.map(
+                (m) => MemberCard(
+                  member: m,
+                  isLastOwner: owners.length == 1,
+                  onDemote: owners.length > 1
+                      ? () => _confirmDemote(m)
+                      : null,
+                ),
+              ),
+              SizedBox(height: AppSizes.spacingMedium),
+            ],
+
+            // Active Employees
+            if (activeEmployees.isNotEmpty) ...[
+              SectionHeader(title: 'الموظفين'),
+              ...activeEmployees.map(
+                (m) => MemberCard(
+                  member: m,
+                  onEditPermissions: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider.value(
+                          value: _cubit,
+                          child: EditMemberPermissionsPage(
+                            member: m,
+                            companyId: companyId,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  onDeactivate: () => _confirmDeactivate(m),
+                  onRemove: () => _confirmRemove(m),
+                  onPromote: () => _confirmPromote(m),
+                ),
+              ),
+              SizedBox(height: AppSizes.spacingMedium),
+            ],
+
+            // Inactive Members
+            if (inactiveMembers.isNotEmpty) ...[
+              SectionHeader(title: 'الأعضاء غير النشطين'),
+              ...inactiveMembers.map(
+                (m) => MemberCard(
+                  member: m,
+                  onReactivate: () => _confirmReactivate(m),
+                ),
+              ),
+            ],
           ],
         ),
       );
@@ -175,17 +511,40 @@ class _MembersPageState extends State<MembersPage>
     return const SizedBox.shrink();
   }
 
-  Widget _buildJoinRequestsHeader() {
-    return Padding(
-      padding: EdgeInsets.only(bottom: AppSizes.spacingSmall),
-      child: Text(
-        '${AppStrings.joinRequests} (${_joinRequests!.length})',
-        style: TextStyle(
-          fontSize: AppSizes.fontMedium,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textPrimary,
+  Widget _buildCollapsibleSection({
+    required String title,
+    required bool expanded,
+    required VoidCallback onToggle,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: onToggle,
+          child: Row(
+            children: [
+              Icon(
+                expanded ? Icons.expand_less : Icons.expand_more,
+                color: AppColors.textPrimary,
+              ),
+              SizedBox(width: AppSizes.spacingTiny),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: AppSizes.fontMedium,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        if (expanded) ...[
+          SizedBox(height: AppSizes.spacingSmall),
+          ...children,
+        ],
+      ],
     );
   }
 
@@ -193,7 +552,7 @@ class _MembersPageState extends State<MembersPage>
     return Card(
       margin: EdgeInsets.only(bottom: AppSizes.spacingSmall),
       elevation: 0,
-      color: AppColors.surface,
+      color: AppColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
         side: BorderSide(color: AppColors.inputBorder),
@@ -287,96 +646,24 @@ class _MembersPageState extends State<MembersPage>
     if (diff.inDays < 7) return 'منذ ${diff.inDays} يوم';
     return '${local.year}/${local.month}/${local.day}';
   }
+}
 
-  void _confirmApprove(String requestId) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(AppStrings.approve),
-        content: Text(AppStrings.approveJoinConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppStrings.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _approveRequest(requestId);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.trendUp,
-              foregroundColor: AppColors.white,
-            ),
-            child: Text(AppStrings.approve),
-          ),
-        ],
-      ),
-    );
-  }
+class SectionHeader extends StatelessWidget {
+  final String title;
 
-  void _confirmReject(String requestId) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(
-          AppStrings.rejectJoinConfirm.split('.')[0],
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Text(AppStrings.rejectJoinConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppStrings.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _rejectRequest(requestId);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: AppColors.white,
-            ),
-            child: Text(AppStrings.reject),
-          ),
-        ],
-      ),
-    );
-  }
+  const SectionHeader({super.key, required this.title});
 
-  void _confirmRemove(CompanyMember member) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(
-          AppStrings.removeMember,
-          style: TextStyle(fontWeight: FontWeight.bold),
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: AppSizes.spacingSmall),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: AppSizes.fontLarge,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textPrimary,
         ),
-        content: Text(
-          '${AppStrings.removeMemberConfirm} ${member.userName ?? member.userId}?',
-          style: TextStyle(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppStrings.cancel, style: TextStyle()),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _cubit.removeMember(
-                companyId,
-                member.id,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: AppColors.white,
-            ),
-            child: Text(AppStrings.remove, style: TextStyle()),
-          ),
-        ],
       ),
     );
   }

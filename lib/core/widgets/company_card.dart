@@ -8,18 +8,16 @@ import 'package:stockflow/features/companies/domain/entities/company.dart';
 /// A selectable company card used inside the company-switcher bottom sheet.
 ///
 /// Shows an avatar (initials or logo), the company name, business type,
-/// an optional role pill, and a trailing check/chevron icon.
+/// and a trailing check/chevron icon.
 class CompanyCard extends StatelessWidget {
   final Company company;
   final bool isSelected;
-  final String? roleName;
   final VoidCallback onTap;
 
   const CompanyCard({
     super.key,
     required this.company,
     required this.isSelected,
-    this.roleName,
     required this.onTap,
   });
 
@@ -39,18 +37,6 @@ class CompanyCard extends StatelessWidget {
   Color _initialsColor() {
     if (isSelected) return AppColors.white;
     return AppColors.darkGrey;
-  }
-
-  Color _pillBg() {
-    if (roleName == 'Owner' || roleName == 'مالك') return AppColors.lightGreen;
-    if (roleName == 'Manager' || roleName == 'مدير') return AppColors.blueLight;
-    return AppColors.chipBg;
-  }
-
-  Color _pillText() {
-    if (roleName == 'Owner' || roleName == 'مالك') return AppColors.primary;
-    if (roleName == 'Manager' || roleName == 'مدير') return AppColors.bluePrimary;
-    return AppColors.greyMedium;
   }
 
   @override
@@ -119,38 +105,15 @@ class CompanyCard extends StatelessWidget {
                       color: AppColors.textDark,
                     ),
                   ),
-                  SizedBox(height: 2.h),
-                  Row(
-                    children: [
-                      if (company.businessType != null)
-                        Text(
-                          company.businessType!,
-                          style: TextStyle(
-                            fontFamily: 'Cairo',
-                            fontSize: AppSizes.fontSmall,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      if (company.businessType != null && roleName != null)
-                        SizedBox(width: 8.w),
-                      if (roleName != null)
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                          decoration: BoxDecoration(
-                            color: _pillBg(),
-                            borderRadius: BorderRadius.circular(9999),
-                          ),
-                          child: Text(
-                            roleName!,
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: AppSizes.fontSmall,
-                              color: _pillText(),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                  if (company.businessType != null)
+                    Text(
+                      company.businessType!,
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: AppSizes.fontSmall,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                 ],
               ),
             ),

@@ -5,8 +5,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
 import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/domain/usecases/get_company_usecase.dart';
 import 'package:stockflow/features/companies/domain/usecases/update_company_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/get_company_join_code_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/regenerate_company_join_code_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/leave_company_usecase.dart';
+import 'package:stockflow/features/companies/domain/usecases/delete_company_usecase.dart';
 
 sealed class CompanySettingsState extends Equatable {
   const CompanySettingsState();
@@ -60,29 +63,33 @@ final class CompanySettingsError extends CompanySettingsState {
 }
 
 class CompanySettingsCubit extends Cubit<CompanySettingsState> {
-  final GetCompanyUseCase _getCompanyUseCase;
   final UpdateCompanyUseCase _updateCompanyUseCase;
+  final GetCompanyJoinCodeUseCase _getCompanyJoinCodeUseCase;
+  final RegenerateCompanyJoinCodeUseCase _regenerateCompanyJoinCodeUseCase;
+  final LeaveCompanyUseCase _leaveCompanyUseCase;
+  final DeleteCompanyUseCase _deleteCompanyUseCase;
   final ImagePicker _picker;
   final SupabaseClient _supabase;
 
   CompanySettingsCubit({
-    required GetCompanyUseCase getCompanyUseCase,
     required UpdateCompanyUseCase updateCompanyUseCase,
+    required GetCompanyJoinCodeUseCase getCompanyJoinCodeUseCase,
+    required RegenerateCompanyJoinCodeUseCase regenerateCompanyJoinCodeUseCase,
+    required LeaveCompanyUseCase leaveCompanyUseCase,
+    required DeleteCompanyUseCase deleteCompanyUseCase,
     ImagePicker? picker,
     SupabaseClient? supabase,
-  })  : _getCompanyUseCase = getCompanyUseCase,
-        _updateCompanyUseCase = updateCompanyUseCase,
+  })  : _updateCompanyUseCase = updateCompanyUseCase,
+        _getCompanyJoinCodeUseCase = getCompanyJoinCodeUseCase,
+        _regenerateCompanyJoinCodeUseCase = regenerateCompanyJoinCodeUseCase,
+        _leaveCompanyUseCase = leaveCompanyUseCase,
+        _deleteCompanyUseCase = deleteCompanyUseCase,
         _picker = picker ?? ImagePicker(),
         _supabase = supabase ?? Supabase.instance.client,
         super(const CompanySettingsInitial());
 
-  Future<void> loadCompany(String companyId) async {
-    emit(const CompanySettingsLoading());
-    final result = await _getCompanyUseCase.call(companyId);
-    result.fold(
-      (failure) => emit(CompanySettingsError(failure.message)),
-      (company) => emit(CompanySettingsLoaded(company: company)),
-    );
+  void loadFromCompany(Company company) {
+    emit(CompanySettingsLoaded(company: company));
   }
 
   Future<void> pickImageFromGallery() async {
@@ -112,6 +119,42 @@ class CompanySettingsCubit extends Cubit<CompanySettingsState> {
       final data = state as CompanySettingsData;
       emit(CompanySettingsLoaded(company: data.company, imagePath: null));
     }
+  }
+
+  Future<String?> getJoinCode() async {
+    final result = await _getCompanyJoinCodeUseCase.call();
+    return result.fold(
+      (failure) => null,
+      (code) => code,
+    );
+  }
+
+  Future<String?> regenerateJoinCode() async {
+    final result = await _regenerateCompanyJoinCodeUseCase.call();
+    return result.fold(
+      (failure) => null,
+      (code) => code,
+    );
+  }
+
+  Future<bool> leaveCompany() async {
+    final result = await _leaveCompanyUseCase.call();
+    final success = result.fold(
+      (failure) => false,
+      (_) => true,
+    );
+    if (success) emit(const CompanySettingsSuccess(AppStrings.companyLeft));
+    return success;
+  }
+
+  Future<bool> deleteCompany(String companyId) async {
+    final result = await _deleteCompanyUseCase.call(companyId);
+    final success = result.fold(
+      (failure) => false,
+      (_) => true,
+    );
+    if (success) emit(const CompanySettingsSuccess(AppStrings.companyDeleted));
+    return success;
   }
 
   Future<void> updateCompany({

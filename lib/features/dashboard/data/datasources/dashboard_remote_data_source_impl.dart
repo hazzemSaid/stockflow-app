@@ -172,34 +172,28 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   Future<List<Map<String, dynamic>>> _fetchRecentActivity(
     String companyId,
   ) async {
-    final data = await _client
-        .from('invoices')
-        .select(
-          'id, total_amount, remaining_amount, payment_status, created_at, customers(name)',
-        )
-        .eq('company_id', companyId)
-        .order('created_at', ascending: false)
-        .limit(5);
+    final data = await _client.rpc(
+      'get_activity_log',
+      params: {
+        'p_company_id': companyId,
+        'p_filter_days': 7,
+        'p_page_limit': 5,
+        'p_page_offset': 0,
+      },
+    );
 
     final list = data as List;
     return list.map((row) {
-      final customerMap = row['customers'] as Map?;
-      final customerName = customerMap?['name'] as String? ?? '';
+      final m = row as Map<String, dynamic>;
       return <String, dynamic>{
-        'id': row['id'],
-        'user_id': '',
-        'user_name': customerName,
-        'action': 'create_invoice',
-        'entity_type': 'invoice',
-        'entity_id': row['id'],
-        'details': {
-          'name': customerName,
-          'amount': (row['total_amount'] as num).toDouble(),
-          'payment_status': row['payment_status'],
-          'remaining_amount':
-              (row['remaining_amount'] as num?)?.toDouble() ?? 0,
-        },
-        'created_at': row['created_at'],
+        'id': m['id'],
+        'user_id': m['user_id'] ?? '',
+        'user_name': m['user_name'] ?? '',
+        'action': m['action'],
+        'entity_type': m['entity_type'],
+        'entity_id': m['entity_id'],
+        'details': m['details'] ?? {},
+        'created_at': m['created_at'],
       };
     }).toList();
   }

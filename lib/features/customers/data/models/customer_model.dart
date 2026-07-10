@@ -104,39 +104,8 @@ class CustomerModel {
       ));
     }
 
-    double openingDebt = (json['total_debt'] as num?)?.toDouble() ?? 0;
-    if (openingDebt == 0) {
-      for (final inv in rawInvoices) {
-        if (inv['is_opening_balance'] == true ||
-            inv['invoice_type'] == 'opening_balance') {
-          openingDebt = (inv['total_amount'] as num?)?.toDouble() ?? 0;
-          break;
-        }
-      }
-    }
-
-    final hasOpeningInvoice = rawInvoices.any((inv) =>
-        inv['is_opening_balance'] == true ||
-        inv['invoice_type'] == 'opening_balance');
-    final computedDebt = (json['computed_debt'] as num?)?.toDouble();
-    final totalDebt = computedDebt != null
-        ? computedDebt
-        : (hasOpeningInvoice
-            ? (totalPurchases - totalPaid)
-            : (openingDebt + totalPurchases - totalPaid));
+    final totalDebt = (json['computed_debt'] as num?)?.toDouble() ?? 0;
     final createdAtStr = json['created_at'] as String?;
-    if (!hasOpeningInvoice && openingDebt > 0 && createdAtStr != null) {
-      final createDate = DateTime.parse(createdAtStr);
-      transactions.add(CustomerTransaction(
-        id: 'opening_debt',
-        type: 'opening_debt',
-        amount: openingDebt,
-        createdAt: createDate,
-        title: 'رصيد افتتاحي',
-        subtitle: 'عند إنشاء الحساب',
-        statusLabel: 'معلق',
-      ));
-    }
 
     transactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -163,7 +132,6 @@ class CustomerModel {
       if (nameOfficial != null) 'name_official': nameOfficial,
       if (phone != null) 'phone': phone,
       if (address != null) 'address': address,
-      if (totalDebt > 0) 'total_debt': totalDebt,
       if (imageUrl != null) 'image_url': imageUrl,
       if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
       if (totalPurchases > 0) 'total_purchases': totalPurchases,
@@ -177,7 +145,6 @@ class CustomerModel {
       if (nameOfficial != null) 'name_official': nameOfficial,
       if (phone != null) 'phone': phone,
       if (address != null) 'address': address,
-      if (totalDebt > 0) 'total_debt': totalDebt,
       if (imageUrl != null) 'image_url': imageUrl,
     };
   }

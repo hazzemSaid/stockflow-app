@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -80,14 +81,27 @@ bool _isProtectedRoute(String location) => _protectedRoutes.any((route) {
 final ChangeNotifier _authStateNotifier = _AuthStateNotifier();
 
 class _AuthStateNotifier extends ChangeNotifier {
+  Timer? _debounce;
+
   _AuthStateNotifier() {
-    sl<AuthCubit>().stream.listen((_) => notifyListeners());
-    sl<CompanyCubit>().stream.listen((_) => notifyListeners());
+    sl<AuthCubit>().stream.listen((_) => _schedule());
+    sl<CompanyCubit>().stream.listen((_) => _schedule());
+  }
+
+  void _schedule() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 50), notifyListeners);
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 }
 
 Page<void> _buildFullScreenPage<T>(GoRouterState state, Widget child) {
-  return NoTransitionPage(key: state.pageKey, child: child);
+  return NoTransitionPage(key: ValueKey(state.uri.toString()), child: child);
 }
 
 final GoRouter appRouter = GoRouter(
@@ -122,7 +136,8 @@ final GoRouter appRouter = GoRouter(
         final isBlockedCompanyRoute =
             _isCompanyRoute(location) &&
             location != AppRoutes.companyCreate &&
-            location != AppRoutes.welcomeJoin;
+            location != AppRoutes.welcomeJoin &&
+            location != AppRoutes.welcomePending;
         if (_isAuthRoute(location) || isBlockedCompanyRoute) {
           return AppRoutes.dashboard;
         }
@@ -201,8 +216,13 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.welcomePending,
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) {
-        final cubit = state.extra as JoinCompanyCubit;
-        return PendingApprovalScreen(cubit: cubit);
+        final args = state.extra as Map<String, dynamic>;
+        return PendingApprovalScreen(
+          requestId: args['requestId'] as String,
+          companyId: args['companyId'] as String,
+          companyName: args['companyName'] as String,
+          companyLogo: args['companyLogo'] as String?,
+        );
       },
     ),
     StatefulShellRoute.indexedStack(
@@ -342,7 +362,7 @@ final GoRouter appRouter = GoRouter(
                   path: 'create',
                   parentNavigatorKey: _rootNavigatorKey,
                   pageBuilder: (context, state) {
-                    final extra = state.extra as Map<String, String>?;
+                    final extra = state.extra as Map<String, dynamic>?;
                     final hasCustomer =
                         extra != null && extra.containsKey('customerId');
                     return _buildFullScreenPage(
@@ -379,6 +399,14 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'company',
                   parentNavigatorKey: _rootNavigatorKey,
+                  redirect: (context, state) {
+                    final companyState = sl<CompanyCubit>().state;
+                    if (companyState is CompanySelected &&
+                        companyState.membership?.isOwner != true) {
+                      return AppRoutes.settings;
+                    }
+                    return null;
+                  },
                   pageBuilder: (context, state) => _buildFullScreenPage(
                     state,
                     BlocProvider(
@@ -393,7 +421,6 @@ final GoRouter appRouter = GoRouter(
                   pageBuilder: (context, state) =>
                       _buildFullScreenPage(state, const MembersPage()),
                 ),
-
               ],
             ),
           ],

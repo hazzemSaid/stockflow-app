@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/error/error_handler.dart';
 import '../../domain/entities/product_input.dart';
 import '../models/product_model.dart';
 import '../models/inventory_movement_model.dart';
@@ -11,6 +12,13 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   ProductRemoteDataSourceImpl(this._client);
 
+  TaskEither<String, T> _rpc<T>(String name, {Map<String, dynamic>? params}) {
+    return TaskEither.tryCatch(
+      () async => await _client.rpc(name, params: params) as T,
+      (error, stackTrace) => handleError(error, stackTrace),
+    );
+  }
+
   @override
   TaskEither<String, List<ProductModel>> listProducts({
     required String companyId,
@@ -20,42 +28,29 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String? sortColumn,
     bool ascending = false,
   }) {
-    return TaskEither.tryCatch(() async {
-      var request = _client
-          .from('products')
-          .select()
-          .eq('company_id', companyId);
-
-      if (query != null && query.trim().isNotEmpty) {
-        request = request.ilike('name', '%$query%');
-      }
-
-      final orderColumn = sortColumn ?? 'created_at';
-      var orderedRequest = request.order(orderColumn, ascending: ascending);
-
-      if (limit != null && offset != null) {
-        orderedRequest = orderedRequest.range(offset, offset + limit - 1);
-      }
-
-      final data = await orderedRequest as List<dynamic>;
-      // fetched products
-      return data
+    return _rpc<List>(
+      'list_products',
+      params: {
+        'p_company_id': companyId,
+        if (query != null && query.trim().isNotEmpty) 'p_query': query,
+        if (limit != null) 'p_limit': limit,
+        if (offset != null) 'p_offset': offset,
+        if (sortColumn != null) 'p_sort_column': sortColumn,
+        'p_ascending': ascending,
+      },
+    ).map(
+      (data) => data
           .map((json) => ProductModel.fromJson(json as Map<String, dynamic>))
-          .toList();
-    }, (error, stackTrace) => error.toString());
+          .toList(),
+    );
   }
 
   @override
   TaskEither<String, ProductModel> getProduct(String id, String companyId) {
-    return TaskEither.tryCatch(() async {
-      final data = await _client
-          .from('products')
-          .select()
-          .filter('id', 'eq', id)
-          .filter('company_id', 'eq', companyId)
-          .single();
-      return ProductModel.fromJson(data);
-    }, (error, stackTrace) => error.toString());
+    return _rpc<Map<String, dynamic>>(
+      'get_product',
+      params: {'p_product_id': id, 'p_company_id': companyId},
+    ).map((json) => ProductModel.fromJson(json));
   }
 
   @override
@@ -64,37 +59,18 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String userId,
     String companyId,
   ) {
-    return TaskEither.tryCatch(() async {
-      final model = ProductModel(
-        id: '',
-        name: input.name,
-        imageUrl: input.imageUrl,
-        quantity: input.quantity,
-        price: input.price,
-        createdBy: userId,
-        expirationDate: input.expirationDate,
-      );
-      final data = model.toInsertJson();
-      data.remove('id');
-      data['company_id'] = companyId;
-      final response = await _client
-          .from('products')
-          .insert(data)
-          .select()
-          .single();
-
-      if (input.quantity > 0) {
-        await _client.from('inventory_logs').insert({
-          'product_id': response['id'],
-          'company_id': companyId,
-          'type': 'in',
-          'quantity': input.quantity,
-          'created_by': userId,
-        });
-      }
-
-      return ProductModel.fromJson(response);
-    }, (error, stackTrace) => error.toString());
+    final expDate = input.expirationDate;
+    return _rpc<Map<String, dynamic>>(
+      'create_product',
+      params: {
+        'p_name': input.name,
+        if (input.imageUrl != null) 'p_image_url': input.imageUrl,
+        'p_quantity': input.quantity,
+        'p_price': input.price,
+        if (expDate != null) 'p_expiration_date': expDate.toIso8601String(),
+        'p_company_id': companyId,
+      },
+    ).map((json) => ProductModel.fromJson(json));
   }
 
   @override
@@ -104,56 +80,27 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String userId,
     String companyId,
   ) {
-    return TaskEither.tryCatch(() async {
-      final currentProduct = await _client
-          .from('products')
-          .select('quantity')
-          .filter('id', 'eq', id)
-          .filter('company_id', 'eq', companyId)
-          .single();
-      final currentQty = currentProduct['quantity'] as int;
-
-      final model = ProductModel(
-        id: id,
-        name: input.name,
-        imageUrl: input.imageUrl,
-        quantity: input.quantity,
-        price: input.price,
-        createdBy: '',
-        expirationDate: input.expirationDate,
-      );
-      final response = await _client
-          .from('products')
-          .update(model.toUpdateJson())
-          .filter('id', 'eq', id)
-          .filter('company_id', 'eq', companyId)
-          .select()
-          .single();
-
-      final delta = input.quantity - currentQty;
-      if (delta != 0) {
-        await _client.from('inventory_logs').insert({
-          'product_id': id,
-          'company_id': companyId,
-          'type': delta > 0 ? 'in' : 'out',
-          'quantity': delta.abs(),
-          'created_by': userId,
-        });
-      }
-
-      return ProductModel.fromJson(response);
-    }, (error, stackTrace) => error.toString());
+    final expDate = input.expirationDate;
+    return _rpc<Map<String, dynamic>>(
+      'update_product',
+      params: {
+        'p_product_id': id,
+        'p_name': input.name,
+        if (input.imageUrl != null) 'p_image_url': input.imageUrl,
+        'p_quantity': input.quantity,
+        'p_price': input.price,
+        if (expDate != null) 'p_expiration_date': expDate.toIso8601String(),
+        'p_company_id': companyId,
+      },
+    ).map((json) => ProductModel.fromJson(json));
   }
 
   @override
   TaskEither<String, void> deleteProduct(String id, String companyId) {
-    return TaskEither.tryCatch(() async {
-      await _client
-          .from('products')
-          .delete()
-          .filter('id', 'eq', id)
-          .filter('company_id', 'eq', companyId);
-    }, (error, stackTrace) => error.toString());
+    return _rpc<void>(
+      'delete_product',
+      params: {'p_product_id': id, 'p_company_id': companyId},
+    );
   }
 
   @override
@@ -176,7 +123,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           .from('product-images')
           .getPublicUrl(fileName);
       return publicUrl;
-    }, (error, stackTrace) => error.toString());
+    }, (error, stackTrace) => handleError(error, stackTrace));
   }
 
   @override
@@ -189,40 +136,16 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     required String userId,
     required String companyId,
   }) {
-    return TaskEither.tryCatch(() async {
-      final currentProduct = await _client
-          .from('products')
-          .select('quantity')
-          .filter('id', 'eq', productId)
-          .filter('company_id', 'eq', companyId)
-          .single();
-      final currentQty = currentProduct['quantity'] as int;
-
-      final finalQuantity = type == 'in'
-          ? currentQty + delta
-          : currentQty - delta;
-
-      if (finalQuantity < 0) {
-        throw Exception('لا يمكن أن تصبح الكمية أقل من صفر');
-      }
-
-      await _client
-          .from('products')
-          .update({'quantity': finalQuantity})
-          .filter('id', 'eq', productId)
-          .filter('company_id', 'eq', companyId);
-
-      await _client.from('inventory_logs').insert({
-        'product_id': productId,
-        'company_id': companyId,
-        'type': type,
-        'quantity': delta,
-        if (note != null) 'note': note,
-        'created_by': userId,
-      });
-
-      return {'success': true, 'new_quantity': finalQuantity};
-    }, (error, stackTrace) => error.toString());
+    return _rpc<Map<String, dynamic>>(
+      'update_product_quantity',
+      params: {
+        'p_product_id': productId,
+        'p_type': type,
+        'p_delta': delta,
+        if (note != null) 'p_note': note,
+        'p_company_id': companyId,
+      },
+    );
   }
 
   @override
@@ -230,22 +153,16 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String productId,
     String companyId,
   ) {
-    return TaskEither.tryCatch(() async {
-      final data =
-          await _client
-                  .from('inventory_logs')
-                  .select()
-                  .filter('product_id', 'eq', productId)
-                  .filter('company_id', 'eq', companyId)
-                  .order('created_at', ascending: false)
-                  .limit(20)
-              as List<dynamic>;
-      return data
+    return _rpc<List>(
+      'get_product_movements',
+      params: {'p_product_id': productId, 'p_company_id': companyId},
+    ).map(
+      (data) => data
           .map(
             (json) =>
                 InventoryMovementModel.fromJson(json as Map<String, dynamic>),
           )
-          .toList();
-    }, (error, stackTrace) => error.toString());
+          .toList(),
+    );
   }
 }

@@ -28,11 +28,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw const AuthException(AppStrings.userDataNotFound);
       }
       final user = response.user!;
-      await _supabaseClient.from('users').insert({
-        'id': user.id,
-        'name': name,
-        'email': email,
-      });
       return UserModel.fromSupabaseUser(user);
     } on supabase.AuthException catch (e) {
       throw AuthException(e.message);

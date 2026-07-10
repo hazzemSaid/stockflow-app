@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stockflow/core/company/company_cubit.dart';
 import 'package:stockflow/core/company/company_state.dart';
 import 'package:stockflow/core/constants/app_colors.dart';
 import 'package:stockflow/core/constants/app_sizes.dart';
+import 'package:stockflow/core/constants/app_routes.dart';
 import 'package:stockflow/core/constants/app_strings.dart';
 import 'package:stockflow/core/widgets/app_snackbar.dart';
 import 'package:stockflow/features/auth/presentation/widgets/logo_picker.dart';
 import 'package:stockflow/features/companies/domain/entities/company.dart';
 import 'package:stockflow/features/companies/presentation/cubit/company_settings_cubit.dart';
+import 'package:stockflow/features/companies/presentation/widgets/share_code_widget.dart';
 
 class CompanySettingsPage extends StatefulWidget {
   const CompanySettingsPage({super.key});
@@ -25,6 +28,8 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
   final _addressController = TextEditingController();
   bool _initialized = false;
   bool _dataLoaded = false;
+  String? _joinCode;
+  bool _joinCodeLoading = false;
 
   @override
   void dispose() {
@@ -41,8 +46,8 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
       _initialized = true;
       final companyState = context.read<CompanyCubit>().state;
       if (companyState is CompanySelected) {
-        context.read<CompanySettingsCubit>().loadCompany(
-          companyState.companyId,
+        context.read<CompanySettingsCubit>().loadFromCompany(
+          companyState.company,
         );
       }
     }
@@ -57,15 +62,36 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
     }
   }
 
+  Future<void> _loadJoinCode() async {
+    setState(() => _joinCodeLoading = true);
+    final code = await context.read<CompanySettingsCubit>().getJoinCode();
+    if (mounted) {
+      setState(() {
+        _joinCode = code;
+        _joinCodeLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final companyState = context.read<CompanyCubit>().state;
+    final currentMembership = companyState is CompanySelected
+        ? companyState.membership
+        : null;
+    final isOwner = currentMembership?.isOwner ?? false;
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: BlocConsumer<CompanySettingsCubit, CompanySettingsState>(
         listener: (context, state) {
           if (state is CompanySettingsSuccess) {
             AppSnackbar.success(context, state.message);
-            context.pop();
+            if (state.message == AppStrings.companyDeleted ||
+                state.message == AppStrings.companyLeft) {
+              context.go(AppRoutes.companySelect);
+            } else {
+              context.pop();
+            }
           } else if (state is CompanySettingsError) {
             AppSnackbar.error(context, state.message);
           }
@@ -99,6 +125,7 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
                           data.company,
                           data.imagePath,
                           state is CompanySettingsUpdating,
+                          isOwner,
                         ),
                       ),
                     ),
@@ -175,10 +202,12 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
     Company company,
     String? imagePath,
     bool isLoading,
+    bool isOwner,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // -- Company Info --
         Center(
           child: LogoPicker(
             imagePath: imagePath,
@@ -221,9 +250,246 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
         _buildInfoCard(company),
         SizedBox(height: AppSizes.spacingXLarge),
         _buildSaveButton(context, company.id, isLoading),
+
+        SizedBox(height: AppSizes.spacingXLarge),
+        Divider(color: AppColors.inputBorder),
+
+        // -- Join Code Section (owner-only) --
+        if (isOwner) ...[
+          SizedBox(height: AppSizes.spacingLarge),
+          _buildSectionTitle('رمز الدعوة'),
+          SizedBox(height: AppSizes.spacingSmall),
+          _joinCodeLoading
+              ? Center(child: CircularProgressIndicator())
+              : _joinCode != null
+                  ? ShareCodeWidget(
+                      code: _joinCode!,
+                      onCopy: () {
+                        Clipboard.setData(ClipboardData(text: _joinCode!));
+                        AppSnackbar.success(context, 'تم نسخ الرمز');
+                      },
+                      onRegenerate: () => _confirmRegenerateCode(),
+                    )
+                  : ElevatedButton(
+                      onPressed: _loadJoinCode,
+                      child: Text('عرض رمز الدعوة'),
+                    ),
+          SizedBox(height: AppSizes.spacingLarge),
+          Divider(color: AppColors.inputBorder),
+        ],
+
+        // -- Team Members shortcut --
+        SizedBox(height: AppSizes.spacingLarge),
+        _buildSectionTitle(AppStrings.teamMembers),
+        SizedBox(height: AppSizes.spacingSmall),
+        _buildLinkCard(
+          icon: Icons.people,
+          label: 'عرض فريق العمل',
+          onTap: () => context.push('/settings/members'),
+        ),
+
+        SizedBox(height: AppSizes.spacingLarge),
+        Divider(color: AppColors.inputBorder),
+
+        // -- Danger Zone (owner-only) --
+        if (isOwner) ...[
+          SizedBox(height: AppSizes.spacingLarge),
+          _buildSectionTitle('منطقة الخطر', color: AppColors.error),
+          SizedBox(height: AppSizes.spacingSmall),
+          _buildDangerButton(
+            label: 'حذف الشركة',
+            icon: Icons.delete_forever,
+            onTap: () => _confirmDeleteCompany(company.id),
+          ),
+          SizedBox(height: AppSizes.spacingSmall),
+        ] else ...[
+          SizedBox(height: AppSizes.spacingLarge),
+          Divider(color: AppColors.inputBorder),
+          SizedBox(height: AppSizes.spacingLarge),
+          _buildDangerButton(
+            label: 'مغادرة الشركة',
+            icon: Icons.exit_to_app,
+            onTap: _confirmLeaveCompany,
+          ),
+        ],
       ],
     );
   }
+
+  Widget _buildSectionTitle(String title, {Color? color}) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: AppSizes.fontXLarge,
+        fontWeight: FontWeight.bold,
+        color: color ?? AppColors.textPrimary,
+      ),
+    );
+  }
+
+  Widget _buildLinkCard({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+        border: Border.all(
+          color: AppColors.inputBorder,
+          width: AppSizes.borderWidthThin,
+        ),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: AppColors.primary),
+        title: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: AppSizes.fontMedium,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: AppSizes.iconSmall,
+          color: AppColors.textSecondary,
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _buildDangerButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, color: AppColors.error),
+        label: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: AppSizes.fontLarge,
+            color: AppColors.error,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: AppColors.error.withAlpha(77)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+          ),
+          padding: EdgeInsets.symmetric(vertical: AppSizes.spacingMedium),
+        ),
+      ),
+    );
+  }
+
+  void _confirmDeleteCompany(String companyId) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(
+          'حذف الشركة',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'هل أنت متأكد من حذف الشركة؟ لا يمكن التراجع عن هذا الإجراء.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<CompanySettingsCubit>().deleteCompany(companyId);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text('حذف'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmLeaveCompany() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(
+          'مغادرة الشركة',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text('هل أنت متأكد من مغادرة هذه الشركة؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<CompanySettingsCubit>().leaveCompany();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text('مغادرة'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmRegenerateCode() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('تغيير رمز الدعوة'),
+        content: Text('سيتم تعطيل الرمز الحالي وإنشاء رمز جديد. هل أنت متأكد؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final cubit = context.read<CompanySettingsCubit>();
+              final newCode = await cubit.regenerateJoinCode();
+              if (mounted) {
+                if (newCode != null) {
+                  setState(() => _joinCode = newCode);
+                  AppSnackbar.success(context, 'تم تغيير رمز الدعوة');
+                } else {
+                  AppSnackbar.error(context, 'فشل تغيير رمز الدعوة');
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text('تأكيد'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Original widget helpers ---
 
   Widget _buildFormField({
     required String label,
@@ -427,4 +693,3 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
     );
   }
 }
-

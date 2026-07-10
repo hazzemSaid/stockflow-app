@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/company/company_cubit.dart';
+import '../../../../core/company/company_state.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/app_sizes.dart';
@@ -18,6 +19,8 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authCubit = context.read<AuthCubit>();
+    final companyState = context.watch<CompanyCubit>().state;
+    final isOwner = companyState is CompanySelected && companyState.membership?.isOwner == true;
 
     return SafeArea(
       child: ListView(
@@ -27,12 +30,14 @@ class SettingsScreen extends StatelessWidget {
           SizedBox(height: AppSizes.spacingMedium),
           _SettingsCard(
             children: [
-              _SettingsTile(
-                icon: Icons.business,
-                label: AppStrings.companySettings,
-                onTap: () => context.go('${AppRoutes.settings}/company'),
-              ),
-              Divider(height: 1, indent: AppSizes.spacingXLarge * 2),
+              if (isOwner)
+                _SettingsTile(
+                  icon: Icons.business,
+                  label: AppStrings.companySettings,
+                  onTap: () => context.go('${AppRoutes.settings}/company'),
+                ),
+              if (isOwner)
+                Divider(height: 1, indent: AppSizes.spacingXLarge * 2),
               _SettingsTile(
                 icon: Icons.people,
                 label: AppStrings.teamMembers,
