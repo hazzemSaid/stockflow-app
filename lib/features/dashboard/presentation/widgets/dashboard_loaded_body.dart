@@ -104,30 +104,30 @@ class DashboardLoadedBody extends StatelessWidget {
               SizedBox(height: AppSizes.spacingSmall),
               DashboardQuickActionsGrid(actionWidth: actionWidth),
               SizedBox(height: AppSizes.spacingLarge),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSizes.spacingMedium,
-                ),
-                child: const SectionHeader(
-                  title: AppStrings.dashboardRecentActivity,
-                  subtitle: AppStrings.dashboardRecentActivitySubtitle,
-                ),
-              ),
-              SizedBox(height: AppSizes.spacingSmall),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSizes.spacingMedium,
-                ),
-                child: ActivityList(
-                  entries: stats.recentActivities,
-                  onItemTap: (entry) {
-                    final id = entry.entityId;
-                    if (id != null) {
-                      context.go(AppRoutes.invoiceDetailsPath(id));
-                    }
-                  },
-                ),
-              ),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(
+              //     horizontal: AppSizes.spacingMedium,
+              //   ),
+              //   child: const SectionHeader(
+              //     title: AppStrings.dashboardRecentActivity,
+              //     subtitle: AppStrings.dashboardRecentActivitySubtitle,
+              //   ),
+              // ),
+              // SizedBox(height: AppSizes.spacingSmall),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(
+              //     horizontal: AppSizes.spacingMedium,
+              //   ),
+              //   child: ActivityList(
+              //     entries: stats.recentActivities,
+              //     onItemTap: (entry) {
+              //       final id = entry.entityId;
+              //       if (id != null) {
+              //         context.go(AppRoutes.invoiceDetailsPath(id));
+              //       }
+              //     },
+              //   ),
+              // ),
               SizedBox(height: AppSizes.spacingLarge),
               Padding(
                 padding: EdgeInsets.symmetric(
