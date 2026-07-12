@@ -1,16 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:stockflow/features/companies/domain/entities/company_member.dart';
-import 'package:stockflow/features/companies/domain/usecases/get_company_members_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/invite_member_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/remove_member_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/update_member_permissions_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/remove_company_member_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/deactivate_member_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/reactivate_member_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/promote_member_to_owner_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/demote_owner_to_member_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/get_member_permissions_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company_member.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/get_company_members_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/invite_member_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/remove_member_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/update_member_permissions_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/remove_company_member_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/deactivate_member_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/reactivate_member_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/promote_member_to_owner_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/demote_owner_to_member_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/get_member_permissions_usecase.dart';
 
 sealed class CompanyMembersState extends Equatable {
   const CompanyMembersState();

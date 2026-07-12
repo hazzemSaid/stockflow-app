@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
-import 'package:stockflow/features/invoice/presentation/cubit/product_picker/product_picker_cubit.dart';
-import 'package:stockflow/features/invoice/presentation/widgets/product_picker_body.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
+import 'package:makhzanflow/features/invoice/presentation/cubit/product_picker/product_picker_cubit.dart';
+import 'package:makhzanflow/features/invoice/presentation/widgets/product_picker_body.dart';
 
 class ProductPickerScreen extends StatefulWidget {
   final CreateInvoiceCubit createCubit;

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/customers/presentation/cubit/customers/customers_cubit.dart';
-import 'package:stockflow/features/customers/presentation/pages/customers_screen.dart';
-import 'package:stockflow/features/customers/presentation/widgets/customer_list_header.dart';
-import 'package:stockflow/features/customers/presentation/widgets/customer_search_bar.dart';
-import 'package:stockflow/features/customers/presentation/widgets/customer_filter_chips.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/customers/presentation/cubit/customers/customers_cubit.dart';
+import 'package:makhzanflow/features/customers/presentation/pages/customers_screen.dart';
+import 'package:makhzanflow/features/customers/presentation/widgets/customer_list_header.dart';
+import 'package:makhzanflow/features/customers/presentation/widgets/customer_search_bar.dart';
+import 'package:makhzanflow/features/customers/presentation/widgets/customer_filter_chips.dart';
 import '../shared/test_setup.dart';
 
 class MockCustomersCubit extends Cubit<CustomersState> implements CustomersCubit {

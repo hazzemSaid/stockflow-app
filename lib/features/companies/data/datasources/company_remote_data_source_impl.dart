@@ -1,9 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:stockflow/core/error/exceptions.dart';
-import 'package:stockflow/features/companies/data/datasources/company_remote_data_source.dart';
-import 'package:stockflow/features/companies/data/models/company_member_model.dart';
-import 'package:stockflow/features/companies/data/models/company_model.dart';
-import 'package:stockflow/features/companies/data/models/join_request_model.dart';
+import 'package:makhzanflow/core/error/exceptions.dart';
+import 'package:makhzanflow/features/companies/data/datasources/company_remote_data_source.dart';
+import 'package:makhzanflow/features/companies/data/models/company_member_model.dart';
+import 'package:makhzanflow/features/companies/data/models/company_model.dart';
+import 'package:makhzanflow/features/companies/data/models/join_request_model.dart';
 
 class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
   final SupabaseClient _client;

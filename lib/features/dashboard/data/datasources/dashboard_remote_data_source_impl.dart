@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:stockflow/core/error/exceptions.dart';
+import 'package:makhzanflow/core/error/exceptions.dart';
 import '../models/dashboard_stats_model.dart';
 import 'dashboard_remote_data_source.dart';
 

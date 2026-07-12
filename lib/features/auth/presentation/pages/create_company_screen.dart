@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_routes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/di/service_locator.dart';
-import 'package:stockflow/core/widgets/app_snackbar.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/features/companies/domain/usecases/create_company_full_usecase.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_routes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/di/service_locator.dart';
+import 'package:makhzanflow/core/widgets/app_snackbar.dart';
+import 'package:makhzanflow/core/company/company_cubit.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/create_company_full_usecase.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:stockflow/features/auth/presentation/cubit/create_company_cubit.dart';
-import 'package:stockflow/features/auth/presentation/widgets/logo_picker.dart';
+import 'package:makhzanflow/features/auth/presentation/cubit/create_company_cubit.dart';
+import 'package:makhzanflow/features/auth/presentation/widgets/logo_picker.dart';
 
 class CreateCompanyScreen extends StatefulWidget {
   const CreateCompanyScreen({super.key});

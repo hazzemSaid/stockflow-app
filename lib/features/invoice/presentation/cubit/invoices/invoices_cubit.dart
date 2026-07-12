@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/features/customers/domain/usecases/get_customers_usecase.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
-import 'package:stockflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
+import 'package:makhzanflow/features/customers/domain/usecases/get_customers_usecase.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice_status.dart';
+import 'package:makhzanflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
 import 'invoices_state.dart';
 
 export 'invoices_state.dart';

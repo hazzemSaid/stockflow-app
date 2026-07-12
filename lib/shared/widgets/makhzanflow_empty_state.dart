@@ -3,13 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 
-class StockFlowEmptyState extends StatelessWidget {
+class MakhzanFlowEmptyState extends StatelessWidget {
   final IconData icon;
   final String message;
   final String? actionLabel;
   final VoidCallback? onAction;
 
-  const StockFlowEmptyState({
+  const MakhzanFlowEmptyState({
     super.key,
     required this.icon,
     required this.message,

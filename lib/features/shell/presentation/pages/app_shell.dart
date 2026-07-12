@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/shell/presentation/cubit/app_shell_state.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/shell/presentation/cubit/app_shell_state.dart';
 import '../cubit/app_shell_cubit.dart';
-import '../widgets/stockflow_bottom_nav.dart';
+import '../widgets/makhzanflow_bottom_nav.dart';
 
 class AppShell extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -64,7 +64,7 @@ class _AppShellState extends State<AppShell> {
               child: Scaffold(
                 backgroundColor: AppColors.appBackground,
                 body: widget.navigationShell,
-                bottomNavigationBar: StockFlowBottomNav(
+                bottomNavigationBar: MakhzanFlowBottomNav(
                   navigationShell: widget.navigationShell,
                 ),
               ),

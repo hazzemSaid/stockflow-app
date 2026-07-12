@@ -1,4 +1,4 @@
-import 'package:stockflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
 
 class CompanyModel extends Company {
   const CompanyModel({

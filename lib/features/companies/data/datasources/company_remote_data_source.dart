@@ -1,6 +1,6 @@
-import 'package:stockflow/features/companies/data/models/company_member_model.dart';
-import 'package:stockflow/features/companies/data/models/company_model.dart';
-import 'package:stockflow/features/companies/data/models/join_request_model.dart';
+import 'package:makhzanflow/features/companies/data/models/company_member_model.dart';
+import 'package:makhzanflow/features/companies/data/models/company_model.dart';
+import 'package:makhzanflow/features/companies/data/models/join_request_model.dart';
 
 abstract class CompanyRemoteDataSource {
   Future<List<CompanyModel>> getUserCompanies();

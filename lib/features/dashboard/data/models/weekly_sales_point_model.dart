@@ -1,4 +1,4 @@
-import 'package:stockflow/features/dashboard/domain/entities/weekly_sales_point.dart';
+import 'package:makhzanflow/features/dashboard/domain/entities/weekly_sales_point.dart';
 
 /// Arabic short day names indexed by [DateTime.weekday] (1=Mon … 7=Sun).
 const _kArabicDayLabels = <int, String>{

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:stockflow/features/companies/domain/usecases/check_join_request_status_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/join_company_by_code_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/cancel_join_request_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/check_join_request_status_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/join_company_by_code_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/cancel_join_request_usecase.dart';
 
 sealed class JoinCompanyState extends Equatable {
   const JoinCompanyState();

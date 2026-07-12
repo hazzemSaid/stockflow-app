@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stockflow/core/di/service_locator.dart';
-import 'package:stockflow/core/permissions/permission_service.dart';
+import 'package:makhzanflow/core/di/service_locator.dart';
+import 'package:makhzanflow/core/permissions/permission_service.dart';
 
 class PermissionGate extends StatelessWidget {
   final String? permission;

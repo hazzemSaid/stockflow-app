@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice_status.dart';
 
 class UnpaidInvoiceCard extends StatelessWidget {
   final Invoice invoice;

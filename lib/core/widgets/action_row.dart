@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
 
 /// A tappable row with a coloured icon container and a label, used inside
 /// the company-switcher bottom‑sheet for actions (create, join, sign out).

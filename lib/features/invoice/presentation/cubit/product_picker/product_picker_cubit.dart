@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/core/error/failures.dart' show ServerFailure;
-import 'package:stockflow/features/products/domain/entities/product.dart';
-import 'package:stockflow/features/products/domain/usecases/get_products_usecase.dart';
+import 'package:makhzanflow/core/error/failures.dart' show ServerFailure;
+import 'package:makhzanflow/features/products/domain/entities/product.dart';
+import 'package:makhzanflow/features/products/domain/usecases/get_products_usecase.dart';
 import 'product_picker_state.dart';
 
 export 'product_picker_state.dart';

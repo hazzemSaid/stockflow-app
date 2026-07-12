@@ -15,7 +15,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.stockflow.app"
+    namespace = "com.makhzan.flow"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -29,7 +29,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.stockflow.app"
+        applicationId = "com.makhzan.flow"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -56,6 +56,10 @@ android {
             )
         }
     }
+}
+
+dependencies {
+    implementation("com.google.android.play:core:1.10.3")
 }
 
 flutter {

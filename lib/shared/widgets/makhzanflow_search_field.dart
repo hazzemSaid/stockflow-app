@@ -3,14 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 
-class StockFlowSearchField extends StatelessWidget {
+class MakhzanFlowSearchField extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final VoidCallback? onClear;
   final String hintText;
   final bool autofocus;
 
-  const StockFlowSearchField({
+  const MakhzanFlowSearchField({
     super.key,
     required this.controller,
     required this.onChanged,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class StockFlowTheme {
+class MakhzanFlowTheme {
   static const Color darkGreen = Color(0xFF0B3A24);
   static const Color mainGreen = Color(0xFF0F5132);
   static const Color orange = Color(0xFFF97316);
@@ -163,7 +163,7 @@ class StockFlowTheme {
         unselectedLabelStyle: textTheme.labelSmall,
       ),
       extensions: const <ThemeExtension<dynamic>>[
-        StockFlowStatusColors(
+        MakhzanFlowStatusColors(
           paidBg: softGreen,
           paidText: mainGreen,
           partialBg: lightOrange,
@@ -177,8 +177,8 @@ class StockFlowTheme {
 }
 
 @immutable
-class StockFlowStatusColors extends ThemeExtension<StockFlowStatusColors> {
-  const StockFlowStatusColors({
+class MakhzanFlowStatusColors extends ThemeExtension<MakhzanFlowStatusColors> {
+  const MakhzanFlowStatusColors({
     required this.paidBg,
     required this.paidText,
     required this.partialBg,
@@ -195,7 +195,7 @@ class StockFlowStatusColors extends ThemeExtension<StockFlowStatusColors> {
   final Color debtText;
 
   @override
-  StockFlowStatusColors copyWith({
+  MakhzanFlowStatusColors copyWith({
     Color? paidBg,
     Color? paidText,
     Color? partialBg,
@@ -203,7 +203,7 @@ class StockFlowStatusColors extends ThemeExtension<StockFlowStatusColors> {
     Color? debtBg,
     Color? debtText,
   }) {
-    return StockFlowStatusColors(
+    return MakhzanFlowStatusColors(
       paidBg: paidBg ?? this.paidBg,
       paidText: paidText ?? this.paidText,
       partialBg: partialBg ?? this.partialBg,
@@ -214,12 +214,12 @@ class StockFlowStatusColors extends ThemeExtension<StockFlowStatusColors> {
   }
 
   @override
-  StockFlowStatusColors lerp(
-    ThemeExtension<StockFlowStatusColors>? other,
+  MakhzanFlowStatusColors lerp(
+    ThemeExtension<MakhzanFlowStatusColors>? other,
     double t,
   ) {
-    if (other is! StockFlowStatusColors) return this;
-    return StockFlowStatusColors(
+    if (other is! MakhzanFlowStatusColors) return this;
+    return MakhzanFlowStatusColors(
       paidBg: Color.lerp(paidBg, other.paidBg, t)!,
       paidText: Color.lerp(paidText, other.paidText, t)!,
       partialBg: Color.lerp(partialBg, other.partialBg, t)!,

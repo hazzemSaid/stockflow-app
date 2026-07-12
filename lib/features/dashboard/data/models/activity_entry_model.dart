@@ -1,4 +1,4 @@
-import 'package:stockflow/features/dashboard/domain/entities/activity_entry.dart';
+import 'package:makhzanflow/features/dashboard/domain/entities/activity_entry.dart';
 
 class ActivityEntryModel extends ActivityEntry {
   const ActivityEntryModel({

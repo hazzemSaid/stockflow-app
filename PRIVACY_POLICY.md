@@ -4,11 +4,11 @@
 
 ## 1. Introduction
 
-Welcome to StockFlow ("we," "our," or "us"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application.
+Welcome to MakhzanFlow ("we," "our," or "us"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application.
 
-StockFlow is a smart inventory management system that helps businesses manage their stock, customers, invoices, and team members. We are committed to protecting your privacy and ensuring transparency about how we handle your data.
+MakhzanFlow is a smart inventory management system that helps businesses manage their stock, customers, invoices, and team members. We are committed to protecting your privacy and ensuring transparency about how you handle your data.
 
-**Company:** StockFlow  
+**Company:** MakhzanFlow  
 **Contact Email:** haazemsaidd@gmail.com  
 **Phone:** 01224661310  
 **Website:** https://stockflow.app
@@ -164,4 +164,4 @@ If you have any questions, concerns, or requests regarding this Privacy Policy o
 
 ---
 
-*This Privacy Policy was prepared based on a thorough analysis of the StockFlow application codebase, including all collected data types, permissions, third-party SDKs, and data flows.*
+*This Privacy Policy was prepared based on a thorough analysis of the MakhzanFlow application codebase, including all collected data types, permissions, third-party SDKs, and data flows.*

@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice.dart';
 
 abstract class InvoiceRepository {
   Future<Either<Failure, String>> createInvoice({

@@ -1,11 +1,11 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/core/error/exceptions.dart';
-import 'package:stockflow/features/companies/data/datasources/company_remote_data_source.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/domain/entities/company_member.dart';
-import 'package:stockflow/features/companies/domain/entities/join_request.dart';
-import 'package:stockflow/features/companies/domain/repositories/company_repository.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/core/error/exceptions.dart';
+import 'package:makhzanflow/features/companies/data/datasources/company_remote_data_source.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company_member.dart';
+import 'package:makhzanflow/features/companies/domain/entities/join_request.dart';
+import 'package:makhzanflow/features/companies/domain/repositories/company_repository.dart';
 
 class CompanyRepositoryImpl implements CompanyRepository {
   final CompanyRemoteDataSource _dataSource;

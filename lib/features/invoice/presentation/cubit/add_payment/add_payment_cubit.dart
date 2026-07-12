@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/domain/usecases/add_payment_usecase.dart';
-import 'package:stockflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/invoice/domain/usecases/add_payment_usecase.dart';
+import 'package:makhzanflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
 import 'add_payment_state.dart';
 
 export 'add_payment_state.dart';

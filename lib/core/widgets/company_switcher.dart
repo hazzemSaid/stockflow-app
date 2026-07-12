@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
-import 'package:stockflow/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_routes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/widgets/action_row.dart';
-import 'package:stockflow/core/widgets/app_network_image.dart';
-import 'package:stockflow/core/widgets/company_card.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/core/company/company_cubit.dart';
+import 'package:makhzanflow/core/company/company_state.dart';
+import 'package:makhzanflow/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_routes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/widgets/action_row.dart';
+import 'package:makhzanflow/core/widgets/app_network_image.dart';
+import 'package:makhzanflow/core/widgets/company_card.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
 
 class CompanySwitcher extends StatefulWidget {
   const CompanySwitcher({super.key});

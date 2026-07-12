@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stockflow/features/customers/domain/entities/customer_transaction.dart';
-import 'package:stockflow/features/customers/presentation/widgets/customer_transaction_list.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/customers/domain/entities/customer_transaction.dart';
+import 'package:makhzanflow/features/customers/presentation/widgets/customer_transaction_list.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
 
 Widget createTestWidget({
   int selectedTab = 0,

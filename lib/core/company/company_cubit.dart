@@ -2,13 +2,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:stockflow/core/company/company_state.dart';
-import 'package:stockflow/core/di/service_locator.dart';
-import 'package:stockflow/core/permissions/permission_service.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/domain/entities/company_member.dart';
-import 'package:stockflow/features/companies/domain/usecases/get_company_members_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/get_user_companies_usecase.dart';
+import 'package:makhzanflow/core/company/company_state.dart';
+import 'package:makhzanflow/core/di/service_locator.dart';
+import 'package:makhzanflow/core/permissions/permission_service.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company_member.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/get_company_members_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/get_user_companies_usecase.dart';
 
 class CompanyCubit extends Cubit<CompanyState> {
   final GetUserCompaniesUseCase _getUserCompaniesUseCase;

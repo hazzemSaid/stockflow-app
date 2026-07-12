@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
+import 'package:makhzanflow/core/error/failures.dart';
 import '../entities/dashboard_stats.dart';
 
 /// Abstract contract for fetching aggregated dashboard data for a company.

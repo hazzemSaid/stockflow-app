@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/features/customers/domain/usecases/get_customers_usecase.dart';
+import 'package:makhzanflow/features/customers/domain/usecases/get_customers_usecase.dart';
 import 'customer_picker_state.dart';
 
 export 'customer_picker_state.dart';

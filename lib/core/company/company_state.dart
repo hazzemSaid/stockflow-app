@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/domain/entities/company_member.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company_member.dart';
 
 sealed class CompanyState extends Equatable {
   const CompanyState();

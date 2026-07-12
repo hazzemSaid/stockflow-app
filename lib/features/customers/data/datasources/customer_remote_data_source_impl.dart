@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/customers/data/datasources/customer_remote_data_source.dart';
-import 'package:stockflow/features/customers/data/models/customer_model.dart';
-import 'package:stockflow/features/customers/data/models/customer_filter_counts_model.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/customers/data/datasources/customer_remote_data_source.dart';
+import 'package:makhzanflow/features/customers/data/models/customer_model.dart';
+import 'package:makhzanflow/features/customers/data/models/customer_filter_counts_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class CustomerRemoteDataSourceImpl implements CustomerRemoteDataSource {

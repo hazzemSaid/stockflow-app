@@ -1,6 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class StockFlowEnv {
+class MakhzanFlowEnv {
   static String get supabaseUrl {
     final value = dotenv.env['SUPABASE_URL']?.trim();
     if (value == null || value.isEmpty) {

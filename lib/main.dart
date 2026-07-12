@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:stockflow/core/env.dart';
+import 'package:makhzanflow/core/env.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,8 +17,8 @@ void main() async {
   await dotenv.load(fileName: '.env');
   // Initialize Supabase
   await Supabase.initialize(
-    url: StockFlowEnv.supabaseUrl,
-    anonKey: StockFlowEnv.supabaseAnonKey,
+    url: MakhzanFlowEnv.supabaseUrl,
+    anonKey: MakhzanFlowEnv.supabaseAnonKey,
   );
 
   await initServiceLocator();
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         );
       },
       child: MaterialApp.router(
-        title: 'StockFlow',
+        title: 'MakhzanFlow',
         theme: AppTheme.lightTheme,
         routerConfig: appRouter,
         localizationsDelegates: const [

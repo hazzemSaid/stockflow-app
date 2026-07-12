@@ -7,10 +7,10 @@ import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../models/navigation_destination.dart';
 
-class StockFlowBottomNav extends StatelessWidget {
+class MakhzanFlowBottomNav extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
-  const StockFlowBottomNav({super.key, required this.navigationShell});
+  const MakhzanFlowBottomNav({super.key, required this.navigationShell});
 
   static const List<NavigationDestinationData> destinations = [
     NavigationDestinationData(

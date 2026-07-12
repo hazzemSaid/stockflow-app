@@ -1,6 +1,6 @@
-import 'package:stockflow/features/dashboard/domain/entities/dashboard_stats.dart';
-import 'package:stockflow/features/dashboard/domain/entities/weekly_sales_point.dart';
-import 'package:stockflow/features/dashboard/domain/entities/activity_entry.dart';
+import 'package:makhzanflow/features/dashboard/domain/entities/dashboard_stats.dart';
+import 'package:makhzanflow/features/dashboard/domain/entities/weekly_sales_point.dart';
+import 'package:makhzanflow/features/dashboard/domain/entities/activity_entry.dart';
 import 'weekly_sales_point_model.dart';
 import 'activity_entry_model.dart';
 

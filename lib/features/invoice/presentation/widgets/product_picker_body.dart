@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/invoice/presentation/cubit/product_picker/product_picker_cubit.dart';
-import 'package:stockflow/features/invoice/presentation/widgets/product_tile.dart';
-import 'package:stockflow/features/invoice/presentation/widgets/product_picker_loading.dart';
-import 'package:stockflow/features/invoice/presentation/widgets/product_picker_error.dart';
-import 'package:stockflow/features/invoice/presentation/widgets/product_picker_empty.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/invoice/presentation/cubit/product_picker/product_picker_cubit.dart';
+import 'package:makhzanflow/features/invoice/presentation/widgets/product_tile.dart';
+import 'package:makhzanflow/features/invoice/presentation/widgets/product_picker_loading.dart';
+import 'package:makhzanflow/features/invoice/presentation/widgets/product_picker_error.dart';
+import 'package:makhzanflow/features/invoice/presentation/widgets/product_picker_empty.dart';
 
 class ProductPickerBody extends StatefulWidget {
   const ProductPickerBody({super.key});

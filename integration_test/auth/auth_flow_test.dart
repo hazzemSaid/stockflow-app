@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/auth/presentation/pages/login_screen.dart';
-import 'package:stockflow/features/auth/presentation/pages/register_screen.dart';
-import 'package:stockflow/features/auth/presentation/pages/splash_screen.dart';
-import 'package:stockflow/features/auth/presentation/pages/welcome_screen.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/auth/presentation/pages/login_screen.dart';
+import 'package:makhzanflow/features/auth/presentation/pages/register_screen.dart';
+import 'package:makhzanflow/features/auth/presentation/pages/splash_screen.dart';
+import 'package:makhzanflow/features/auth/presentation/pages/welcome_screen.dart';
 import '../shared/test_setup.dart';
 
 void main() {
@@ -142,7 +142,7 @@ void main() {
       await tester.pump();
 
       final fields = find.byType(TextFormField);
-      await tester.enterText(fields.first, 'user@stockflow.eg');
+      await tester.enterText(fields.first, 'user@MakhzanFlow.eg');
       await tester.enterText(fields.last, 'mypassword');
     });
 
@@ -154,7 +154,7 @@ void main() {
       expect(fields, findsNWidgets(4));
 
       await tester.enterText(fields.at(0), 'أحمد محمد');
-      await tester.enterText(fields.at(1), 'ahmed@stockflow.eg');
+      await tester.enterText(fields.at(1), 'ahmed@MakhzanFlow.eg');
       await tester.enterText(fields.at(2), 'securepass123');
       await tester.enterText(fields.at(3), 'securepass123');
 

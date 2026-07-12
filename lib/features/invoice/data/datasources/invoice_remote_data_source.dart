@@ -1,8 +1,8 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/data/models/add_payment_dto.dart';
-import 'package:stockflow/features/invoice/data/models/invoice_create_dto.dart';
-import 'package:stockflow/features/invoice/data/models/invoice_model.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/invoice/data/models/add_payment_dto.dart';
+import 'package:makhzanflow/features/invoice/data/models/invoice_create_dto.dart';
+import 'package:makhzanflow/features/invoice/data/models/invoice_model.dart';
 
 abstract class InvoiceRemoteDataSource {
   Future<Either<Failure, String>> createInvoice(
