@@ -57,3 +57,4 @@ specs
 
 # Google OAuth client secrets
 client_secret_*.json
+lib/firebase_options.dart
