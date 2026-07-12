@@ -1,4 +1,6 @@
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+import '../../../../core/env.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../models/user_model.dart';
@@ -6,6 +8,7 @@ import '../models/user_model.dart';
 abstract class AuthRemoteDataSource {
   Future<UserModel> signUp(String email, String password, String name);
   Future<UserModel> signInWithEmailAndPassword(String email, String password);
+  Future<UserModel> signInWithGoogle();
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();
   Stream<UserModel?> get authStateChanges;
@@ -13,8 +16,12 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final supabase.SupabaseClient _supabaseClient;
+  final GoogleSignIn _googleSignIn;
 
-  AuthRemoteDataSourceImpl(this._supabaseClient);
+  AuthRemoteDataSourceImpl(this._supabaseClient, {GoogleSignIn? googleSignIn})
+    : _googleSignIn =
+          googleSignIn ??
+          GoogleSignIn(serverClientId: MakhzanFlowEnv.googleWebClientId);
 
   @override
   Future<UserModel> signUp(String email, String password, String name) async {
@@ -60,7 +67,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> signInWithEmailAndPassword(String email, String password) async {
+  Future<UserModel> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     try {
       final response = await _supabaseClient.auth.signInWithPassword(
         email: email,
@@ -78,9 +88,39 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
+  Future<UserModel> signInWithGoogle() async {
+    try {
+      _googleSignIn.signOut(); // Ensure previous sessions are cleared
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw const GoogleSignInCancelledException();
+      }
+      final googleAuth = await googleUser.authentication;
+      if (googleAuth.idToken == null) {
+        throw const AuthException(AppStrings.googleSignInError);
+      }
+      final response = await _supabaseClient.auth.signInWithIdToken(
+        provider: supabase.OAuthProvider.google,
+        idToken: googleAuth.idToken!,
+      );
+      if (response.user == null) {
+        throw const AuthException(AppStrings.userDataNotFound);
+      }
+      return UserModel.fromSupabaseUser(response.user!);
+    } on supabase.AuthException catch (e) {
+      throw AuthException(e.message);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
   Future<void> signOut() async {
     try {
-      await _supabaseClient.auth.signOut();
+      await Future.wait([
+        _supabaseClient.auth.signOut(),
+        _googleSignIn.signOut(),
+      ]);
     } catch (e) {
       throw ServerException(e.toString());
     }

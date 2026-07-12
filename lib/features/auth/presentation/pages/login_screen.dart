@@ -12,6 +12,7 @@ import '../widgets/auth_text_field.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_bottom_link.dart';
+import '../widgets/google_auth_section.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -185,6 +186,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               label: AppStrings.loginButton,
                               isLoading: isLoading,
                               onPressed: _onLogin,
+                            ),
+                            SizedBox(height: AppSizes.spacingLarge),
+                            GoogleAuthSection(
+                              label: AppStrings.signInWithGoogle,
+                              isLoading: isLoading,
+                              onPressed: () {
+                                context.read<AuthCubit>().signInWithGoogle();
+                              },
                             ),
                             SizedBox(height: AppSizes.spacingLarge),
                             AuthBottomLink(

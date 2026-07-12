@@ -43,6 +43,7 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/auth_state_changes_usecase.dart';
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
 import '../../features/auth/domain/usecases/sign_in_usecase.dart';
+import '../../features/auth/domain/usecases/sign_in_with_google_usecase.dart';
 import '../../features/auth/domain/usecases/sign_up_usecase.dart';
 import '../../features/auth/domain/usecases/sign_out_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
@@ -110,6 +111,9 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton<SignInUseCase>(
     () => SignInUseCase(sl<AuthRepository>()),
   );
+  sl.registerLazySingleton<SignInWithGoogleUseCase>(
+    () => SignInWithGoogleUseCase(sl<AuthRepository>()),
+  );
   sl.registerLazySingleton<SignUpUseCase>(
     () => SignUpUseCase(sl<AuthRepository>()),
   );
@@ -127,6 +131,7 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton<AuthCubit>(
     () => AuthCubit(
       signInUseCase: sl<SignInUseCase>(),
+      signInWithGoogleUseCase: sl<SignInWithGoogleUseCase>(),
       signUpUseCase: sl<SignUpUseCase>(),
       signOutUseCase: sl<SignOutUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),

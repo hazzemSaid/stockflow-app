@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/error/failures.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/usecases/auth_state_changes_usecase.dart';
 import '../../domain/usecases/get_current_user_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
+import '../../domain/usecases/sign_in_with_google_usecase.dart';
 import '../../domain/usecases/sign_up_usecase.dart';
 import '../../domain/usecases/sign_out_usecase.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final SignInUseCase _signInUseCase;
+  final SignInWithGoogleUseCase _signInWithGoogleUseCase;
   final SignUpUseCase _signUpUseCase;
   final SignOutUseCase _signOutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
@@ -18,11 +21,13 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit({
     required SignInUseCase signInUseCase,
+    required SignInWithGoogleUseCase signInWithGoogleUseCase,
     required SignUpUseCase signUpUseCase,
     required SignOutUseCase signOutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
     required AuthStateChangesUseCase authStateChangesUseCase,
   })  : _signInUseCase = signInUseCase,
+        _signInWithGoogleUseCase = signInWithGoogleUseCase,
         _signUpUseCase = signUpUseCase,
         _signOutUseCase = signOutUseCase,
         _getCurrentUserUseCase = getCurrentUserUseCase,
@@ -70,6 +75,21 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await _signUpUseCase.call(email, password, name);
     result.fold(
       (failure) => emit(AuthError(failure.message)),
+      (user) => emit(Authenticated(user)),
+    );
+  }
+
+  Future<void> signInWithGoogle() async {
+    emit(AuthLoading());
+    final result = await _signInWithGoogleUseCase.call();
+    result.fold(
+      (failure) {
+        if (failure is GoogleSignInCancelledFailure) {
+          emit(Unauthenticated());
+        } else {
+          emit(AuthError(failure.message));
+        }
+      },
       (user) => emit(Authenticated(user)),
     );
   }
