@@ -12,6 +12,7 @@ import '../widgets/auth_text_field.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_bottom_link.dart';
+import '../widgets/google_auth_section.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -190,6 +191,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               label: AppStrings.registerButton,
                               isLoading: isLoading,
                               onPressed: _onRegister,
+                            ),
+                            SizedBox(height: AppSizes.spacingLarge),
+                            GoogleAuthSection(
+                              label: AppStrings.signUpWithGoogle,
+                              isLoading: isLoading,
+                              onPressed: () {
+                                context.read<AuthCubit>().signInWithGoogle();
+                              },
                             ),
                             SizedBox(height: AppSizes.spacingLarge),
                             AuthBottomLink(

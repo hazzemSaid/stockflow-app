@@ -43,6 +43,13 @@ class AppStrings {
   static const String alreadyHaveAccount = 'لديك حساب بالفعل؟ ';
   static const String loginNow = 'سجل دخول';
 
+  // Google Sign-In
+  static const String signInWithGoogle = 'تسجيل الدخول باستخدام Google';
+  static const String signUpWithGoogle = 'التسجيل باستخدام Google';
+  static const String orContinueWith = 'أو';
+  static const String googleSignInCancelled = 'تم إلغاء تسجيل الدخول';
+  static const String googleSignInError = 'حدث خطأ أثناء تسجيل الدخول باستخدام Google';
+
   // Shell & Navigation
   static const String navDashboard = 'الرئيسية';
   static const String navProducts = 'المنتجات';

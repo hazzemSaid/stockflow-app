@@ -22,4 +22,12 @@ class MakhzanFlowEnv {
     }
     return value;
   }
+
+  static String get googleWebClientId {
+    final value = dotenv.env['GOOGLE_WEB_CLIENT_ID']?.trim();
+    if (value == null || value.isEmpty) {
+      throw StateError('Missing GOOGLE_WEB_CLIENT_ID in .env');
+    }
+    return value;
+  }
 }
