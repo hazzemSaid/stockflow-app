@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/customers/domain/entities/customer.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/customers/domain/entities/customer.dart';
 
 class CustomerSelectionCard extends StatelessWidget {
   final Customer? customer;

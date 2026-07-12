@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/domain/usecases/update_company_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/get_company_join_code_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/regenerate_company_join_code_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/leave_company_usecase.dart';
-import 'package:stockflow/features/companies/domain/usecases/delete_company_usecase.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/update_company_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/get_company_join_code_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/regenerate_company_join_code_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/leave_company_usecase.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/delete_company_usecase.dart';
 
 sealed class CompanySettingsState extends Equatable {
   const CompanySettingsState();

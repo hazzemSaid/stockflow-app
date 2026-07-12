@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/settings/presentation/pages/settings_screen.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/settings/presentation/pages/settings_screen.dart';
 import '../shared/test_setup.dart';
 
 void main() {

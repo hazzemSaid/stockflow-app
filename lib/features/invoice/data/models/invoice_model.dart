@@ -1,7 +1,7 @@
-import 'package:stockflow/features/invoice/data/models/invoice_item_model.dart';
-import 'package:stockflow/features/invoice/data/models/payment_model.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
+import 'package:makhzanflow/features/invoice/data/models/invoice_item_model.dart';
+import 'package:makhzanflow/features/invoice/data/models/payment_model.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice_status.dart';
 
 class InvoiceModel {
   final String id;

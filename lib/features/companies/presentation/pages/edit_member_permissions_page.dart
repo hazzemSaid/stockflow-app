@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/constants/permission_labels.dart';
-import 'package:stockflow/core/widgets/app_snackbar.dart';
-import 'package:stockflow/features/companies/domain/entities/company_member.dart';
-import 'package:stockflow/features/companies/presentation/cubit/company_members_cubit.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/constants/permission_labels.dart';
+import 'package:makhzanflow/core/widgets/app_snackbar.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company_member.dart';
+import 'package:makhzanflow/features/companies/presentation/cubit/company_members_cubit.dart';
 
 class EditMemberPermissionsPage extends StatefulWidget {
   final CompanyMember member;

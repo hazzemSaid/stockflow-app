@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/domain/repositories/company_repository.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/domain/repositories/company_repository.dart';
 
 class CreateCompanyFullUseCase {
   final CompanyRepository _repository;

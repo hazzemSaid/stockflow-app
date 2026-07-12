@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
-import 'package:stockflow/features/invoice/domain/repositories/invoice_repository.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice.dart';
+import 'package:makhzanflow/features/invoice/domain/repositories/invoice_repository.dart';
 
 class GetInvoicesUseCase {
   final InvoiceRepository repository;

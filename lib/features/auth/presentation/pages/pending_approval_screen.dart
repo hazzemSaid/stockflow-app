@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_routes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/di/service_locator.dart';
-import 'package:stockflow/features/companies/presentation/cubit/join_company_cubit.dart';
+import 'package:makhzanflow/core/company/company_cubit.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_routes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/di/service_locator.dart';
+import 'package:makhzanflow/features/companies/presentation/cubit/join_company_cubit.dart';
 
 class PendingApprovalScreen extends StatefulWidget {
   final String requestId;

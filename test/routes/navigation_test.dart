@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stockflow/core/constants/app_routes.dart';
+import 'package:makhzanflow/core/constants/app_routes.dart';
 
 void main() {
   group('App Routes', () {

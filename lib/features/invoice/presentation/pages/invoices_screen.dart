@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_aware_state.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/constants/app_routes.dart';
-import 'package:stockflow/core/permissions/permission_constants.dart';
-import 'package:stockflow/core/permissions/permission_gate.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
-import 'package:stockflow/features/invoice/presentation/cubit/invoices/invoices_cubit.dart';
-import 'package:stockflow/features/invoice/presentation/widgets/invoice_card.dart';
-import 'package:stockflow/features/invoice/presentation/widgets/invoices_filter_chip.dart';
-import 'package:stockflow/features/invoice/presentation/widgets/invoices_empty_state.dart';
+import 'package:makhzanflow/core/company/company_aware_state.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/constants/app_routes.dart';
+import 'package:makhzanflow/core/permissions/permission_constants.dart';
+import 'package:makhzanflow/core/permissions/permission_gate.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice_status.dart';
+import 'package:makhzanflow/features/invoice/presentation/cubit/invoices/invoices_cubit.dart';
+import 'package:makhzanflow/features/invoice/presentation/widgets/invoice_card.dart';
+import 'package:makhzanflow/features/invoice/presentation/widgets/invoices_filter_chip.dart';
+import 'package:makhzanflow/features/invoice/presentation/widgets/invoices_empty_state.dart';
 
 class InvoicesScreen extends StatefulWidget {
   const InvoicesScreen({super.key});

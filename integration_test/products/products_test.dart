@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/products/presentation/cubit/products/products_cubit.dart';
-import 'package:stockflow/features/products/presentation/pages/products_screen.dart';
-import 'package:stockflow/features/products/presentation/widgets/product_screen_header.dart';
-import 'package:stockflow/features/products/presentation/widgets/product_loading_view.dart';
-import 'package:stockflow/features/products/presentation/widgets/product_empty_view.dart';
-import 'package:stockflow/features/products/presentation/widgets/product_error_view.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/products/presentation/cubit/products/products_cubit.dart';
+import 'package:makhzanflow/features/products/presentation/pages/products_screen.dart';
+import 'package:makhzanflow/features/products/presentation/widgets/product_screen_header.dart';
+import 'package:makhzanflow/features/products/presentation/widgets/product_loading_view.dart';
+import 'package:makhzanflow/features/products/presentation/widgets/product_empty_view.dart';
+import 'package:makhzanflow/features/products/presentation/widgets/product_error_view.dart';
 import '../shared/test_setup.dart';
 
 class MockProductsCubit extends Cubit<ProductsState> implements ProductsCubit {

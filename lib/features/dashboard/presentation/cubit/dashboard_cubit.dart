@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/features/dashboard/domain/usecases/get_dashboard_stats_usecase.dart';
+import 'package:makhzanflow/features/dashboard/domain/usecases/get_dashboard_stats_usecase.dart';
 import 'dashboard_state.dart';
 
 class DashboardCubit extends Cubit<DashboardState> {

@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
+import 'package:makhzanflow/core/error/failures.dart';
 import '../models/customer_model.dart';
 import '../models/customer_filter_counts_model.dart';
 

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/features/companies/presentation/cubit/company_settings_cubit.dart';
+import 'package:makhzanflow/features/companies/presentation/cubit/company_settings_cubit.dart';
 import '../../core/constants/app_routes.dart';
 import '../../core/di/service_locator.dart';
 import '../../core/company/company_cubit.dart';

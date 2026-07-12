@@ -1,5 +1,5 @@
 class AppStrings {
-  static const String appName = 'StockFlow';
+  static const String appName = 'MakhzanFlow';
   static const String appNameArabic = 'ستوك فلو';
   static const String appSubtitle = 'نظام إدارة المخازن الذكي';
   static const String appVersion = 'الإصدار 1.0.0';
@@ -8,10 +8,10 @@ class AppStrings {
   static const String loginTitle = 'تسجيل الدخول';
   static const String loginSubtitle = 'Login';
   static const String welcomeBack = 'أهلاً بك مجدداً';
-  static const String loginToContinue = 'سجل دخولك للمتابعة إلى StockFlow';
+  static const String loginToContinue = 'سجل دخولك للمتابعة إلى MakhzanFlow';
 
   static const String emailLabel = 'البريد الإلكتروني';
-  static const String emailHint = 'ahmed@stockflow.eg';
+  static const String emailHint = 'ahmed@MakhzanFlow.eg';
   static const String passwordLabel = 'كلمة المرور';
   static const String passwordHint = '••••••••';
 
@@ -38,7 +38,7 @@ class AppStrings {
   static const String registerTitle = 'إنشاء حساب';
   static const String registerWelcome = 'انضم إلينا';
   static const String registerToContinue =
-      'أنشئ حساباً جديداً للمتابعة إلى StockFlow';
+      'أنشئ حساباً جديداً للمتابعة إلى MakhzanFlow';
   static const String registerButton = 'إنشاء حساب';
   static const String alreadyHaveAccount = 'لديك حساب بالفعل؟ ';
   static const String loginNow = 'سجل دخول';
@@ -187,7 +187,7 @@ class AppStrings {
   static const String signOut = 'تسجيل الخروج';
 
   // Onboarding / Welcome
-  static const String welcomeTitle = 'مرحباً بك في\nStockFlow';
+  static const String welcomeTitle = 'مرحباً بك في\nMakhzanFlow';
   static const String welcomeSubtitle =
       'أدِر مخزونك ومبيعاتك وفريقك\nمن مكان واحد';
   static const String welcomeAppSubtitle = 'نظام إدارة المخازن والفرق';

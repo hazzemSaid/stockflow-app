@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
 
 class ProductsSectionHeader extends StatelessWidget {
   final int productCount;

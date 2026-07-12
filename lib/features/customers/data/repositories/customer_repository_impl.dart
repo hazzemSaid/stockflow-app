@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
+import 'package:makhzanflow/core/error/failures.dart';
 import '../../domain/entities/customer.dart';
 import '../../domain/entities/customer_filter_counts.dart';
 import '../../domain/repositories/customer_repository.dart';

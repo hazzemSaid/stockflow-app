@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stockflow/features/customers/data/models/customer_filter_counts_model.dart';
-import 'package:stockflow/features/customers/domain/entities/customer_filter_counts.dart';
+import 'package:makhzanflow/features/customers/data/models/customer_filter_counts_model.dart';
+import 'package:makhzanflow/features/customers/domain/entities/customer_filter_counts.dart';
 
 void main() {
   group('CustomerFilterCountsModel', () {

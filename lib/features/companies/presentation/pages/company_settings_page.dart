@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_routes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/widgets/app_snackbar.dart';
-import 'package:stockflow/features/auth/presentation/widgets/logo_picker.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/presentation/cubit/company_settings_cubit.dart';
-import 'package:stockflow/features/companies/presentation/widgets/share_code_widget.dart';
+import 'package:makhzanflow/core/company/company_cubit.dart';
+import 'package:makhzanflow/core/company/company_state.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_routes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/widgets/app_snackbar.dart';
+import 'package:makhzanflow/features/auth/presentation/widgets/logo_picker.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/presentation/cubit/company_settings_cubit.dart';
+import 'package:makhzanflow/features/companies/presentation/widgets/share_code_widget.dart';
 
 class CompanySettingsPage extends StatefulWidget {
   const CompanySettingsPage({super.key});

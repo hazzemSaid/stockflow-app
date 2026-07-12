@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/company/company_state.dart';
-import 'package:stockflow/features/auth/domain/entities/user.dart';
-import 'package:stockflow/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:stockflow/features/auth/presentation/cubit/auth_state.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/domain/entities/company_member.dart';
+import 'package:makhzanflow/core/company/company_cubit.dart';
+import 'package:makhzanflow/core/company/company_state.dart';
+import 'package:makhzanflow/features/auth/domain/entities/user.dart';
+import 'package:makhzanflow/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:makhzanflow/features/auth/presentation/cubit/auth_state.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company_member.dart';
 
 class TestSetup {
   static void ensureInitialized() {}
@@ -62,7 +62,7 @@ class _MockAuthCubit extends Cubit<AuthState> implements AuthCubit {
             ? Authenticated(
                 UserEntity(
                   id: 'test-user-id',
-                  email: 'test@stockflow.eg',
+                  email: 'test@MakhzanFlow.eg',
                   name: 'أحمد محمد',
                 ),
               )

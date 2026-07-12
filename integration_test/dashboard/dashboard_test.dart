@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:stockflow/features/dashboard/presentation/cubit/dashboard_cubit.dart';
-import 'package:stockflow/features/dashboard/presentation/cubit/dashboard_state.dart';
-import 'package:stockflow/features/dashboard/presentation/widgets/dashboard_view.dart';
+import 'package:makhzanflow/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:makhzanflow/features/dashboard/presentation/cubit/dashboard_state.dart';
+import 'package:makhzanflow/features/dashboard/presentation/widgets/dashboard_view.dart';
 
 class MockDashboardCubit extends Cubit<DashboardState> implements DashboardCubit {
   MockDashboardCubit() : super(const DashboardInitial());

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:stockflow/features/dashboard/domain/entities/dashboard_stats.dart';
+import 'package:makhzanflow/features/dashboard/domain/entities/dashboard_stats.dart';
 
 /// Sealed state hierarchy for [DashboardCubit].
 sealed class DashboardState extends Equatable {

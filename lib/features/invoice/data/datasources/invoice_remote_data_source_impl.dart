@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/data/datasources/invoice_remote_data_source.dart';
-import 'package:stockflow/features/invoice/data/models/add_payment_dto.dart';
-import 'package:stockflow/features/invoice/data/models/invoice_create_dto.dart';
-import 'package:stockflow/features/invoice/data/models/invoice_model.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/invoice/data/datasources/invoice_remote_data_source.dart';
+import 'package:makhzanflow/features/invoice/data/models/add_payment_dto.dart';
+import 'package:makhzanflow/features/invoice/data/models/invoice_create_dto.dart';
+import 'package:makhzanflow/features/invoice/data/models/invoice_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class InvoiceRemoteDataSourceImpl implements InvoiceRemoteDataSource {

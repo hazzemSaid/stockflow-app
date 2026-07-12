@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
 
 class AppSnackbar {
   static void success(

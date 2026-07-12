@@ -1,5 +1,5 @@
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice.dart';
 
 sealed class AddPaymentState {}
 

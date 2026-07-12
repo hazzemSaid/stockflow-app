@@ -1,8 +1,8 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/exceptions.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/dashboard/domain/entities/dashboard_stats.dart';
-import 'package:stockflow/features/dashboard/domain/repositories/dashboard_repository.dart';
+import 'package:makhzanflow/core/error/exceptions.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/dashboard/domain/entities/dashboard_stats.dart';
+import 'package:makhzanflow/features/dashboard/domain/repositories/dashboard_repository.dart';
 import '../datasources/dashboard_remote_data_source.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {

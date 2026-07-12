@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stockflow/core/company/company_cubit.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_routes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/di/service_locator.dart';
-import 'package:stockflow/core/permissions/permission_service.dart';
-import 'package:stockflow/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:stockflow/features/auth/presentation/widgets/welcome_actions.dart';
-import 'package:stockflow/features/auth/presentation/widgets/welcome_hero.dart';
-import 'package:stockflow/features/auth/presentation/widgets/welcome_logo.dart';
-import 'package:stockflow/features/auth/presentation/widgets/welcome_painters.dart';
+import 'package:makhzanflow/core/company/company_cubit.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_routes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/di/service_locator.dart';
+import 'package:makhzanflow/core/permissions/permission_service.dart';
+import 'package:makhzanflow/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:makhzanflow/features/auth/presentation/widgets/welcome_actions.dart';
+import 'package:makhzanflow/features/auth/presentation/widgets/welcome_hero.dart';
+import 'package:makhzanflow/features/auth/presentation/widgets/welcome_logo.dart';
+import 'package:makhzanflow/features/auth/presentation/widgets/welcome_painters.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});

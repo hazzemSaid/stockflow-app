@@ -2,12 +2,12 @@
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_test/flutter_test.dart';
 // import 'package:integration_test/integration_test.dart';
-// import 'package:stockflow/core/constants/app_strings.dart';
-// import 'package:stockflow/core/error/failures.dart';
-// import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
-// import 'package:stockflow/features/invoice/presentation/cubit/invoices/invoices_cubit.dart';
-// import 'package:stockflow/features/invoice/presentation/pages/invoices_screen.dart';
-// import 'package:stockflow/features/invoice/presentation/widgets/invoices_empty_state.dart';
+// import 'package:makhzanflow/core/constants/app_strings.dart';
+// import 'package:makhzanflow/core/error/failures.dart';
+// import 'package:makhzanflow/features/invoice/domain/entities/invoice_status.dart';
+// import 'package:makhzanflow/features/invoice/presentation/cubit/invoices/invoices_cubit.dart';
+// import 'package:makhzanflow/features/invoice/presentation/pages/invoices_screen.dart';
+// import 'package:makhzanflow/features/invoice/presentation/widgets/invoices_empty_state.dart';
 // import '../shared/test_setup.dart';
 
 // class MockInvoicesCubit extends Cubit<InvoicesState> implements InvoicesCubit {

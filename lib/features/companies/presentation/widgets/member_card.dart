@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/features/companies/domain/entities/company_member.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company_member.dart';
 
 class MemberCard extends StatelessWidget {
   final CompanyMember member;

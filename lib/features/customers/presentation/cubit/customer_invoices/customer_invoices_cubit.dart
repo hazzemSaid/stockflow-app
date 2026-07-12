@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
+import 'package:makhzanflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
 import 'customer_invoices_state.dart';
 
 export 'customer_invoices_state.dart';

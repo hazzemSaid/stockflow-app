@@ -1,10 +1,10 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/invoice/data/datasources/invoice_remote_data_source.dart';
-import 'package:stockflow/features/invoice/data/models/add_payment_dto.dart';
-import 'package:stockflow/features/invoice/data/models/invoice_create_dto.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice.dart';
-import 'package:stockflow/features/invoice/domain/repositories/invoice_repository.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/invoice/data/datasources/invoice_remote_data_source.dart';
+import 'package:makhzanflow/features/invoice/data/models/add_payment_dto.dart';
+import 'package:makhzanflow/features/invoice/data/models/invoice_create_dto.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice.dart';
+import 'package:makhzanflow/features/invoice/domain/repositories/invoice_repository.dart';
 
 class InvoiceRepositoryImpl implements InvoiceRepository {
   final InvoiceRemoteDataSource dataSource;

@@ -1,8 +1,8 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
-import 'package:stockflow/features/companies/domain/entities/company_member.dart';
-import 'package:stockflow/features/companies/domain/entities/join_request.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company_member.dart';
+import 'package:makhzanflow/features/companies/domain/entities/join_request.dart';
 
 abstract class CompanyRepository {
   Future<Either<Failure, List<Company>>> getUserCompanies();

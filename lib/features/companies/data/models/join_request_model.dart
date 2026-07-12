@@ -1,4 +1,4 @@
-import 'package:stockflow/features/companies/domain/entities/join_request.dart';
+import 'package:makhzanflow/features/companies/domain/entities/join_request.dart';
 
 class JoinRequestModel extends JoinRequest {
   const JoinRequestModel({

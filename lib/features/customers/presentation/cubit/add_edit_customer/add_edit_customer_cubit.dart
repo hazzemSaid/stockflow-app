@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stockflow/core/constants/app_strings.dart';
-import 'package:stockflow/core/error/failures.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/error/failures.dart';
 import '../../../domain/usecases/create_customer_usecase.dart';
 import '../../../domain/usecases/upload_customer_image_usecase.dart';
 import '../../../domain/usecases/get_customer_usecase.dart';

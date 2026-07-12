@@ -1,5 +1,5 @@
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/customers/domain/entities/customer.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/customers/domain/entities/customer.dart';
 
 sealed class CreateInvoiceState {}
 

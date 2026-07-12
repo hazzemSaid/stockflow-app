@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice_item.dart';
-import 'package:stockflow/features/invoice/domain/entities/invoice_status.dart';
-import 'package:stockflow/features/invoice/domain/entities/payment.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice_item.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/invoice_status.dart';
+import 'package:makhzanflow/features/invoice/domain/entities/payment.dart';
 
 class Invoice extends Equatable {
   final String id;

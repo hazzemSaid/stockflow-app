@@ -1,4 +1,4 @@
-import 'package:stockflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/constants/app_strings.dart';
 
 /// Maps permission dotted-path keys to their Arabic display labels.
 const Map<String, String> permissionLabels = {

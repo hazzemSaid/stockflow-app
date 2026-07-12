@@ -1,5 +1,5 @@
-import 'package:stockflow/core/error/failures.dart';
-import 'package:stockflow/features/products/domain/entities/product.dart';
+import 'package:makhzanflow/core/error/failures.dart';
+import 'package:makhzanflow/features/products/domain/entities/product.dart';
 
 sealed class ProductPickerState {}
 

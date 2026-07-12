@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:stockflow/core/constants/app_colors.dart';
-import 'package:stockflow/core/constants/app_sizes.dart';
-import 'package:stockflow/core/widgets/app_network_image.dart';
-import 'package:stockflow/features/companies/domain/entities/company.dart';
+import 'package:makhzanflow/core/constants/app_colors.dart';
+import 'package:makhzanflow/core/constants/app_sizes.dart';
+import 'package:makhzanflow/core/widgets/app_network_image.dart';
+import 'package:makhzanflow/features/companies/domain/entities/company.dart';
 
 /// A selectable company card used inside the company-switcher bottom sheet.
 ///

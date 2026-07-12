@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:stockflow/features/dashboard/domain/entities/activity_entry.dart';
+import 'package:makhzanflow/features/dashboard/domain/entities/activity_entry.dart';
 import '../../../../core/constants/app_colors.dart';
 
 /// Maps raw [action] + [entityType] strings from the activity log RPC

@@ -1,4 +1,4 @@
-import 'package:stockflow/features/auth/domain/entities/user.dart';
+import 'package:makhzanflow/features/auth/domain/entities/user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class UserModel extends UserEntity {

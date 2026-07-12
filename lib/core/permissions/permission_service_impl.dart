@@ -1,4 +1,4 @@
-import 'package:stockflow/core/permissions/permission_service.dart';
+import 'package:makhzanflow/core/permissions/permission_service.dart';
 
 class PermissionServiceImpl implements PermissionService {
   Map<String, dynamic>? _cachedPermissions;
