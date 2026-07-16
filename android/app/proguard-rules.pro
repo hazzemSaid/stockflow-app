@@ -27,5 +27,5 @@
 -dontwarn com.google.android.gms.**
 
 # Play Core (referenced by Flutter engine for deferred components, not used in this app)
--dontwarn com.google.play.core.**
+-dontwarn com.google.android.play.core.**
 -dontwarn com.google.j2objc.annotations.RetainedWith

@@ -61,8 +61,14 @@ android {
     }
 }
 
+
+
 dependencies {
-    implementation("com.google.android.play:core:1.10.3")
+    constraints {
+        implementation("com.google.android.play:core:1.13.0") {
+            because("play-core 1.10.3 is incompatible with targetSdkVersion 34")
+        }
+    }
 }
 
 flutter {
