@@ -1,12 +1,13 @@
 name: makhzanflow
 description: "A new Flutter project."
 publish_to: 'none'
-version: 0.1.0
+version: 0.1.0+3
 
 environment:
   sdk: ^3.10.7
 
 dependencies:
+  sentry_flutter: ^9.24.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -32,8 +33,10 @@ dependencies:
   flutter_native_splash: ^2.4.8
   google_sign_in: ^6.3.0
   firebase_core: ^4.11.0
+  cupertino_icons: ^1.0.8
 
 dev_dependencies:
+  sentry_dart_plugin: ^3.4.0
   flutter_test:
     sdk: flutter
   integration_test:
@@ -56,3 +59,8 @@ flutter_launcher_icons:
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/images/logo.png"
   remove_alpha_ios: true
+sentry:
+  upload_debug_symbols: true
+  upload_source_maps: true
+  project: flutter
+  org: makhzanflow

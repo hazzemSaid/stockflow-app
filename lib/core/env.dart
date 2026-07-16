@@ -23,6 +23,14 @@ class MakhzanFlowEnv {
     return value;
   }
 
+  static String get sentryDsn {
+    final value = dotenv.env['SENTRY_DSN']?.trim();
+    if (value == null || value.isEmpty) {
+      throw StateError('Missing SENTRY_DSN in .env');
+    }
+    return value;
+  }
+
   static String get googleWebClientId {
     final value = dotenv.env['GOOGLE_WEB_CLIENT_ID']?.trim();
     if (value == null || value.isEmpty) {

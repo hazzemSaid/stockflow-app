@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,12 +11,11 @@ import 'config/routes/router.dart';
 import 'core/company/company_cubit.dart';
 import 'core/di/service_locator.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Load environment variables
   await dotenv.load(fileName: '.env');
-  // Initialize Supabase
   await Supabase.initialize(
     url: MakhzanFlowEnv.supabaseUrl,
     anonKey: MakhzanFlowEnv.supabaseAnonKey,
@@ -23,7 +23,15 @@ void main() async {
 
   await initServiceLocator();
 
-  runApp(const MyApp());
+  if (kReleaseMode) {
+    await SentryFlutter.init((options) {
+      options.dsn = MakhzanFlowEnv.sentryDsn;
+      options.tracesSampleRate = 1.0;
+      options.profilesSampleRate = 1.0;
+    }, appRunner: () => runApp(SentryWidget(child: const MyApp())));
+  } else {
+    runApp(const MyApp());
+  }
 }
 
 class MyApp extends StatelessWidget {
