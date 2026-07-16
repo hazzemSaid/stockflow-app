@@ -55,6 +55,11 @@ android/app/upload-keystore.jks
 .specify
 specs
 
+
 # Google OAuth client secrets
 client_secret_*.json
 lib/firebase_options.dart
+android/app/google-services.json
+
+sentry.properties
+sentry-wizard.exe
