@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:makhzanflow/core/company/company_aware_state.dart';
 import 'package:makhzanflow/core/company/company_cubit.dart';
 import 'package:makhzanflow/core/company/company_state.dart';
-import 'package:makhzanflow/core/di/service_locator.dart';
 import 'package:makhzanflow/core/widgets/app_snackbar.dart';
 import 'package:makhzanflow/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:makhzanflow/features/auth/presentation/cubit/auth_state.dart';
