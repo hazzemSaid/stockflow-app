@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/company/company_cubit.dart';
 import '../../../../core/company/company_state.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -20,7 +19,9 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authCubit = context.read<AuthCubit>();
     final companyState = context.watch<CompanyCubit>().state;
-    final isOwner = companyState is CompanySelected && companyState.membership?.isOwner == true;
+    final isOwner =
+        companyState is CompanySelected &&
+        companyState.membership?.isOwner == true;
 
     return SafeArea(
       child: ListView(

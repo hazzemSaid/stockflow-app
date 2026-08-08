@@ -6,7 +6,6 @@ import 'package:makhzanflow/core/company/company_aware_state.dart';
 import 'package:makhzanflow/core/constants/app_colors.dart';
 import 'package:makhzanflow/core/constants/app_sizes.dart';
 import 'package:makhzanflow/core/constants/app_strings.dart';
-import 'package:makhzanflow/core/di/service_locator.dart';
 import 'package:makhzanflow/features/invoice/domain/entities/invoice.dart';
 import 'package:makhzanflow/features/invoice/presentation/cubit/invoice_details/invoice_details_cubit.dart';
 import 'package:makhzanflow/features/invoice/presentation/widgets/invoice_details_company_header.dart';
@@ -31,12 +30,16 @@ class InvoiceDetailsScreen extends StatefulWidget {
 class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen>
     with CompanyAwareState<InvoiceDetailsScreen> {
   late final InvoiceDetailsCubit _cubit;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _cubit = sl<InvoiceDetailsCubit>();
-    _cubit.loadInvoice(widget.invoiceId, companyId);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _cubit = context.read<InvoiceDetailsCubit>();
+      _cubit.loadInvoice(widget.invoiceId, companyId);
+      _initialized = true;
+    }
   }
 
   @override
@@ -45,63 +48,52 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen>
   }
 
   @override
-  void dispose() {
-    _cubit.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _cubit,
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: AppColors.appBackground,
+      appBar: AppBar(
         backgroundColor: AppColors.appBackground,
-        appBar: AppBar(
-          backgroundColor: AppColors.appBackground,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: AppColors.textDark,
-              size: AppSizes.iconMedium,
-            ),
-            onPressed: () => context.pop(),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: AppColors.textDark,
+            size: AppSizes.iconMedium,
           ),
-          title: Text(
-            AppStrings.invoiceDetailsTitle,
-            style: TextStyle(
-              fontSize: AppSizes.fontXLarge,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textDark,
-            ),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          AppStrings.invoiceDetailsTitle,
+          style: TextStyle(
+            fontSize: AppSizes.fontXLarge,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textDark,
           ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.print, color: AppColors.primary),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.share, color: AppColors.primary),
-            ),
-          ],
         ),
-        body: BlocBuilder<InvoiceDetailsCubit, InvoiceDetailsState>(
-          builder: (context, state) {
-            if (state is InvoiceDetailsLoading) {
-              return const InvoiceDetailsLoadingState();
-            }
-            if (state is InvoiceDetailsError) {
-              return InvoiceDetailsErrorState(
-                message: state.failure.message,
-              );
-            }
-            if (state is InvoiceDetailsLoaded) {
-              return _InvoiceDetailContent(invoice: state.invoice);
-            }
-            return const SizedBox.shrink();
-          },
-        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.print, color: AppColors.primary),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.share, color: AppColors.primary),
+          ),
+        ],
+      ),
+      body: BlocBuilder<InvoiceDetailsCubit, InvoiceDetailsState>(
+        builder: (context, state) {
+          if (state is InvoiceDetailsLoading) {
+            return const InvoiceDetailsLoadingState();
+          }
+          if (state is InvoiceDetailsError) {
+            return InvoiceDetailsErrorState(message: state.failure.message);
+          }
+          if (state is InvoiceDetailsLoaded) {
+            return _InvoiceDetailContent(invoice: state.invoice);
+          }
+          return const SizedBox.shrink();
+        },
       ),
     );
   }

@@ -40,7 +40,7 @@ class _DashboardViewState extends State<DashboardView>
   @override
   void onCompanyChanged(String companyId) {
     setState(() {
-      final companyState = sl<CompanyCubit>().state;
+      final companyState = context.read<CompanyCubit>().state;
       if (companyState is CompanySelected) {
         _company = companyState.company;
       }
@@ -59,7 +59,7 @@ class _DashboardViewState extends State<DashboardView>
     _userName = authCubit.state is Authenticated
         ? (authCubit.state as Authenticated).user.name
         : '';
-    final companyState = sl<CompanyCubit>().state;
+    final companyState = context.read<CompanyCubit>().state;
     if (companyState is CompanySelected) {
       _company = companyState.company;
     }
@@ -74,7 +74,7 @@ class _DashboardViewState extends State<DashboardView>
   }
 
   void _triggerLoad() {
-    final companyState = sl<CompanyCubit>().state;
+    final companyState = context.read<CompanyCubit>().state;
     if (companyState is CompanySelected) {
       context.read<DashboardCubit>().loadDashboard(companyState.company.id);
     }

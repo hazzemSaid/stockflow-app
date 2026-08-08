@@ -7,7 +7,6 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/di/service_locator.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../cubit/customer_details/customer_details_cubit.dart';
 import '../widgets/customer_action_buttons.dart';
@@ -28,12 +27,16 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen>
     with CompanyAwareState<CustomerDetailsScreen> {
   late final CustomerDetailsCubit _cubit;
   int _selectedTab = 0;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _cubit = sl<CustomerDetailsCubit>();
-    _cubit.loadCustomer(widget.customerId, companyId);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _cubit = context.read<CustomerDetailsCubit>();
+      _cubit.loadCustomer(widget.customerId, companyId);
+      _initialized = true;
+    }
   }
 
   @override
@@ -42,136 +45,128 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen>
   }
 
   @override
-  void dispose() {
-    _cubit.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _cubit,
-      child: Scaffold(
-        backgroundColor: AppColors.appBackground,
-        body: BlocConsumer<CustomerDetailsCubit, CustomerDetailsState>(
-          listener: (context, state) {
-            if (state.status == CustomerDetailsStatus.error &&
-                state.failure != null) {
-              AppSnackbar.error(
-                context,
-                state.failure?.message ?? AppStrings.unexpectedError,
+    return Scaffold(
+      backgroundColor: AppColors.appBackground,
+      body: BlocConsumer<CustomerDetailsCubit, CustomerDetailsState>(
+        listener: (context, state) {
+          if (state.status == CustomerDetailsStatus.error &&
+              state.failure != null) {
+            AppSnackbar.error(
+              context,
+              state.failure?.message ?? AppStrings.unexpectedError,
+            );
+          }
+        },
+        builder: (context, state) {
+          switch (state.status) {
+            case CustomerDetailsStatus.initial:
+            case CustomerDetailsStatus.loading:
+              return const Center(child: CircularProgressIndicator());
+            case CustomerDetailsStatus.error:
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppStrings.customerLoadError,
+                      style: TextStyle(
+                        fontSize: AppSizes.fontMedium,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    SizedBox(height: AppSizes.spacingMedium),
+                    ElevatedButton(
+                      onPressed: () =>
+                          _cubit.loadCustomer(widget.customerId, companyId),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      child: Text(
+                        AppStrings.customerRetry,
+                        style: const TextStyle(fontFamily: 'Cairo'),
+                      ),
+                    ),
+                  ],
+                ),
               );
-            }
-          },
-          builder: (context, state) {
-            switch (state.status) {
-              case CustomerDetailsStatus.initial:
-              case CustomerDetailsStatus.loading:
-                return const Center(child: CircularProgressIndicator());
-              case CustomerDetailsStatus.error:
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        AppStrings.customerLoadError,
-                        style: TextStyle(
-                          fontSize: AppSizes.fontMedium,
-                          color: AppColors.textDark,
-                        ),
+            case CustomerDetailsStatus.success:
+              final customer = state.customer!;
+              return SafeArea(
+                child: NestedScrollView(
+                  headerSliverBuilder: (context, innerBoxScrolled) => [
+                    SliverToBoxAdapter(
+                      child: CustomerDetailsHeader(
+                        name: customer.name,
+                        address: customer.address,
+                        phone: customer.phone,
+                        imageUrl: customer.imageUrl,
+                        onPressed: () async {
+                          final updated = await context.push<bool>(
+                            AppRoutes.customerEditPath(widget.customerId),
+                          );
+                          if (updated == true && mounted) {
+                            _cubit.loadCustomer(widget.customerId, companyId);
+                          }
+                        },
                       ),
-                      SizedBox(height: AppSizes.spacingMedium),
-                      ElevatedButton(
-                        onPressed: () => _cubit.loadCustomer(widget.customerId, companyId),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                    ),
+                  ],
+                  body: SingleChildScrollView(
+                    padding: EdgeInsets.only(top: AppSizes.spacingMedium),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomerDebtSummaryCard(
+                          totalDebt: customer.totalDebt,
+                          totalPurchases: customer.totalPurchases,
+                          totalPaid: customer.totalPaid,
                         ),
-                        child: Text(
-                          AppStrings.customerRetry,
-                          style: const TextStyle(fontFamily: 'Cairo'),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              case CustomerDetailsStatus.success:
-                final customer = state.customer!;
-                return SafeArea(
-                  child: NestedScrollView(
-                    headerSliverBuilder: (context, innerBoxScrolled) => [
-                      SliverToBoxAdapter(
-                        child: CustomerDetailsHeader(
-                          name: customer.name,
-                          address: customer.address,
-                          phone: customer.phone,
-                          imageUrl: customer.imageUrl,
-                          onPressed: () async {
-                            final updated = await context.push<bool>(
-                              AppRoutes.customerEditPath(widget.customerId),
+                        SizedBox(height: AppSizes.spacingMedium),
+                        CustomerActionButtons(
+                          onNewInvoice: () {
+                            context.push(
+                              AppRoutes.invoiceCreate,
+                              extra: {
+                                'customerId': widget.customerId,
+                                'customerName': customer.name,
+                              },
                             );
-                            if (updated == true && mounted) {
+                          },
+                          onRecordPayment: () async {
+                            final result = await context.push<bool>(
+                              AppRoutes.customerAddPaymentPath(
+                                widget.customerId,
+                              ),
+                              extra: customer.name,
+                            );
+                            if (result == true && mounted) {
                               _cubit.loadCustomer(widget.customerId, companyId);
                             }
                           },
                         ),
-                      ),
-                    ],
-                    body: SingleChildScrollView(
-                      padding: EdgeInsets.only(top: AppSizes.spacingMedium),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CustomerDebtSummaryCard(
-                            totalDebt: customer.totalDebt,
-                            totalPurchases: customer.totalPurchases,
-                            totalPaid: customer.totalPaid,
+                        SizedBox(height: AppSizes.spacingMedium),
+                        _tabBar(),
+                        SizedBox(height: AppSizes.spacingSmall),
+                        CustomerTransactionList(
+                          selectedTab: _selectedTab,
+                          transactions: customer.transactions,
+                          onViewAll: () => context.push(
+                            AppRoutes.customerInvoicesPath(widget.customerId),
+                            extra: customer.name,
                           ),
-                          SizedBox(height: AppSizes.spacingMedium),
-                          CustomerActionButtons(
-                            onNewInvoice: () {
-                              context.push(
-                                AppRoutes.invoiceCreate,
-                                extra: {
-                                  'customerId': widget.customerId,
-                                  'customerName': customer.name,
-                                },
-                              );
-                            },
-                            onRecordPayment: () async {
-                              final result = await context.push<bool>(
-                                AppRoutes.customerAddPaymentPath(
-                                  widget.customerId,
-                                ),
-                                extra: customer.name,
-                              );
-                              if (result == true && mounted) {
-                                _cubit.loadCustomer(widget.customerId, companyId);
-                              }
-                            },
+                          onInvoiceTap: (invoiceId) => context.push(
+                            AppRoutes.invoiceDetailsPath(invoiceId),
                           ),
-                          SizedBox(height: AppSizes.spacingMedium),
-                          _tabBar(),
-                          SizedBox(height: AppSizes.spacingSmall),
-                          CustomerTransactionList(
-                            selectedTab: _selectedTab,
-                            transactions: customer.transactions,
-                            onViewAll: () => context.push(
-                              AppRoutes.customerInvoicesPath(widget.customerId),
-                              extra: customer.name,
-                            ),
-                            onInvoiceTap: (invoiceId) => context.push(
-                              AppRoutes.invoiceDetailsPath(invoiceId),
-                            ),
-                          ),
-                          SizedBox(height: AppSizes.spacingLarge),
-                        ],
-                      ),
+                        ),
+                        SizedBox(height: AppSizes.spacingLarge),
+                      ],
                     ),
                   ),
-                );
-            }
-          },
-        ),
+                ),
+              );
+          }
+        },
       ),
     );
   }

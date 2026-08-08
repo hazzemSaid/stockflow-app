@@ -132,7 +132,7 @@ class _CreateBusinessScreenState extends State<CreateBusinessScreen> {
               ),
               SizedBox(height: AppSizes.spacingSmall),
               DropdownButtonFormField<String>(
-                value: _selectedType,
+                initialValue: _selectedType,
                 decoration: InputDecoration(
                   hintText: AppStrings.businessTypeHint,
                   border: OutlineInputBorder(

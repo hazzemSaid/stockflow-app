@@ -6,7 +6,6 @@ import 'package:makhzanflow/core/constants/app_colors.dart';
 import 'package:makhzanflow/core/constants/app_sizes.dart';
 import 'package:makhzanflow/core/constants/app_routes.dart';
 import 'package:makhzanflow/core/constants/app_strings.dart';
-import 'package:makhzanflow/core/di/service_locator.dart';
 import 'package:makhzanflow/features/companies/presentation/cubit/join_company_cubit.dart';
 
 class PendingApprovalScreen extends StatefulWidget {
@@ -29,55 +28,52 @@ class PendingApprovalScreen extends StatefulWidget {
 
 class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
   late final JoinCompanyCubit _cubit;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _cubit = sl<JoinCompanyCubit>();
-    _cubit.resumePolling(
-      requestId: widget.requestId,
-      companyId: widget.companyId,
-      companyName: widget.companyName,
-      companyLogo: widget.companyLogo,
-    );
-  }
-
-  @override
-  void dispose() {
-    _cubit.close();
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _cubit = context.read<JoinCompanyCubit>();
+      _cubit.resumePolling(
+        requestId: widget.requestId,
+        companyId: widget.companyId,
+        companyName: widget.companyName,
+        companyLogo: widget.companyLogo,
+      );
+      _initialized = true;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _cubit,
-      child: BlocListener<JoinCompanyCubit, JoinCompanyState>(
-        listener: (context, state) async {
-          if (state is JoinCompanyApproved) {
-            await context.read<CompanyCubit>().loadCompanies(selectCompanyId: state.companyId);
-            if (context.mounted) {
-              context.go(AppRoutes.dashboard);
-            }
-          } else if (state is JoinCompanyInitial) {
-            context.go(AppRoutes.welcomeJoin);
+    return BlocListener<JoinCompanyCubit, JoinCompanyState>(
+      listener: (context, state) async {
+        if (state is JoinCompanyApproved) {
+          await context.read<CompanyCubit>().loadCompanies(
+            selectCompanyId: state.companyId,
+          );
+          if (context.mounted) {
+            context.go(AppRoutes.dashboard);
           }
-        },
-        child: Scaffold(
-          backgroundColor: AppColors.appBackground,
-          body: Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSizes.spacingXLarge),
-              child: BlocBuilder<JoinCompanyCubit, JoinCompanyState>(
-                builder: (context, state) {
-                  return switch (state) {
-                    JoinCompanyRejected() => _buildRejected(context),
-                    JoinCompanyInitial() => _buildCancelled(),
-                    JoinCompanyRequestData() => _buildPending(context, state),
-                    _ => _buildPending(context, null),
-                  };
-                },
-              ),
+        } else if (state is JoinCompanyInitial) {
+          context.go(AppRoutes.welcomeJoin);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.appBackground,
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(AppSizes.spacingXLarge),
+            child: BlocBuilder<JoinCompanyCubit, JoinCompanyState>(
+              builder: (context, state) {
+                return switch (state) {
+                  JoinCompanyRejected() => _buildRejected(context),
+                  JoinCompanyInitial() => _buildCancelled(),
+                  JoinCompanyRequestData() => _buildPending(context, state),
+                  _ => _buildPending(context, null),
+                };
+              },
             ),
           ),
         ),
@@ -113,9 +109,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
           textAlign: TextAlign.center,
         ),
         SizedBox(height: AppSizes.spacingXLarge * 2),
-        CircularProgressIndicator(
-          color: AppColors.primary,
-        ),
+        CircularProgressIndicator(color: AppColors.primary),
         SizedBox(height: AppSizes.spacingMedium),
         Text(
           AppStrings.pendingChecking,
