@@ -22,7 +22,7 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
   final ApiClient _apiClient;
 
   CompanyRemoteDataSourceImpl({required ApiClient apiClient})
-      : _apiClient = apiClient;
+    : _apiClient = apiClient;
 
   // ======================= Company CRUD =======================
 
@@ -47,6 +47,7 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
       final response = await _apiClient.dio.post(
         ApiEndpoints.companies,
         data: dto.toJson(),
+        options: Options(headers: {'Content-Type': 'application/json'}),
       );
       return Right(CompanyModel.fromJson(_dataOrThrow(response)));
     } on DioException catch (e) {
@@ -224,23 +225,20 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
       // The join endpoint does not return the request id — fetch it from the
       // user's join requests so polling/cancelling can work.
       final requests = await getMyJoinRequests();
-      return requests.fold(
-        (failure) => Left(failure),
-        (list) {
-          for (final request in list) {
-            if (request.companyId == companyId) {
-              return Right({
-                'request_id': request.id,
-                'company_id': companyId,
-                'company_name': request.companyName,
-                'company_logo': request.companyLogo,
-                'status': request.status,
-              });
-            }
+      return requests.fold((failure) => Left(failure), (list) {
+        for (final request in list) {
+          if (request.companyId == companyId) {
+            return Right({
+              'request_id': request.id,
+              'company_id': companyId,
+              'company_name': request.companyName,
+              'company_logo': request.companyLogo,
+              'status': request.status,
+            });
           }
-          return Left(ServerFailure(ErrorMessages.unexpectedError));
-        },
-      );
+        }
+        return Left(ServerFailure(ErrorMessages.unexpectedError));
+      });
     } on DioException catch (e) {
       return Left(mapDioExceptionToFailure(e));
     } catch (e) {
@@ -272,11 +270,7 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
   ) async {
     try {
       await _apiClient.dio.post(
-        ApiEndpoints.companyJoinRequestAction(
-          companyId,
-          requestId,
-          'approve',
-        ),
+        ApiEndpoints.companyJoinRequestAction(companyId, requestId, 'approve'),
       );
       return const Right(null);
     } on DioException catch (e) {
@@ -293,11 +287,7 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
   ) async {
     try {
       await _apiClient.dio.post(
-        ApiEndpoints.companyJoinRequestAction(
-          companyId,
-          requestId,
-          'reject',
-        ),
+        ApiEndpoints.companyJoinRequestAction(companyId, requestId, 'reject'),
       );
       return const Right(null);
     } on DioException catch (e) {
@@ -313,21 +303,18 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
   ) async {
     try {
       final requests = await getMyJoinRequests();
-      return requests.fold(
-        (failure) => Left(failure),
-        (list) {
-          for (final request in list) {
-            if (request.id == requestId) {
-              return Right({
-                'request_id': request.id,
-                'company_id': request.companyId,
-                'status': request.status,
-              });
-            }
+      return requests.fold((failure) => Left(failure), (list) {
+        for (final request in list) {
+          if (request.id == requestId) {
+            return Right({
+              'request_id': request.id,
+              'company_id': request.companyId,
+              'status': request.status,
+            });
           }
-          return Left(NotFoundFailure(ErrorMessages.notFound));
-        },
-      );
+        }
+        return Left(NotFoundFailure(ErrorMessages.notFound));
+      });
     } on DioException catch (e) {
       return Left(mapDioExceptionToFailure(e));
     } catch (e) {
