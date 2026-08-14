@@ -40,6 +40,7 @@ import 'package:makhzanflow/features/companies/presentation/cubit/join_company_c
 import 'package:makhzanflow/features/companies/presentation/cubit/company_members_cubit.dart';
 import 'package:makhzanflow/features/companies/presentation/cubit/company_settings_cubit.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
+import '../../features/auth/data/datasources/auth_remote_data_source_impl.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/auth_state_changes_usecase.dart';
@@ -105,7 +106,10 @@ Future<void> initServiceLocator() async {
 
   // Auth: Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(Supabase.instance.client),
+    () => AuthRemoteDataSourceImpl(
+      apiClient: sl<ApiClient>(),
+      tokenStorage: sl<TokenStorage>(),
+    ),
   );
 
   // Auth: Repositories
