@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:makhzanflow/core/api/api_client.dart';
+import 'package:makhzanflow/core/storage/token_storage.dart';
 import 'package:makhzanflow/features/customers/domain/usecases/get_customer-filtercounts_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:makhzanflow/core/company/company_cubit.dart';
@@ -97,6 +99,10 @@ import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
 final sl = GetIt.instance;
 
 Future<void> initServiceLocator() async {
+  // Core: Token storage + API client
+  sl.registerLazySingleton<TokenStorage>(() => TokenStorage());
+  sl.registerLazySingleton<ApiClient>(() => ApiClient(tokenStorage: sl<TokenStorage>()));
+
   // Auth: Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(Supabase.instance.client),

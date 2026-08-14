@@ -1,6 +1,14 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MakhzanFlowEnv {
+  static String get apiBaseUrl {
+    final value = dotenv.env['API_BASE_URL']?.trim();
+    if (value == null || value.isEmpty) {
+      throw StateError('Missing API_BASE_URL in .env');
+    }
+    return value.replaceAll(RegExp(r'/+$'), '');
+  }
+
   static String get supabaseUrl {
     final value = dotenv.env['SUPABASE_URL']?.trim();
     if (value == null || value.isEmpty) {
