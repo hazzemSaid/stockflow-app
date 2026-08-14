@@ -36,7 +36,7 @@ abstract class ProductRemoteDataSource {
     String companyId,
   );
 
-  TaskEither<String, String> uploadImage(String filePath);
+  TaskEither<String, String> uploadImage(String filePath, String productId);
 
   TaskEither<String, Map<String, dynamic>> updateQuantityTransaction({
     required String productId,

@@ -67,8 +67,8 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  TaskEither<String, String> uploadProductImage(String filePath) {
-    return dataSource.uploadImage(filePath);
+  TaskEither<String, String> uploadProductImage(String filePath, String productId) {
+    return dataSource.uploadImage(filePath, productId);
   }
 
   @override

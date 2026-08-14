@@ -108,37 +108,37 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
 
     emit(state.copyWith(status: AddEditProductStatus.loading));
 
-    String? imageUrl;
+    final input = ProductInput(
+      name: state.input.name,
+      price: price,
+      quantity: quantity,
+      imageUrl: state.imageUploadUrl,
+      expirationDate: state.expirationDate,
+    );
 
-    if (state.imageLocalPath != null) {
+    final hasNewImage = state.imageLocalPath != null;
+
+    Future<bool> uploadNewImage(String productId) async {
       emit(state.copyWith(isImageUploading: true));
-      final uploadResult = await _uploadImageUseCase(state.imageLocalPath!).run();
-      final uploadError = uploadResult.fold(
+      final uploadResult = await _uploadImageUseCase(
+        state.imageLocalPath!,
+        productId,
+      ).run();
+      return uploadResult.fold(
         (error) {
           emit(state.copyWith(
             status: AddEditProductStatus.error,
             errorMessage: error,
             isImageUploading: false,
           ));
-          return error;
+          return false;
         },
-        (url) {
-          imageUrl = url;
-          return null;
+        (_) {
+          emit(state.copyWith(isImageUploading: false));
+          return true;
         },
       );
-      if (uploadError != null) return false;
-    } else {
-      imageUrl = state.imageUploadUrl;
     }
-
-    final input = ProductInput(
-      name: state.input.name,
-      price: price,
-      quantity: quantity,
-      imageUrl: imageUrl,
-      expirationDate: state.expirationDate,
-    );
 
     if (state.isEditMode && _updateProductUseCase != null) {
       final result = await _updateProductUseCase(
@@ -152,7 +152,11 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
           ));
           return false;
         },
-        (product) {
+        (product) async {
+          if (hasNewImage) {
+            final uploaded = await uploadNewImage(product.id);
+            if (!uploaded) return false;
+          }
           emit(state.copyWith(
             status: AddEditProductStatus.success,
             successMessage: 'تم حفظ المنتج بنجاح',
@@ -170,7 +174,11 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
           ));
           return false;
         },
-        (product) {
+        (product) async {
+          if (hasNewImage) {
+            final uploaded = await uploadNewImage(product.id);
+            if (!uploaded) return false;
+          }
           emit(state.copyWith(
             status: AddEditProductStatus.success,
             successMessage: 'تم حفظ المنتج بنجاح',
