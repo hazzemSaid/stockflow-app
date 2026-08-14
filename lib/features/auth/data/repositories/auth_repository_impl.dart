@@ -58,8 +58,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> signInWithGoogle() {
-    return _remoteDataSource.signInWithGoogle();
+  Future<Either<Failure, UserEntity>> signInWithGoogle() async {
+    try {
+      return _remoteDataSource.signInWithGoogle();
+    } catch (e) {
+      // Backend /auth/google is not ready yet — surface a controlled failure
+      // instead of letting the stub crash the UI.
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override

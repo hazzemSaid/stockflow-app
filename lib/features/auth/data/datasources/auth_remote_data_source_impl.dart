@@ -9,6 +9,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../models/auth_response_dto.dart';
 import '../models/login_request_dto.dart';
+import '../models/refresh_token_request_dto.dart';
 import '../models/register_request_dto.dart';
 import '../models/user_model.dart';
 import '../models/verify_email_request_dto.dart';
@@ -16,9 +17,9 @@ import 'auth_remote_data_source.dart';
 
 /// REST implementation of [AuthRemoteDataSource] backed by Dio.
 ///
-/// Register, verify-email, resend and login are wired to the Express backend.
-/// Google sign-in, logout and session restore are stubbed and will be
-/// implemented in later phases.
+/// Register, verify-email, resend, login, logout and session restore are
+/// wired to the Express backend. Google sign-in is stubbed and will be
+/// implemented when the backend `/auth/google` endpoint is ready.
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final ApiClient _apiClient;
   final TokenStorage _tokenStorage;
@@ -106,17 +107,46 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Either<Failure, UserModel>> signInWithGoogle() {
-    throw UnimplementedError('Wired in Phase 5');
+    throw UnimplementedError('Wired when backend /auth/google is ready');
   }
 
   @override
-  Future<Either<Failure, void>> signOut() {
-    throw UnimplementedError('Wired in Phase 5');
+  Future<Either<Failure, void>> signOut() async {
+    Failure? failure;
+    try {
+      final refreshToken = await _tokenStorage.refreshToken;
+      if (refreshToken != null) {
+        await _apiClient.dio.post(
+          ApiEndpoints.logout,
+          data: RefreshTokenRequestDto(refreshToken: refreshToken).toJson(),
+        );
+      }
+    } on DioException catch (e) {
+      failure = mapDioExceptionToFailure(e);
+    } catch (e) {
+      failure = ServerFailure(e.toString());
+    }
+    // Always clear local tokens so the app never stays signed in when the
+    // server session is gone.
+    await _tokenStorage.clearAll();
+    return failure == null ? const Right(null) : Left(failure);
   }
 
   @override
-  Future<Either<Failure, UserModel?>> getCurrentUser() async =>
-      const Right(null);
+  Future<Either<Failure, UserModel?>> getCurrentUser() async {
+    try {
+      final response = await _apiClient.dio.get(ApiEndpoints.me);
+      final data = _data(response);
+      if (data == null) {
+        return Left(ServerFailure(ErrorMessages.unexpectedError));
+      }
+      return Right(UserModel.fromJson(data));
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 
   @override
   Stream<UserModel?> get authStateChanges => const Stream.empty();
