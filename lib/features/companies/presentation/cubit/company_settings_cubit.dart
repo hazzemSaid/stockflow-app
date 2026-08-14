@@ -121,16 +121,16 @@ class CompanySettingsCubit extends Cubit<CompanySettingsState> {
     }
   }
 
-  Future<String?> getJoinCode() async {
-    final result = await _getCompanyJoinCodeUseCase.call();
+  Future<String?> getJoinCode(String companyId) async {
+    final result = await _getCompanyJoinCodeUseCase.call(companyId);
     return result.fold(
       (failure) => null,
       (code) => code,
     );
   }
 
-  Future<String?> regenerateJoinCode() async {
-    final result = await _regenerateCompanyJoinCodeUseCase.call();
+  Future<String?> regenerateJoinCode(String companyId) async {
+    final result = await _regenerateCompanyJoinCodeUseCase.call(companyId);
     return result.fold(
       (failure) => null,
       (code) => code,

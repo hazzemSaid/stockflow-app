@@ -75,4 +75,6 @@ abstract class ErrorMessages {
       _tr('البيانات المدخلة غير صحيحة', 'The entered data is invalid');
   static String get connectionFailed =>
       _tr('تعذر الاتصال بالخادم', 'Failed to connect to the server');
+  static String get unsupportedOperation =>
+      _tr('هذه العملية غير مدعومة حالياً', 'This operation is not supported yet');
 }

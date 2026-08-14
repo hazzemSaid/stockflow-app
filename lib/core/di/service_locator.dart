@@ -317,7 +317,7 @@ Future<void> initServiceLocator() async {
 
   // Companies: Data sources
   sl.registerLazySingleton<CompanyRemoteDataSource>(
-    () => CompanyRemoteDataSourceImpl(Supabase.instance.client),
+    () => CompanyRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
 
   // Companies: Repository

@@ -60,7 +60,7 @@ class _MembersPageState extends State<MembersPage>
 
   Future<void> _approveRequest(String requestId) async {
     setState(() => _joinRequestActionInProgress = true);
-    final result = await sl<ApproveJoinRequestUseCase>().call(requestId);
+    final result = await sl<ApproveJoinRequestUseCase>().call(companyId, requestId);
     result.fold((_) => AppSnackbar.error(context, AppStrings.unexpectedError), (
       _,
     ) {
@@ -73,7 +73,7 @@ class _MembersPageState extends State<MembersPage>
 
   Future<void> _rejectRequest(String requestId) async {
     setState(() => _joinRequestActionInProgress = true);
-    final result = await sl<RejectJoinRequestUseCase>().call(requestId);
+    final result = await sl<RejectJoinRequestUseCase>().call(companyId, requestId);
     result.fold((_) => AppSnackbar.error(context, AppStrings.unexpectedError), (
       _,
     ) {
@@ -85,7 +85,7 @@ class _MembersPageState extends State<MembersPage>
 
   void _showShareCodeSheet() async {
     final settingsCubit = context.read<CompanySettingsCubit>();
-    final code = await settingsCubit.getJoinCode();
+    final code = await settingsCubit.getJoinCode(companyId);
     if (!mounted) return;
     if (code == null) {
       AppSnackbar.error(context, 'فشل تحميل رمز الدعوة');
@@ -156,7 +156,7 @@ class _MembersPageState extends State<MembersPage>
 
     if (confirmed == true && mounted) {
       final settingsCubit = context.read<CompanySettingsCubit>();
-      final newCode = await settingsCubit.regenerateJoinCode();
+      final newCode = await settingsCubit.regenerateJoinCode(companyId);
       if (mounted) {
         if (newCode != null) {
           AppSnackbar.success(context, 'تم تغيير رمز الدعوة');
@@ -300,7 +300,7 @@ class _MembersPageState extends State<MembersPage>
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _cubit.removeMember(companyId, member.id);
+              _cubit.removeMember(companyId, member.userId);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
@@ -329,7 +329,7 @@ class _MembersPageState extends State<MembersPage>
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _cubit.promoteToOwner(companyId, member.id);
+              _cubit.promoteToOwner(companyId, member.userId);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.trendUp,
@@ -358,7 +358,7 @@ class _MembersPageState extends State<MembersPage>
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _cubit.demoteToMember(companyId, member.id, {});
+              _cubit.demoteToMember(companyId, member.userId, {});
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
