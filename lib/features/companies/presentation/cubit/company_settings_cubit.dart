@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/utils/image_data_uri.dart';
 import 'package:makhzanflow/features/companies/domain/entities/company.dart';
 import 'package:makhzanflow/features/companies/domain/usecases/update_company_usecase.dart';
 import 'package:makhzanflow/features/companies/domain/usecases/get_company_join_code_usecase.dart';
@@ -69,7 +69,6 @@ class CompanySettingsCubit extends Cubit<CompanySettingsState> {
   final LeaveCompanyUseCase _leaveCompanyUseCase;
   final DeleteCompanyUseCase _deleteCompanyUseCase;
   final ImagePicker _picker;
-  final SupabaseClient _supabase;
 
   CompanySettingsCubit({
     required UpdateCompanyUseCase updateCompanyUseCase,
@@ -78,14 +77,12 @@ class CompanySettingsCubit extends Cubit<CompanySettingsState> {
     required LeaveCompanyUseCase leaveCompanyUseCase,
     required DeleteCompanyUseCase deleteCompanyUseCase,
     ImagePicker? picker,
-    SupabaseClient? supabase,
   })  : _updateCompanyUseCase = updateCompanyUseCase,
         _getCompanyJoinCodeUseCase = getCompanyJoinCodeUseCase,
         _regenerateCompanyJoinCodeUseCase = regenerateCompanyJoinCodeUseCase,
         _leaveCompanyUseCase = leaveCompanyUseCase,
         _deleteCompanyUseCase = deleteCompanyUseCase,
         _picker = picker ?? ImagePicker(),
-        _supabase = supabase ?? Supabase.instance.client,
         super(const CompanySettingsInitial());
 
   void loadFromCompany(Company company) {
@@ -174,19 +171,7 @@ class CompanySettingsCubit extends Cubit<CompanySettingsState> {
     String? logoUrl;
     if (imagePath != null) {
       try {
-        final fileName =
-            '${DateTime.now().millisecondsSinceEpoch}_logo.jpg';
-        final file = File(imagePath);
-        await _supabase.storage.from('company-logos').upload(
-              fileName,
-              file,
-              fileOptions: const FileOptions(
-                contentType: 'image/jpeg',
-                upsert: true,
-              ),
-            );
-        logoUrl =
-            _supabase.storage.from('company-logos').getPublicUrl(fileName);
+        logoUrl = await fileToDataUri(File(imagePath));
       } on Exception {
         emit(CompanySettingsError(
           '${AppStrings.uploadLogoError}: تعذر رفع الشعار',

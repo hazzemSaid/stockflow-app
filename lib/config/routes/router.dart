@@ -19,7 +19,6 @@ import 'package:makhzanflow/features/invoice/presentation/cubit/invoice_details/
 import 'package:makhzanflow/features/products/presentation/cubit/add_edit_product/add_edit_product_cubit.dart';
 import 'package:makhzanflow/features/products/presentation/cubit/product_details/product_details_cubit.dart';
 import 'package:makhzanflow/features/products/presentation/cubit/products/products_cubit.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/constants/app_routes.dart';
 import '../../core/di/service_locator.dart';
 import '../../core/company/company_cubit.dart';
@@ -127,7 +126,6 @@ Widget _buildCreateCompanyPage() {
       createCompanyFullUseCase: sl<CreateCompanyFullUseCase>(),
       companyCubit: sl<CompanyCubit>(),
       picker: ImagePicker(),
-      supabase: Supabase.instance.client,
     ),
     child: const CreateCompanyScreen(),
   );
