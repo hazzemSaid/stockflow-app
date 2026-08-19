@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:makhzanflow/core/company/company_aware_state.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/permissions/permission_constants.dart';
+import '../../../../core/permissions/permission_gate.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../cubit/product_details/product_details_cubit.dart';
 import '../widgets/inventory_movement_list.dart';
@@ -77,17 +79,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                       SizedBox(height: AppSizes.spacingLarge),
                       ProductInfoSection(product: product),
                       SizedBox(height: AppSizes.spacingLarge),
-                      ProductActionButtons(
-                        onEdit: () async {
-                          final updated = await context.push<bool>(
-                            '/products/${product.id}/edit',
-                          );
-                          if (updated == true && mounted) {
-                            _cubit.loadProduct(widget.productId, companyId);
-                          }
-                        },
-                        onDelete: () => _confirmDelete(context, product.id),
-                        isDeleting: state.isDeleting,
+                      PermissionGate(
+                        anyPermissions: [
+                          PermissionKeys.productsEdit,
+                          PermissionKeys.productsDelete,
+                        ],
+                        child: ProductActionButtons(
+                          onEdit: () async {
+                            final updated = await context.push<bool>(
+                              '/products/${product.id}/edit',
+                            );
+                            if (updated == true && mounted) {
+                              _cubit.loadProduct(widget.productId, companyId);
+                            }
+                          },
+                          onDelete: () => _confirmDelete(context, product.id),
+                          isDeleting: state.isDeleting,
+                        ),
                       ),
                       InventoryMovementList(movements: state.recentMovements),
                     ],

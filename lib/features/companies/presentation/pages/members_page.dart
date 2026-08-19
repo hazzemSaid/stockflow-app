@@ -55,12 +55,17 @@ class _MembersPageState extends State<MembersPage>
     if (companyId.isEmpty) return;
     final useCase = sl<GetJoinRequestsUseCase>();
     final result = await useCase.call(companyId);
-    result.fold((_) {}, (requests) => setState(() => _joinRequests = requests));
+    result.fold((_) {}, (requests) {
+      setState(() => _joinRequests = requests);
+    });
   }
 
   Future<void> _approveRequest(String requestId) async {
     setState(() => _joinRequestActionInProgress = true);
-    final result = await sl<ApproveJoinRequestUseCase>().call(companyId, requestId);
+    final result = await sl<ApproveJoinRequestUseCase>().call(
+      companyId,
+      requestId,
+    );
     result.fold((_) => AppSnackbar.error(context, AppStrings.unexpectedError), (
       _,
     ) {
@@ -73,7 +78,10 @@ class _MembersPageState extends State<MembersPage>
 
   Future<void> _rejectRequest(String requestId) async {
     setState(() => _joinRequestActionInProgress = true);
-    final result = await sl<RejectJoinRequestUseCase>().call(companyId, requestId);
+    final result = await sl<RejectJoinRequestUseCase>().call(
+      companyId,
+      requestId,
+    );
     result.fold((_) => AppSnackbar.error(context, AppStrings.unexpectedError), (
       _,
     ) {

@@ -5,6 +5,9 @@ import 'package:makhzanflow/core/company/company_aware_state.dart';
 import 'package:makhzanflow/core/constants/app_colors.dart';
 import 'package:makhzanflow/core/constants/app_sizes.dart';
 import 'package:makhzanflow/core/constants/app_strings.dart';
+import 'package:makhzanflow/core/permissions/permission_constants.dart';
+import 'package:makhzanflow/core/permissions/permission_service.dart';
+import 'package:makhzanflow/core/di/service_locator.dart';
 import 'package:makhzanflow/core/widgets/app_snackbar.dart';
 import '../../../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../../../features/auth/presentation/cubit/auth_state.dart';
@@ -125,6 +128,16 @@ class _AddEditProductScreenState extends State<AddEditProductScreen>
   }
 
   Future<void> _save() async {
+    final permissionService = sl<PermissionService>();
+    final permission = _isEditMode
+        ? PermissionKeys.productsEdit
+        : PermissionKeys.productsCreate;
+    if (!permissionService.hasPermission(permission)) {
+      if (mounted) {
+        AppSnackbar.error(context, 'ليس لديك صلاحية للقيام بهذا الإجراء');
+      }
+      return;
+    }
     final authState = context.read<AuthCubit>().state;
     final userId = authState is Authenticated ? authState.user.id : '';
     if (userId.isEmpty) return;
