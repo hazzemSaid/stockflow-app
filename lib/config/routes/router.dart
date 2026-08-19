@@ -33,6 +33,7 @@ import '../../features/auth/presentation/pages/create_company_screen.dart';
 import '../../features/auth/presentation/pages/welcome_screen.dart';
 import '../../features/auth/presentation/pages/join_business_screen.dart';
 import '../../features/auth/presentation/pages/pending_approval_screen.dart';
+import '../../features/auth/presentation/pages/email_verification_screen.dart';
 import '../../features/companies/presentation/cubit/join_company_cubit.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../../features/products/presentation/pages/products_screen.dart';
@@ -58,6 +59,7 @@ final List<String> _authRoutes = [
   AppRoutes.splash,
   AppRoutes.login,
   AppRoutes.register,
+  AppRoutes.emailVerification,
 ];
 final List<String> _companyRoutes = [
   AppRoutes.companySelect,
@@ -144,6 +146,11 @@ final GoRouter appRouter = GoRouter(
       return null;
     }
 
+    if (authState is EmailVerificationPending) {
+      if (location == AppRoutes.emailVerification) return null;
+      return AppRoutes.emailVerification;
+    }
+
     if (authState is Authenticated) {
       final companyCubit = sl<CompanyCubit>();
       final companyState = companyCubit.state;
@@ -213,6 +220,15 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.register,
       builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.emailVerification,
+      builder: (context, state) {
+        final email = state.extra as String? ??
+            sl<AuthCubit>().pendingVerificationEmail ??
+            '';
+        return EmailVerificationScreen(email: email);
+      },
     ),
     GoRoute(
       path: AppRoutes.companySelect,

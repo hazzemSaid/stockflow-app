@@ -1,13 +1,11 @@
 import 'package:makhzanflow/features/auth/domain/entities/user.dart';
 
 class UserModel extends UserEntity {
-  final bool isVerified;
-
   const UserModel({
     required super.id,
     required super.email,
     super.name,
-    this.isVerified = false,
+    super.isVerified,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {

@@ -49,6 +49,8 @@ import '../../features/auth/domain/usecases/sign_in_usecase.dart';
 import '../../features/auth/domain/usecases/sign_in_with_google_usecase.dart';
 import '../../features/auth/domain/usecases/sign_up_usecase.dart';
 import '../../features/auth/domain/usecases/sign_out_usecase.dart';
+import '../../features/auth/domain/usecases/verify_email_usecase.dart';
+import '../../features/auth/domain/usecases/resend_verification_email_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/products/data/datasources/product_remote_data_source.dart';
 import '../../features/products/data/datasources/product_remote_data_source_impl.dart';
@@ -130,6 +132,12 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton<SignOutUseCase>(
     () => SignOutUseCase(sl<AuthRepository>()),
   );
+  sl.registerLazySingleton<VerifyEmailUseCase>(
+    () => VerifyEmailUseCase(sl<AuthRepository>()),
+  );
+  sl.registerLazySingleton<ResendVerificationEmailUseCase>(
+    () => ResendVerificationEmailUseCase(sl<AuthRepository>()),
+  );
   sl.registerLazySingleton<GetCurrentUserUseCase>(
     () => GetCurrentUserUseCase(sl<AuthRepository>()),
   );
@@ -146,6 +154,8 @@ Future<void> initServiceLocator() async {
       signOutUseCase: sl<SignOutUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
       authStateChangesUseCase: sl<AuthStateChangesUseCase>(),
+      verifyEmailUseCase: sl<VerifyEmailUseCase>(),
+      resendVerificationEmailUseCase: sl<ResendVerificationEmailUseCase>(),
     ),
   );
 
