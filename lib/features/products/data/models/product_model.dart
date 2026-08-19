@@ -6,6 +6,9 @@ class ProductModel {
   final String? imageUrl;
   final int quantity;
   final double price;
+  final String sku;
+  final String? barcode;
+  final int minStock;
   final String createdBy;
   final DateTime? expirationDate;
   final DateTime? createdAt;
@@ -17,6 +20,9 @@ class ProductModel {
     this.imageUrl,
     required this.quantity,
     required this.price,
+    required this.sku,
+    this.barcode,
+    required this.minStock,
     required this.createdBy,
     this.expirationDate,
     this.createdAt,
@@ -30,6 +36,9 @@ class ProductModel {
       imageUrl: json['image_url'] as String?,
       quantity: (json['stock'] ?? json['quantity']) as int,
       price: (json['price'] as num).toDouble(),
+      sku: (json['sku'] as String?) ?? '',
+      barcode: json['barcode'] as String?,
+      minStock: (json['min_stock'] as num?)?.toInt() ?? 0,
       createdBy: (json['created_by'] as String?) ?? '',
       expirationDate: _parseDate(json, 'expiry_date', 'expiration_date'),
       createdAt: _parseDate(json, 'created_at'),
@@ -53,6 +62,9 @@ class ProductModel {
       'image_url': imageUrl,
       'quantity': quantity,
       'price': price,
+      'sku': sku,
+      'barcode': barcode,
+      'min_stock': minStock,
       'created_by': createdBy,
       'expiration_date': expirationDate?.toIso8601String(),
       'created_at': createdAt?.toIso8601String(),
@@ -66,6 +78,9 @@ class ProductModel {
       if (imageUrl != null) 'image_url': imageUrl,
       'quantity': quantity,
       'price': price,
+      'sku': sku,
+      if (barcode != null) 'barcode': barcode,
+      'min_stock': minStock,
       'created_by': createdBy,
       if (expirationDate != null)
         'expiration_date': expirationDate!.toIso8601String(),
@@ -77,8 +92,11 @@ class ProductModel {
       'name': name,
       'price': price,
       'quantity': quantity,
+      'sku': sku,
+      'min_stock': minStock,
     };
     if (imageUrl != null) data['image_url'] = imageUrl;
+    if (barcode != null) data['barcode'] = barcode;
     if (expirationDate != null) {
       data['expiration_date'] = expirationDate!.toIso8601String();
     } else {
@@ -94,6 +112,9 @@ class ProductModel {
       imageUrl: imageUrl,
       quantity: quantity,
       price: price,
+      sku: sku,
+      barcode: barcode,
+      minStock: minStock,
       createdBy: createdBy,
       expirationDate: expirationDate,
       createdAt: createdAt,
@@ -108,6 +129,9 @@ class ProductModel {
       imageUrl: entity.imageUrl,
       quantity: entity.quantity,
       price: entity.price,
+      sku: entity.sku,
+      barcode: entity.barcode,
+      minStock: entity.minStock,
       createdBy: entity.createdBy,
       expirationDate: entity.expirationDate,
       createdAt: entity.createdAt,

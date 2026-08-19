@@ -46,8 +46,11 @@ class ProductRepositoryImpl implements ProductRepository {
     }
     final dto = CreateProductRequestDto(
       name: input.name,
+      sku: input.sku,
+      barcode: input.barcode,
       price: input.price,
       stock: input.quantity,
+      minStock: input.minStock,
       expiryDate: input.expirationDate,
     );
     return dataSource
@@ -68,8 +71,11 @@ class ProductRepositoryImpl implements ProductRepository {
     }
     final dto = UpdateProductRequestDto(
       name: input.name,
+      sku: input.sku,
+      barcode: input.barcode,
       price: input.price,
       stock: input.quantity,
+      minStock: input.minStock,
       expiryDate: input.expirationDate,
     );
     return dataSource.updateProduct(id, dto, userId, companyId).map((model) => model.toEntity());

@@ -1,12 +1,12 @@
 /// Request body for `POST /products`:
-/// `{ name, sku?, barcode?, price, stock?, min_stock?, expiry_date?, is_active? }`
+/// `{ name, sku?, barcode?, price, stock, min_stock, expiry_date?, is_active? }`
 class CreateProductRequestDto {
   final String name;
   final String? sku;
   final String? barcode;
   final double price;
-  final int? stock;
-  final int? minStock;
+  final int stock;
+  final int minStock;
   final DateTime? expiryDate;
   final bool? isActive;
 
@@ -15,8 +15,8 @@ class CreateProductRequestDto {
     this.sku,
     this.barcode,
     required this.price,
-    this.stock,
-    this.minStock,
+    required this.stock,
+    required this.minStock,
     this.expiryDate,
     this.isActive,
   });
@@ -26,8 +26,8 @@ class CreateProductRequestDto {
         if (sku != null) 'sku': sku,
         if (barcode != null) 'barcode': barcode,
         'price': price,
-        if (stock != null) 'stock': stock,
-        if (minStock != null) 'min_stock': minStock,
+        'stock': stock,
+        'min_stock': minStock,
         if (expiryDate != null) 'expiry_date': _dateKey(expiryDate!),
         if (isActive != null) 'is_active': isActive,
       };

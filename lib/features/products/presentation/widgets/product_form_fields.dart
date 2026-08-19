@@ -6,23 +6,35 @@ import '../../../../core/constants/app_strings.dart';
 
 class ProductFormFields extends StatefulWidget {
   final String name;
+  final String sku;
+  final String barcode;
   final String price;
   final String quantity;
+  final String minStock;
   final DateTime? expirationDate;
   final ValueChanged<String> onNameChanged;
+  final ValueChanged<String> onSkuChanged;
+  final ValueChanged<String> onBarcodeChanged;
   final ValueChanged<String> onPriceChanged;
   final ValueChanged<String> onQuantityChanged;
+  final ValueChanged<String> onMinStockChanged;
   final ValueChanged<DateTime?> onExpirationDateChanged;
 
   const ProductFormFields({
     super.key,
     required this.name,
+    required this.sku,
+    required this.barcode,
     required this.price,
     required this.quantity,
+    required this.minStock,
     this.expirationDate,
     required this.onNameChanged,
+    required this.onSkuChanged,
+    required this.onBarcodeChanged,
     required this.onPriceChanged,
     required this.onQuantityChanged,
+    required this.onMinStockChanged,
     required this.onExpirationDateChanged,
   });
 
@@ -32,15 +44,21 @@ class ProductFormFields extends StatefulWidget {
 
 class _ProductFormFieldsState extends State<ProductFormFields> {
   late final TextEditingController _nameController;
+  late final TextEditingController _skuController;
+  late final TextEditingController _barcodeController;
   late final TextEditingController _priceController;
   late final TextEditingController _quantityController;
+  late final TextEditingController _minStockController;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.name);
+    _skuController = TextEditingController(text: widget.sku);
+    _barcodeController = TextEditingController(text: widget.barcode);
     _priceController = TextEditingController(text: widget.price);
     _quantityController = TextEditingController(text: widget.quantity);
+    _minStockController = TextEditingController(text: widget.minStock);
   }
 
   @override
@@ -49,19 +67,31 @@ class _ProductFormFieldsState extends State<ProductFormFields> {
     if (widget.name != oldWidget.name && widget.name != _nameController.text) {
       _nameController.text = widget.name;
     }
+    if (widget.sku != oldWidget.sku && widget.sku != _skuController.text) {
+      _skuController.text = widget.sku;
+    }
+    if (widget.barcode != oldWidget.barcode && widget.barcode != _barcodeController.text) {
+      _barcodeController.text = widget.barcode;
+    }
     if (widget.price != oldWidget.price && widget.price != _priceController.text) {
       _priceController.text = widget.price;
     }
     if (widget.quantity != oldWidget.quantity && widget.quantity != _quantityController.text) {
       _quantityController.text = widget.quantity;
     }
+    if (widget.minStock != oldWidget.minStock && widget.minStock != _minStockController.text) {
+      _minStockController.text = widget.minStock;
+    }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _skuController.dispose();
+    _barcodeController.dispose();
     _priceController.dispose();
     _quantityController.dispose();
+    _minStockController.dispose();
     super.dispose();
   }
 
@@ -91,6 +121,20 @@ class _ProductFormFieldsState extends State<ProductFormFields> {
         ),
         SizedBox(height: AppSizes.spacingMedium),
         _buildField(
+          label: AppStrings.productSkuLabel,
+          hint: AppStrings.productSkuHint,
+          controller: _skuController,
+          onChanged: widget.onSkuChanged,
+        ),
+        SizedBox(height: AppSizes.spacingMedium),
+        _buildField(
+          label: AppStrings.productBarcodeLabel,
+          hint: AppStrings.productBarcodeHint,
+          controller: _barcodeController,
+          onChanged: widget.onBarcodeChanged,
+        ),
+        SizedBox(height: AppSizes.spacingMedium),
+        _buildField(
           label: AppStrings.productPriceLabel,
           hint: AppStrings.productPriceHint,
           controller: _priceController,
@@ -105,6 +149,16 @@ class _ProductFormFieldsState extends State<ProductFormFields> {
           hint: AppStrings.productQuantityHint,
           controller: _quantityController,
           onChanged: widget.onQuantityChanged,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          textDirection: TextDirection.ltr,
+        ),
+        SizedBox(height: AppSizes.spacingMedium),
+        _buildField(
+          label: AppStrings.productMinStockLabel,
+          hint: AppStrings.productMinStockHint,
+          controller: _minStockController,
+          onChanged: widget.onMinStockChanged,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           textDirection: TextDirection.ltr,

@@ -40,11 +40,17 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
         isEditMode: true,
         input: ProductInput(
           name: product.name,
+          sku: product.sku,
+          barcode: product.barcode,
           price: product.price,
           quantity: product.quantity,
+          minStock: product.minStock,
         ),
+        skuText: product.sku,
+        barcodeText: product.barcode ?? '',
         priceText: product.price.toString(),
         quantityText: product.quantity.toString(),
+        minStockText: product.minStock.toString(),
         expirationDate: product.expirationDate,
         imageUploadUrl: product.imageUrl,
       )),
@@ -59,10 +65,21 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
     emit(state.copyWith(
       input: ProductInput(
         name: value,
+        sku: state.input.sku,
+        barcode: state.input.barcode,
         price: state.input.price,
         quantity: state.input.quantity,
+        minStock: state.input.minStock,
       ),
     ));
+  }
+
+  void updateSku(String value) {
+    emit(state.copyWith(skuText: value));
+  }
+
+  void updateBarcode(String value) {
+    emit(state.copyWith(barcodeText: value));
   }
 
   void updatePrice(String value) {
@@ -71,6 +88,10 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
 
   void updateQuantity(String value) {
     emit(state.copyWith(quantityText: value));
+  }
+
+  void updateMinStock(String value) {
+    emit(state.copyWith(minStockText: value));
   }
 
   void setImagePath(String path) {
@@ -88,6 +109,9 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
   }
 
   Future<bool> save(String userId, String companyId) async {
+    final sku = state.skuText.trim();
+    final barcode = state.barcodeText.trim();
+
     final price = double.tryParse(state.priceText.isNotEmpty ? state.priceText : '0');
     if (price == null || price < 0) {
       emit(state.copyWith(
@@ -106,12 +130,24 @@ class AddEditProductCubit extends Cubit<AddEditProductState> {
       return false;
     }
 
+    final minStock = int.tryParse(state.minStockText.isNotEmpty ? state.minStockText : '0');
+    if (minStock == null || minStock < 0) {
+      emit(state.copyWith(
+        status: AddEditProductStatus.error,
+        errorMessage: 'الحد الأدنى للمخزون غير صالح',
+      ));
+      return false;
+    }
+
     emit(state.copyWith(status: AddEditProductStatus.loading));
 
     final input = ProductInput(
       name: state.input.name,
+      sku: sku.isEmpty ? null : sku,
+      barcode: barcode.isEmpty ? null : barcode,
       price: price,
       quantity: quantity,
+      minStock: minStock,
       imageUrl: state.imageUploadUrl,
       expirationDate: state.expirationDate,
     );

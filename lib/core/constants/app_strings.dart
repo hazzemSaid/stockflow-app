@@ -259,10 +259,16 @@ class AppStrings {
   static const String productCategoryAll = 'الكل';
   static const String productNameLabel = 'اسم المنتج';
   static const String productNameHint = 'أدخل اسم المنتج';
+  static const String productSkuLabel = 'كود المنتج (SKU)';
+  static const String productSkuHint = 'اتركه فارغاً للتوليد التلقائي';
+  static const String productBarcodeLabel = 'الباركود';
+  static const String productBarcodeHint = 'اختياري';
   static const String productPriceLabel = 'السعر';
   static const String productPriceHint = '٠٫٠٠';
   static const String productQuantityLabel = 'الكمية';
   static const String productQuantityHint = '٠';
+  static const String productMinStockLabel = 'الحد الأدنى للمخزون';
+  static const String productMinStockHint = '٠';
   static const String productImagePicker = 'اختر صورة';
   static const String productImageGallery = 'المعرض';
   static const String productImageCamera = 'الكاميرا';
