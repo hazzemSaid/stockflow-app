@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import '../../domain/entities/product_input.dart';
+import '../models/create_product_request_dto.dart';
+import '../models/update_product_request_dto.dart';
 import '../models/product_model.dart';
 import '../models/inventory_movement_model.dart';
 
@@ -19,14 +20,14 @@ abstract class ProductRemoteDataSource {
   );
 
   TaskEither<String, ProductModel> createProduct(
-    ProductInput input,
+    CreateProductRequestDto dto,
     String userId,
     String companyId,
   );
 
   TaskEither<String, ProductModel> updateProduct(
     String id,
-    ProductInput input,
+    UpdateProductRequestDto dto,
     String userId,
     String companyId,
   );

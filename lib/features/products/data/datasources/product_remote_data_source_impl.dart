@@ -6,9 +6,10 @@ import 'package:makhzanflow/core/api/api_response.dart';
 import 'package:makhzanflow/core/constants/api_endpoints.dart';
 import 'package:makhzanflow/core/constants/error_messages.dart';
 import 'package:makhzanflow/features/products/data/datasources/product_remote_data_source.dart';
+import 'package:makhzanflow/features/products/data/models/create_product_request_dto.dart';
 import 'package:makhzanflow/features/products/data/models/inventory_movement_model.dart';
 import 'package:makhzanflow/features/products/data/models/product_model.dart';
-import 'package:makhzanflow/features/products/domain/entities/product_input.dart';
+import 'package:makhzanflow/features/products/data/models/update_product_request_dto.dart';
 
 /// REST implementation of [ProductRemoteDataSource] backed by the Express API.
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
@@ -55,14 +56,14 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   @override
   TaskEither<String, ProductModel> createProduct(
-    ProductInput input,
+    CreateProductRequestDto dto,
     String userId,
     String companyId,
   ) {
     return TaskEither.tryCatch(() async {
       final response = await _apiClient.dio.post(
         ApiEndpoints.products,
-        data: _productBody(input),
+        data: dto.toJson(),
       );
       return ProductModel.fromJson(_dataOrThrow(response));
     }, (error, stackTrace) => _toMessage(error, stackTrace));
@@ -71,14 +72,14 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   @override
   TaskEither<String, ProductModel> updateProduct(
     String id,
-    ProductInput input,
+    UpdateProductRequestDto dto,
     String userId,
     String companyId,
   ) {
     return TaskEither.tryCatch(() async {
       final response = await _apiClient.dio.put(
         ApiEndpoints.productById(id),
-        data: _productBody(input),
+        data: dto.toJson(),
       );
       return ProductModel.fromJson(_dataOrThrow(response));
     }, (error, stackTrace) => _toMessage(error, stackTrace));
@@ -181,21 +182,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   // ======================= Helpers =======================
-
-  Map<String, dynamic> _productBody(ProductInput input) {
-    return {
-      'name': input.name,
-      'price': input.price,
-      'stock': input.quantity,
-      if (input.expirationDate != null)
-        'expiry_date': _dateKey(input.expirationDate!),
-    };
-  }
-
-  static String _dateKey(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-'
-      '${d.month.toString().padLeft(2, '0')}-'
-      '${d.day.toString().padLeft(2, '0')}';
 
   String _toMessage(Object error, StackTrace stackTrace) {
     if (error is DioException) {

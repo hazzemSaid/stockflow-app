@@ -4,6 +4,8 @@ import '../../domain/entities/inventory_movement.dart';
 import '../../domain/entities/product_input.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/product_remote_data_source.dart';
+import '../models/create_product_request_dto.dart';
+import '../models/update_product_request_dto.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductRemoteDataSource dataSource;
@@ -42,8 +44,14 @@ class ProductRepositoryImpl implements ProductRepository {
     if (validationError != null) {
       return TaskEither.left(validationError);
     }
+    final dto = CreateProductRequestDto(
+      name: input.name,
+      price: input.price,
+      stock: input.quantity,
+      expiryDate: input.expirationDate,
+    );
     return dataSource
-        .createProduct(input, userId, companyId)
+        .createProduct(dto, userId, companyId)
         .map((model) => model.toEntity());
   }
 
@@ -58,7 +66,13 @@ class ProductRepositoryImpl implements ProductRepository {
     if (validationError != null) {
       return TaskEither.left(validationError);
     }
-    return dataSource.updateProduct(id, input, userId, companyId).map((model) => model.toEntity());
+    final dto = UpdateProductRequestDto(
+      name: input.name,
+      price: input.price,
+      stock: input.quantity,
+      expiryDate: input.expirationDate,
+    );
+    return dataSource.updateProduct(id, dto, userId, companyId).map((model) => model.toEntity());
   }
 
   @override
