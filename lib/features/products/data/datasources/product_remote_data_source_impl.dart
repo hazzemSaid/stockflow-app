@@ -6,6 +6,7 @@ import 'package:makhzanflow/core/api/api_response.dart';
 import 'package:makhzanflow/core/constants/api_endpoints.dart';
 import 'package:makhzanflow/core/constants/error_messages.dart';
 import 'package:makhzanflow/features/products/data/datasources/product_remote_data_source.dart';
+import 'package:makhzanflow/features/products/data/models/adjust_stock_request_dto.dart';
 import 'package:makhzanflow/features/products/data/models/create_product_request_dto.dart';
 import 'package:makhzanflow/features/products/data/models/inventory_movement_model.dart';
 import 'package:makhzanflow/features/products/data/models/product_model.dart';
@@ -116,21 +117,17 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  TaskEither<String, Map<String, dynamic>> updateQuantityTransaction({
+  TaskEither<String, Map<String, dynamic>> updateQuantityTransaction(
+    AdjustStockRequestDto dto, {
     required String productId,
-    required int newQuantity,
-    required String type,
-    required int delta,
-    String? note,
-    required String userId,
     required String companyId,
   }) {
     return getProduct(productId, companyId).flatMap((model) {
-      final signedDelta = type == 'in' ? delta : -delta;
+      final newStock = model.quantity + dto.quantityChange;
       return TaskEither.tryCatch(() async {
         final response = await _apiClient.dio.put(
           ApiEndpoints.productById(productId),
-          data: {'stock': model.quantity + signedDelta},
+          data: {'stock': newStock},
         );
         return _dataOrThrow(response);
       }, (error, stackTrace) => _toMessage(error, stackTrace));

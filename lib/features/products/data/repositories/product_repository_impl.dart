@@ -4,6 +4,7 @@ import '../../domain/entities/inventory_movement.dart';
 import '../../domain/entities/product_input.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/product_remote_data_source.dart';
+import '../models/adjust_stock_request_dto.dart';
 import '../models/create_product_request_dto.dart';
 import '../models/update_product_request_dto.dart';
 
@@ -99,17 +100,15 @@ class ProductRepositoryImpl implements ProductRepository {
     required String userId,
     required String companyId,
   }) {
-    final type = delta > 0 ? 'in' : 'out';
-    final absDelta = delta.abs();
+    final dto = AdjustStockRequestDto(
+      quantityChange: delta,
+      reason: note ?? '',
+    );
 
     return dataSource
         .updateQuantityTransaction(
+          dto,
           productId: productId,
-          newQuantity: 0,
-          type: type,
-          delta: absDelta,
-          note: note,
-          userId: userId,
           companyId: companyId,
         )
         .flatMap((_) {

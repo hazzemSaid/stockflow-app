@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import '../models/adjust_stock_request_dto.dart';
 import '../models/create_product_request_dto.dart';
 import '../models/update_product_request_dto.dart';
 import '../models/product_model.dart';
@@ -39,13 +40,9 @@ abstract class ProductRemoteDataSource {
 
   TaskEither<String, String> uploadImage(String filePath, String productId);
 
-  TaskEither<String, Map<String, dynamic>> updateQuantityTransaction({
+  TaskEither<String, Map<String, dynamic>> updateQuantityTransaction(
+    AdjustStockRequestDto dto, {
     required String productId,
-    required int newQuantity,
-    required String type,
-    required int delta,
-    String? note,
-    required String userId,
     required String companyId,
   });
 
