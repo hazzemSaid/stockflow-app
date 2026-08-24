@@ -6,10 +6,13 @@ class CustomerModel {
   final String name;
   final String? nameOfficial;
   final String? phone;
+  final String? email;
   final String? address;
+  final double openingBalance;
   final double totalDebt;
   final String? imageUrl;
   final DateTime? createdAt;
+  final DateTime? updatedAt;
   final double totalPurchases;
   final double totalPaid;
   final List<CustomerTransaction> transactions;
@@ -19,10 +22,13 @@ class CustomerModel {
     required this.name,
     this.nameOfficial,
     this.phone,
+    this.email,
     this.address,
+    this.openingBalance = 0,
     this.totalDebt = 0,
     this.imageUrl,
     this.createdAt,
+    this.updatedAt,
     this.totalPurchases = 0,
     this.totalPaid = 0,
     this.transactions = const [],
@@ -104,8 +110,12 @@ class CustomerModel {
       ));
     }
 
-    final totalDebt = (json['computed_debt'] as num?)?.toDouble() ?? 0;
+    final totalDebt =
+        (json['current_debt'] as num?)?.toDouble() ??
+        (json['computed_debt'] as num?)?.toDouble() ??
+        0;
     final createdAtStr = json['created_at'] as String?;
+    final updatedAtStr = json['updated_at'] as String?;
 
     transactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -114,11 +124,16 @@ class CustomerModel {
       name: json['name'] as String,
       nameOfficial: json['name_official'] as String?,
       phone: json['phone'] as String?,
+      email: json['email'] as String?,
       address: json['address'] as String?,
+      openingBalance:
+          (json['opening_balance'] as num?)?.toDouble() ?? 0,
       totalDebt: totalDebt,
       imageUrl: json['image_url'] as String?,
       createdAt:
           createdAtStr != null ? DateTime.tryParse(createdAtStr) : null,
+      updatedAt:
+          updatedAtStr != null ? DateTime.tryParse(updatedAtStr) : null,
       totalPurchases: totalPurchases,
       totalPaid: totalPaid,
       transactions: transactions,
@@ -131,9 +146,11 @@ class CustomerModel {
       'name': name,
       if (nameOfficial != null) 'name_official': nameOfficial,
       if (phone != null) 'phone': phone,
+      if (email != null) 'email': email,
       if (address != null) 'address': address,
       if (imageUrl != null) 'image_url': imageUrl,
       if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+      if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
       if (totalPurchases > 0) 'total_purchases': totalPurchases,
       if (totalPaid > 0) 'total_paid': totalPaid,
     };
@@ -144,6 +161,7 @@ class CustomerModel {
       'name': name,
       if (nameOfficial != null) 'name_official': nameOfficial,
       if (phone != null) 'phone': phone,
+      if (email != null) 'email': email,
       if (address != null) 'address': address,
       if (imageUrl != null) 'image_url': imageUrl,
     };
@@ -154,6 +172,7 @@ class CustomerModel {
       'name': name,
       if (nameOfficial != null) 'name_official': nameOfficial,
       if (phone != null) 'phone': phone,
+      if (email != null) 'email': email,
       if (address != null) 'address': address,
       'image_url': imageUrl,
     };
@@ -165,10 +184,13 @@ class CustomerModel {
       name: name,
       nameOfficial: nameOfficial,
       phone: phone,
+      email: email,
       address: address,
+      openingBalance: openingBalance,
       totalDebt: totalDebt,
       imageUrl: imageUrl,
       createdAt: createdAt,
+      updatedAt: updatedAt,
       totalPurchases: totalPurchases,
       totalPaid: totalPaid,
       transactions: transactions,
@@ -181,10 +203,13 @@ class CustomerModel {
       name: entity.name,
       nameOfficial: entity.nameOfficial,
       phone: entity.phone,
+      email: entity.email,
       address: entity.address,
+      openingBalance: entity.openingBalance,
       totalDebt: entity.totalDebt,
       imageUrl: entity.imageUrl,
       createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
       totalPurchases: entity.totalPurchases,
       totalPaid: entity.totalPaid,
       transactions: entity.transactions,

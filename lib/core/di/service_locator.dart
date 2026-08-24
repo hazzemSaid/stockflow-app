@@ -221,8 +221,7 @@ Future<void> initServiceLocator() async {
 
   // Customers: Data sources
   sl.registerLazySingleton<CustomerRemoteDataSource>(
-    () =>
-        CustomerRemoteDataSourceImpl(supabaseClient: Supabase.instance.client),
+    () => CustomerRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
   sl.registerLazySingleton<GetCustomerFilterCountsUseCase>(
     () => GetCustomerFilterCountsUseCase(sl<CustomerRepository>()),
