@@ -439,6 +439,13 @@ class AppStrings {
   static const String invoiceNo = 'فاتورة';
   static const String printInvoice = 'طباعة الفاتورة';
   static const String shareInvoice = 'مشاركة';
+  static const String cancelInvoice = 'إلغاء الفاتورة';
+  static const String cancelInvoiceConfirmTitle = 'تأكيد الإلغاء';
+  static const String cancelInvoiceConfirmBody =
+      'هل أنت متأكد من إلغاء هذه الفاتورة؟ سيتم إرجاع الكميات إلى المخزون ولا يمكن التراجع.';
+  static const String cancelInvoiceSuccess = 'تم إلغاء الفاتورة وإرجاع المخزون';
+  static const String cancelInvoiceAction = 'تأكيد الإلغاء';
+  static const String cancelInvoiceStockNote = 'سيتم إرجاع المنتجات إلى المخزون تلقائياً';
   static const String mainWarehouse = 'مخزن التوزيع الرئيسي';
   static const String invoiceNumber = 'رقم الفاتورة';
   static const String date = 'التاريخ';

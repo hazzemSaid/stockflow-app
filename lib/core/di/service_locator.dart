@@ -309,7 +309,10 @@ Future<void> initServiceLocator() async {
   );
 
   sl.registerFactory<InvoiceDetailsCubit>(
-    () => InvoiceDetailsCubit(getInvoiceUseCase: sl<GetInvoiceUseCase>()),
+    () => InvoiceDetailsCubit(
+      getInvoiceUseCase: sl<GetInvoiceUseCase>(),
+      cancelInvoiceUseCase: sl<CancelInvoiceUseCase>(),
+    ),
   );
 
   sl.registerFactory<InvoicesCubit>(
