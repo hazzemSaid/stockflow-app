@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/customer_filter_counts.dart';
 import '../../../domain/usecases/get_customers_usecase.dart';
-import '../../../domain/usecases/get_customer-filtercounts_usecase.dart';
+import '../../../domain/usecases/get_customer_filter_counts_usecase.dart';
 import 'customers_state.dart';
 
 export 'customers_state.dart';
