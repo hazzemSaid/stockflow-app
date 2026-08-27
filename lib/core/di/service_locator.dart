@@ -80,9 +80,12 @@ import '../../features/customers/presentation/cubit/add_edit_customer/add_edit_c
 import '../../features/customers/presentation/cubit/customer_details/customer_details_cubit.dart';
 import '../../features/invoice/data/datasources/invoice_remote_data_source.dart';
 import '../../features/invoice/data/datasources/invoice_remote_data_source_impl.dart';
+import '../../features/invoice/data/mappers/invoice_mapper.dart';
 import '../../features/invoice/data/repositories/invoice_repository_impl.dart';
 import '../../features/invoice/domain/repositories/invoice_repository.dart';
+import '../../features/invoice/domain/services/discount_calculator.dart';
 import '../../features/invoice/domain/usecases/add_payment_usecase.dart';
+import '../../features/invoice/domain/usecases/cancel_invoice_usecase.dart';
 import '../../features/invoice/domain/usecases/create_invoice_usecase.dart';
 import '../../features/invoice/domain/usecases/get_invoice_usecase.dart';
 import '../../features/invoice/domain/usecases/get_invoices_usecase.dart';
@@ -265,14 +268,22 @@ Future<void> initServiceLocator() async {
     () => CustomerDetailsCubit(getCustomerUseCase: sl<GetCustomerUseCase>()),
   );
 
+  // Invoice: Domain services (SRP — discount & mapping isolated)
+  sl.registerLazySingleton<DiscountCalculator>(() => DiscountCalculatorImpl());
+  sl.registerLazySingleton<InvoiceMapper>(() => InvoiceMapperImpl());
+
   // Invoice: Data sources
   sl.registerLazySingleton<InvoiceRemoteDataSource>(
-    () => InvoiceRemoteDataSourceImpl(supabaseClient: Supabase.instance.client),
+    () => InvoiceRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
 
-  // Invoice: Repositories
+  // Invoice: Repositories (DI — depends on abstractions DiscountCalculator/InvoiceMapper)
   sl.registerLazySingleton<InvoiceRepository>(
-    () => InvoiceRepositoryImpl(sl<InvoiceRemoteDataSource>()),
+    () => InvoiceRepositoryImpl(
+      sl<InvoiceRemoteDataSource>(),
+      discountCalculator: sl<DiscountCalculator>(),
+      invoiceMapper: sl<InvoiceMapper>(),
+    ),
   );
 
   // Invoice: Use cases
@@ -287,6 +298,9 @@ Future<void> initServiceLocator() async {
   );
   sl.registerLazySingleton<GetInvoicesUseCase>(
     () => GetInvoicesUseCase(sl<InvoiceRepository>()),
+  );
+  sl.registerLazySingleton<CancelInvoiceUseCase>(
+    () => CancelInvoiceUseCase(sl<InvoiceRepository>()),
   );
 
   // Invoice: Cubits
