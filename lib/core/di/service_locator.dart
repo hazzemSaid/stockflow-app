@@ -2,7 +2,6 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:makhzanflow/core/api/api_client.dart';
 import 'package:makhzanflow/core/storage/token_storage.dart';
-import 'package:makhzanflow/features/customers/domain/usecases/get_customer-filtercounts_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:makhzanflow/core/company/company_cubit.dart';
 import 'package:makhzanflow/core/permissions/permission_service.dart';
@@ -104,7 +103,9 @@ final sl = GetIt.instance;
 Future<void> initServiceLocator() async {
   // Core: Token storage + API client
   sl.registerLazySingleton<TokenStorage>(() => TokenStorage());
-  sl.registerLazySingleton<ApiClient>(() => ApiClient(tokenStorage: sl<TokenStorage>()));
+  sl.registerLazySingleton<ApiClient>(
+    () => ApiClient(tokenStorage: sl<TokenStorage>()),
+  );
 
   // Auth: Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -223,9 +224,6 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton<CustomerRemoteDataSource>(
     () => CustomerRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
-  sl.registerLazySingleton<GetCustomerFilterCountsUseCase>(
-    () => GetCustomerFilterCountsUseCase(sl<CustomerRepository>()),
-  );
 
   // Customers: Repositories
   sl.registerLazySingleton<CustomerRepository>(
@@ -251,10 +249,7 @@ Future<void> initServiceLocator() async {
 
   // Customers: Cubits
   sl.registerFactory<CustomersCubit>(
-    () => CustomersCubit(
-      getCustomersUseCase: sl<GetCustomersUseCase>(),
-      getCustomerFilterCountsUseCase: sl<GetCustomerFilterCountsUseCase>(),
-    ),
+    () => CustomersCubit(getCustomersUseCase: sl<GetCustomersUseCase>()),
   );
 
   sl.registerFactory<AddEditCustomerCubit>(
@@ -449,9 +444,7 @@ Future<void> initServiceLocator() async {
   );
 
   // Permission Service
-  sl.registerLazySingleton<PermissionService>(
-    () => PermissionServiceImpl(),
-  );
+  sl.registerLazySingleton<PermissionService>(() => PermissionServiceImpl());
 
   // Company Cubit
   sl.registerLazySingleton<CompanyCubit>(
@@ -478,6 +471,8 @@ Future<void> initServiceLocator() async {
 
   // Dashboard: Cubits
   sl.registerFactory<DashboardCubit>(
-    () => DashboardCubit(getDashboardStatsUseCase: sl<GetDashboardStatsUseCase>()),
+    () => DashboardCubit(
+      getDashboardStatsUseCase: sl<GetDashboardStatsUseCase>(),
+    ),
   );
 }
