@@ -52,45 +52,45 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<CreateInvoiceCubit, CreateInvoiceState>(
+      listenWhen: (prev, curr) =>
+          curr is CreateInvoiceSuccess || curr is CreateInvoiceError,
       listener: (context, state) {
         if (state is CreateInvoiceSuccess) {
           AppSnackbar.success(context, AppStrings.invoiceCreated);
-          // Navigate to the invoice details screen or show a success message
           context.go(AppRoutes.invoiceDetailsPath(state.invoiceId));
         }
         if (state is CreateInvoiceError) {
           AppSnackbar.error(context, state.failure.message);
         }
       },
-      child: BlocBuilder<CreateInvoiceCubit, CreateInvoiceState>(
-        builder: (context, state) {
-          return Scaffold(
-            backgroundColor: AppColors.appBackground,
-            appBar: AppBar(
-              backgroundColor: AppColors.appBackground,
-              elevation: 0,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  color: AppColors.textDark,
-                  size: AppSizes.iconMedium,
-                ),
-                onPressed: () => context.pop(),
-              ),
-              title: Text(
-                AppStrings.invoiceCreateSale,
-                style: TextStyle(
-                  fontSize: AppSizes.fontXLarge,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textDark,
-                ),
-              ),
+      child: Scaffold(
+        backgroundColor: AppColors.appBackground,
+        appBar: AppBar(
+          backgroundColor: AppColors.appBackground,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: AppColors.textDark,
+              size: AppSizes.iconMedium,
             ),
-            body: state is CreateInvoiceLoading
-                ? const CreateInvoiceLoadingState()
-                : CreateInvoiceForm(lockCustomer: widget.lockCustomer),
-          );
-        },
+            onPressed: () => context.pop(),
+          ),
+          title: Text(
+            AppStrings.invoiceCreateSale,
+            style: TextStyle(
+              fontSize: AppSizes.fontXLarge,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+          ),
+        ),
+        body: BlocSelector<CreateInvoiceCubit, CreateInvoiceState, bool>(
+          selector: (s) => s is CreateInvoiceLoading,
+          builder: (context, isLoading) => isLoading
+              ? const CreateInvoiceLoadingState()
+              : CreateInvoiceForm(lockCustomer: widget.lockCustomer),
+        ),
       ),
     );
   }

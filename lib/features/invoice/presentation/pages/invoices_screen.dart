@@ -102,6 +102,8 @@ class _InvoicesScreenState extends State<InvoicesScreen>
             _buildFilters(hasActiveFilter),
             Expanded(
               child: BlocBuilder<InvoicesCubit, InvoicesState>(
+                buildWhen: (prev, curr) =>
+                    prev.status != curr.status || prev.invoices != curr.invoices || prev.failure != curr.failure,
                 builder: (context, state) {
                   switch (state.status) {
                     case InvoicesStatus.initial:
