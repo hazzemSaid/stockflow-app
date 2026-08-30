@@ -1,8 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:makhzanflow/core/api/api_client.dart';
+import 'package:makhzanflow/core/storage/file_upload_service.dart';
 import 'package:makhzanflow/core/storage/token_storage.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:makhzanflow/core/company/company_cubit.dart';
 import 'package:makhzanflow/core/permissions/permission_service.dart';
 import 'package:makhzanflow/core/permissions/permission_service_impl.dart';
@@ -104,10 +104,13 @@ import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
 final sl = GetIt.instance;
 
 Future<void> initServiceLocator() async {
-  // Core: Token storage + API client
+  // Core: Token storage + API client + file upload
   sl.registerLazySingleton<TokenStorage>(() => TokenStorage());
   sl.registerLazySingleton<ApiClient>(
     () => ApiClient(tokenStorage: sl<TokenStorage>()),
+  );
+  sl.registerLazySingleton<FileUploadService>(
+    () => FileUploadService(apiClient: sl<ApiClient>()),
   );
 
   // Auth: Data sources
@@ -449,7 +452,7 @@ Future<void> initServiceLocator() async {
     ),
   );
 
-  // Company Settings Cubit
+  // Company Settings Cubit — uses FileUploadService (SRP)
   sl.registerFactory<CompanySettingsCubit>(
     () => CompanySettingsCubit(
       updateCompanyUseCase: sl<UpdateCompanyUseCase>(),
@@ -457,6 +460,7 @@ Future<void> initServiceLocator() async {
       regenerateCompanyJoinCodeUseCase: sl<RegenerateCompanyJoinCodeUseCase>(),
       leaveCompanyUseCase: sl<LeaveCompanyUseCase>(),
       deleteCompanyUseCase: sl<DeleteCompanyUseCase>(),
+      fileUploadService: sl<FileUploadService>(),
     ),
   );
 
@@ -471,9 +475,9 @@ Future<void> initServiceLocator() async {
     ),
   );
 
-  // Dashboard: Data sources
+  // Dashboard: Data sources — REST via ApiClient
   sl.registerLazySingleton<DashboardRemoteDataSource>(
-    () => DashboardRemoteDataSourceImpl(Supabase.instance.client),
+    () => DashboardRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
 
   // Dashboard: Repositories

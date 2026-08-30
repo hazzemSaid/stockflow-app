@@ -418,7 +418,10 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
       companyId,
       userId,
       const UpdateMemberRequestDto(role: 'owner'),
-    ).then((result) => result.map((_) => null));
+    ).then(
+      // ignore: avoid_returning_null_for_void
+      (result) => result.map((_) => null),
+    );
   }
 
   @override
@@ -431,7 +434,10 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
       companyId,
       userId,
       UpdateMemberRequestDto(role: 'member', permissions: permissions),
-    ).then((result) => result.map((_) => null));
+    ).then(
+      // ignore: avoid_returning_null_for_void
+      (result) => result.map((_) => null),
+    );
   }
 
   @override

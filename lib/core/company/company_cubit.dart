@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:makhzanflow/core/company/company_state.dart';
@@ -50,23 +49,17 @@ class CompanyCubit extends Cubit<CompanyState> {
     CompanyMember? membership,
     List<Company>? allCompanies,
   }) async {
-    debugPrint(
-      '[CompanyCubit] switchCompany — id=${company.id}, name=${company.name}',
-    );
     await _secureStorage.write(key: _lastCompanyKey, value: company.id);
     sl<PermissionService>().clear();
 
     final m = membership ?? await _fetchMyMembership(company.id);
-    debugPrint('[CompanyCubit] membership=$m');
     if (m != null) {
-      debugPrint('[CompanyCubit] loading permissions for memberId=${m.id}');
       await sl<PermissionService>().loadPermissions(
         company.id,
         m.id,
         Map<String, dynamic>.from(m.permissions),
         isOwner: m.isOwner,
       );
-      debugPrint('[CompanyCubit] permissions loaded successfully');
     }
 
     final allCompaniesList = allCompanies ?? switch (state) {
@@ -89,11 +82,6 @@ class CompanyCubit extends Cubit<CompanyState> {
       final authState = sl<AuthCubit>().state;
       final userId = authState is Authenticated ? authState.user.id : null;
       if (userId == null) {
-        debugPrint(
-          '[CompanyCubit] _fetchMyMembership: AuthCubit not in '
-          'Authenticated state (${authState.runtimeType}), '
-          'cannot fetch membership',
-        );
         return null;
       }
       final useCase = sl<GetCompanyMembersUseCase>();

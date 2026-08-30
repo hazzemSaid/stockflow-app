@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:makhzanflow/core/constants/app_strings.dart';
-import 'package:makhzanflow/core/utils/image_data_uri.dart';
+import 'package:makhzanflow/core/storage/file_upload_service.dart';
 import 'package:makhzanflow/features/companies/domain/entities/company.dart';
 import 'package:makhzanflow/features/companies/domain/usecases/update_company_usecase.dart';
 import 'package:makhzanflow/features/companies/domain/usecases/get_company_join_code_usecase.dart';
@@ -69,6 +68,7 @@ class CompanySettingsCubit extends Cubit<CompanySettingsState> {
   final LeaveCompanyUseCase _leaveCompanyUseCase;
   final DeleteCompanyUseCase _deleteCompanyUseCase;
   final ImagePicker _picker;
+  final FileUploadService _fileUploadService;
 
   CompanySettingsCubit({
     required UpdateCompanyUseCase updateCompanyUseCase,
@@ -77,12 +77,14 @@ class CompanySettingsCubit extends Cubit<CompanySettingsState> {
     required LeaveCompanyUseCase leaveCompanyUseCase,
     required DeleteCompanyUseCase deleteCompanyUseCase,
     ImagePicker? picker,
+    FileUploadService? fileUploadService,
   })  : _updateCompanyUseCase = updateCompanyUseCase,
         _getCompanyJoinCodeUseCase = getCompanyJoinCodeUseCase,
         _regenerateCompanyJoinCodeUseCase = regenerateCompanyJoinCodeUseCase,
         _leaveCompanyUseCase = leaveCompanyUseCase,
         _deleteCompanyUseCase = deleteCompanyUseCase,
         _picker = picker ?? ImagePicker(),
+        _fileUploadService = fileUploadService ?? const FileUploadService(),
         super(const CompanySettingsInitial());
 
   void loadFromCompany(Company company) {
@@ -170,14 +172,18 @@ class CompanySettingsCubit extends Cubit<CompanySettingsState> {
 
     String? logoUrl;
     if (imagePath != null) {
-      try {
-        logoUrl = await fileToDataUri(File(imagePath));
-      } on Exception {
-        emit(CompanySettingsError(
-          '${AppStrings.uploadLogoError}: تعذر رفع الشعار',
-        ));
-        return;
-      }
+      final uploadResult = await _fileUploadService.toDataUri(imagePath);
+      final shouldAbort = uploadResult.fold(
+        (failure) {
+          emit(CompanySettingsError(failure.message));
+          return true;
+        },
+        (uri) {
+          logoUrl = uri;
+          return false;
+        },
+      );
+      if (shouldAbort) return;
     }
 
     final result = await _updateCompanyUseCase.call(
