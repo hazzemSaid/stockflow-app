@@ -64,7 +64,13 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
 
   Future<void> _loadJoinCode() async {
     setState(() => _joinCodeLoading = true);
-    final code = await context.read<CompanySettingsCubit>().getJoinCode();
+    final companyState = context.read<CompanyCubit>().state;
+    final companyId = companyState is CompanySelected ? companyState.company.id : null;
+    if (companyId == null) {
+      setState(() => _joinCodeLoading = false);
+      return;
+    }
+    final code = await context.read<CompanySettingsCubit>().getJoinCode(companyId);
     if (mounted) {
       setState(() {
         _joinCode = code;
@@ -468,7 +474,13 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
             onPressed: () async {
               Navigator.pop(context);
               final cubit = context.read<CompanySettingsCubit>();
-              final newCode = await cubit.regenerateJoinCode();
+              final companyState = context.read<CompanyCubit>().state;
+              final companyId = companyState is CompanySelected
+                  ? companyState.company.id
+                  : null;
+              final newCode = companyId == null
+                  ? null
+                  : await cubit.regenerateJoinCode(companyId);
               if (mounted) {
                 if (newCode != null) {
                   setState(() => _joinCode = newCode);

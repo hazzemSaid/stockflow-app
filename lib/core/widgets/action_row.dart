@@ -12,6 +12,7 @@ class ActionRow extends StatelessWidget {
   final Color labelColor;
   final VoidCallback onTap;
   final bool showTopPadding;
+  final bool isLoading;
 
   const ActionRow({
     super.key,
@@ -22,12 +23,13 @@ class ActionRow extends StatelessWidget {
     required this.labelColor,
     required this.onTap,
     this.showTopPadding = false,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       child: Padding(
         padding: EdgeInsets.only(top: showTopPadding ? 4.h : 0),
         child: Padding(
@@ -41,7 +43,19 @@ class ActionRow extends StatelessWidget {
                   color: iconBg,
                   borderRadius: BorderRadius.circular(14.r),
                 ),
-                child: Icon(icon, size: 16.w, color: iconColor),
+                child: isLoading
+                    ? Padding(
+                        padding: EdgeInsets.all(8.w),
+                        child: SizedBox(
+                          width: 16.w,
+                          height: 16.w,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: iconColor,
+                          ),
+                        ),
+                      )
+                    : Icon(icon, size: 16.w, color: iconColor),
               ),
               SizedBox(width: 12.w),
               Text(

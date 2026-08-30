@@ -259,10 +259,16 @@ class AppStrings {
   static const String productCategoryAll = 'الكل';
   static const String productNameLabel = 'اسم المنتج';
   static const String productNameHint = 'أدخل اسم المنتج';
+  static const String productSkuLabel = 'كود المنتج (SKU)';
+  static const String productSkuHint = 'اتركه فارغاً للتوليد التلقائي';
+  static const String productBarcodeLabel = 'الباركود';
+  static const String productBarcodeHint = 'اختياري';
   static const String productPriceLabel = 'السعر';
   static const String productPriceHint = '٠٫٠٠';
   static const String productQuantityLabel = 'الكمية';
   static const String productQuantityHint = '٠';
+  static const String productMinStockLabel = 'الحد الأدنى للمخزون';
+  static const String productMinStockHint = '٠';
   static const String productImagePicker = 'اختر صورة';
   static const String productImageGallery = 'المعرض';
   static const String productImageCamera = 'الكاميرا';
@@ -433,6 +439,13 @@ class AppStrings {
   static const String invoiceNo = 'فاتورة';
   static const String printInvoice = 'طباعة الفاتورة';
   static const String shareInvoice = 'مشاركة';
+  static const String cancelInvoice = 'إلغاء الفاتورة';
+  static const String cancelInvoiceConfirmTitle = 'تأكيد الإلغاء';
+  static const String cancelInvoiceConfirmBody =
+      'هل أنت متأكد من إلغاء هذه الفاتورة؟ سيتم إرجاع الكميات إلى المخزون ولا يمكن التراجع.';
+  static const String cancelInvoiceSuccess = 'تم إلغاء الفاتورة وإرجاع المخزون';
+  static const String cancelInvoiceAction = 'تأكيد الإلغاء';
+  static const String cancelInvoiceStockNote = 'سيتم إرجاع المنتجات إلى المخزون تلقائياً';
   static const String mainWarehouse = 'مخزن التوزيع الرئيسي';
   static const String invoiceNumber = 'رقم الفاتورة';
   static const String date = 'التاريخ';

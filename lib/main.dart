@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:makhzanflow/core/env.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'config/theme/theme.dart';
@@ -16,10 +15,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  await Supabase.initialize(
-    url: MakhzanFlowEnv.supabaseUrl,
-    anonKey: MakhzanFlowEnv.supabaseAnonKey,
-  );
 
   await initServiceLocator();
 
@@ -27,6 +22,7 @@ void main() async {
     await SentryFlutter.init((options) {
       options.dsn = MakhzanFlowEnv.sentryDsn;
       options.tracesSampleRate = 1.0;
+      // ignore: experimental_member_use
       options.profilesSampleRate = 1.0;
     }, appRunner: () => runApp(SentryWidget(child: const MyApp())));
   } else {

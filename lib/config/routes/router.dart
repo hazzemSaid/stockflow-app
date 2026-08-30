@@ -2,7 +2,24 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:makhzanflow/core/storage/file_upload_service.dart';
+import 'package:makhzanflow/features/auth/presentation/cubit/create_company_cubit.dart';
+import 'package:makhzanflow/features/companies/domain/usecases/create_company_full_usecase.dart';
+import 'package:makhzanflow/features/companies/presentation/cubit/company_members_cubit.dart';
 import 'package:makhzanflow/features/companies/presentation/cubit/company_settings_cubit.dart';
+import 'package:makhzanflow/features/customers/presentation/cubit/add_edit_customer/add_edit_customer_cubit.dart';
+import 'package:makhzanflow/features/customers/presentation/cubit/customer_details/customer_details_cubit.dart';
+import 'package:makhzanflow/features/customers/presentation/cubit/customer_invoices/customer_invoices_cubit.dart';
+import 'package:makhzanflow/features/customers/presentation/cubit/customers/customers_cubit.dart';
+import 'package:makhzanflow/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:makhzanflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
+import 'package:makhzanflow/features/invoice/presentation/cubit/add_payment/add_payment_cubit.dart';
+import 'package:makhzanflow/features/invoice/presentation/cubit/create_invoice/create_invoice_cubit.dart';
+import 'package:makhzanflow/features/invoice/presentation/cubit/invoice_details/invoice_details_cubit.dart';
+import 'package:makhzanflow/features/products/presentation/cubit/add_edit_product/add_edit_product_cubit.dart';
+import 'package:makhzanflow/features/products/presentation/cubit/product_details/product_details_cubit.dart';
+import 'package:makhzanflow/features/products/presentation/cubit/products/products_cubit.dart';
 import '../../core/constants/app_routes.dart';
 import '../../core/di/service_locator.dart';
 import '../../core/company/company_cubit.dart';
@@ -17,6 +34,7 @@ import '../../features/auth/presentation/pages/create_company_screen.dart';
 import '../../features/auth/presentation/pages/welcome_screen.dart';
 import '../../features/auth/presentation/pages/join_business_screen.dart';
 import '../../features/auth/presentation/pages/pending_approval_screen.dart';
+import '../../features/auth/presentation/pages/email_verification_screen.dart';
 import '../../features/companies/presentation/cubit/join_company_cubit.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../../features/products/presentation/pages/products_screen.dart';
@@ -42,6 +60,7 @@ final List<String> _authRoutes = [
   AppRoutes.splash,
   AppRoutes.login,
   AppRoutes.register,
+  AppRoutes.emailVerification,
 ];
 final List<String> _companyRoutes = [
   AppRoutes.companySelect,
@@ -82,10 +101,12 @@ final ChangeNotifier _authStateNotifier = _AuthStateNotifier();
 
 class _AuthStateNotifier extends ChangeNotifier {
   Timer? _debounce;
+  late final StreamSubscription _authSub;
+  late final StreamSubscription _companySub;
 
   _AuthStateNotifier() {
-    sl<AuthCubit>().stream.listen((_) => _schedule());
-    sl<CompanyCubit>().stream.listen((_) => _schedule());
+    _authSub = sl<AuthCubit>().stream.listen((_) => _schedule());
+    _companySub = sl<CompanyCubit>().stream.listen((_) => _schedule());
   }
 
   void _schedule() {
@@ -96,12 +117,42 @@ class _AuthStateNotifier extends ChangeNotifier {
   @override
   void dispose() {
     _debounce?.cancel();
+    _authSub.cancel();
+    _companySub.cancel();
+    super.dispose();
+  }
+}
+
+/// Helper to make GoRouter rebuild on stream changes.
+/// Use as `refreshListenable: GoRouterRefreshStream(authCubit.stream)`
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
     super.dispose();
   }
 }
 
 Page<void> _buildFullScreenPage<T>(GoRouterState state, Widget child) {
   return NoTransitionPage(key: ValueKey(state.uri.toString()), child: child);
+}
+
+Widget _buildCreateCompanyPage() {
+  return BlocProvider(
+    create: (_) => CreateCompanyCubit(
+      createCompanyFullUseCase: sl<CreateCompanyFullUseCase>(),
+      companyCubit: sl<CompanyCubit>(),
+      picker: ImagePicker(),
+      fileUploadService: sl<FileUploadService>(),
+    ),
+    child: const CreateCompanyScreen(),
+  );
 }
 
 final GoRouter appRouter = GoRouter(
@@ -115,6 +166,11 @@ final GoRouter appRouter = GoRouter(
 
     if (authState is AuthInitial || authState is AuthLoading) {
       return null;
+    }
+
+    if (authState is EmailVerificationPending) {
+      if (location == AppRoutes.emailVerification) return null;
+      return AppRoutes.emailVerification;
     }
 
     if (authState is Authenticated) {
@@ -188,6 +244,15 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
+      path: AppRoutes.emailVerification,
+      builder: (context, state) {
+        final email = state.extra as String? ??
+            sl<AuthCubit>().pendingVerificationEmail ??
+            '';
+        return EmailVerificationScreen(email: email);
+      },
+    ),
+    GoRoute(
       path: AppRoutes.companySelect,
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const CompanySelectionScreen(),
@@ -195,7 +260,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.companyCreate,
       parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => const CreateCompanyScreen(),
+      builder: (context, state) => _buildCreateCompanyPage(),
     ),
     GoRoute(
       path: AppRoutes.welcome,
@@ -205,23 +270,29 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.welcomeCreate,
       parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => const CreateCompanyScreen(),
+      builder: (context, state) => _buildCreateCompanyPage(),
     ),
     GoRoute(
       path: AppRoutes.welcomeJoin,
       parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => const JoinBusinessScreen(),
+      builder: (context, state) => BlocProvider(
+        create: (_) => sl<JoinCompanyCubit>(),
+        child: const JoinBusinessScreen(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.welcomePending,
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) {
         final args = state.extra as Map<String, dynamic>;
-        return PendingApprovalScreen(
-          requestId: args['requestId'] as String,
-          companyId: args['companyId'] as String,
-          companyName: args['companyName'] as String,
-          companyLogo: args['companyLogo'] as String?,
+        return BlocProvider(
+          create: (_) => sl<JoinCompanyCubit>(),
+          child: PendingApprovalScreen(
+            requestId: args['requestId'] as String,
+            companyId: args['companyId'] as String,
+            companyName: args['companyName'] as String,
+            companyLogo: args['companyLogo'] as String?,
+          ),
         );
       },
     ),
@@ -233,7 +304,10 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.dashboard,
-              builder: (context, state) => const DashboardScreen(),
+              builder: (context, state) => BlocProvider<DashboardCubit>(
+                create: (_) => sl<DashboardCubit>(),
+                child: const DashboardScreen(),
+              ),
             ),
           ],
         ),
@@ -241,13 +315,21 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.products,
-              builder: (context, state) => const ProductsScreen(),
+              builder: (context, state) => BlocProvider<ProductsCubit>(
+                create: (_) => sl<ProductsCubit>(),
+                child: const ProductsScreen(),
+              ),
               routes: [
                 GoRoute(
                   path: 'new',
                   parentNavigatorKey: _rootNavigatorKey,
-                  pageBuilder: (context, state) =>
-                      _buildFullScreenPage(state, const AddEditProductScreen()),
+                  pageBuilder: (context, state) => _buildFullScreenPage(
+                    state,
+                    BlocProvider(
+                      create: (_) => sl<AddEditProductCubit>(),
+                      child: const AddEditProductScreen(),
+                    ),
+                  ),
                 ),
                 GoRoute(
                   path: ':id',
@@ -256,7 +338,10 @@ final GoRouter appRouter = GoRouter(
                     final id = state.pathParameters['id']!;
                     return _buildFullScreenPage(
                       state,
-                      ProductDetailsScreen(productId: id),
+                      BlocProvider(
+                        create: (_) => sl<ProductDetailsCubit>(),
+                        child: ProductDetailsScreen(productId: id),
+                      ),
                     );
                   },
                   routes: [
@@ -267,7 +352,10 @@ final GoRouter appRouter = GoRouter(
                         final id = state.pathParameters['id']!;
                         return _buildFullScreenPage(
                           state,
-                          AddEditProductScreen(productId: id),
+                          BlocProvider(
+                            create: (_) => sl<AddEditProductCubit>(),
+                            child: AddEditProductScreen(productId: id),
+                          ),
                         );
                       },
                     ),
@@ -281,14 +369,20 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.customers,
-              builder: (context, state) => const CustomersScreen(),
+              builder: (context, state) => BlocProvider<CustomersCubit>(
+                create: (_) => sl<CustomersCubit>(),
+                child: const CustomersScreen(),
+              ),
               routes: [
                 GoRoute(
                   path: 'add',
                   parentNavigatorKey: _rootNavigatorKey,
                   pageBuilder: (context, state) => _buildFullScreenPage(
                     state,
-                    const AddEditCustomerScreen(),
+                    BlocProvider(
+                      create: (_) => sl<AddEditCustomerCubit>(),
+                      child: const AddEditCustomerScreen(),
+                    ),
                   ),
                 ),
                 GoRoute(
@@ -298,7 +392,10 @@ final GoRouter appRouter = GoRouter(
                     final id = state.pathParameters['id']!;
                     return _buildFullScreenPage(
                       state,
-                      CustomerDetailsScreen(customerId: id),
+                      BlocProvider(
+                        create: (_) => sl<CustomerDetailsCubit>(),
+                        child: CustomerDetailsScreen(customerId: id),
+                      ),
                     );
                   },
                   routes: [
@@ -309,7 +406,10 @@ final GoRouter appRouter = GoRouter(
                         final id = state.pathParameters['id']!;
                         return _buildFullScreenPage(
                           state,
-                          AddEditCustomerScreen(customerId: id),
+                          BlocProvider(
+                            create: (_) => sl<AddEditCustomerCubit>(),
+                            child: AddEditCustomerScreen(customerId: id),
+                          ),
                         );
                       },
                     ),
@@ -321,9 +421,12 @@ final GoRouter appRouter = GoRouter(
                         final customerName = state.extra as String?;
                         return _buildFullScreenPage(
                           state,
-                          AddPaymentScreen(
-                            customerId: id,
-                            customerName: customerName,
+                          BlocProvider(
+                            create: (_) => sl<AddPaymentCubit>(),
+                            child: AddPaymentScreen(
+                              customerId: id,
+                              customerName: customerName,
+                            ),
                           ),
                         );
                       },
@@ -334,11 +437,23 @@ final GoRouter appRouter = GoRouter(
                       pageBuilder: (context, state) {
                         final id = state.pathParameters['id']!;
                         final customerName = state.extra as String? ?? '';
+                        final companyState = sl<CompanyCubit>().state;
+                        final companyId = companyState is CompanySelected
+                            ? companyState.companyId
+                            : '';
                         return _buildFullScreenPage(
                           state,
-                          CustomerInvoicesScreen(
-                            customerId: id,
-                            customerName: customerName,
+                          BlocProvider(
+                            create: (_) => CustomerInvoicesCubit(
+                              getInvoicesUseCase: sl<GetInvoicesUseCase>(),
+                              customerId: id,
+                              companyId: companyId,
+                              customerName: customerName,
+                            ),
+                            child: CustomerInvoicesScreen(
+                              customerId: id,
+                              customerName: customerName,
+                            ),
                           ),
                         );
                       },
@@ -367,10 +482,13 @@ final GoRouter appRouter = GoRouter(
                         extra != null && extra.containsKey('customerId');
                     return _buildFullScreenPage(
                       state,
-                      CreateInvoiceScreen(
-                        preselectedCustomerId: extra?['customerId'],
-                        preselectedCustomerName: extra?['customerName'],
-                        lockCustomer: hasCustomer,
+                      BlocProvider(
+                        create: (_) => sl<CreateInvoiceCubit>(),
+                        child: CreateInvoiceScreen(
+                          preselectedCustomerId: extra?['customerId'],
+                          preselectedCustomerName: extra?['customerName'],
+                          lockCustomer: hasCustomer,
+                        ),
                       ),
                     );
                   },
@@ -382,7 +500,10 @@ final GoRouter appRouter = GoRouter(
                     final id = state.pathParameters['id']!;
                     return _buildFullScreenPage(
                       state,
-                      InvoiceDetailsScreen(invoiceId: id),
+                      BlocProvider(
+                        create: (_) => sl<InvoiceDetailsCubit>(),
+                        child: InvoiceDetailsScreen(invoiceId: id),
+                      ),
                     );
                   },
                 ),
@@ -418,8 +539,16 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'members',
                   parentNavigatorKey: _rootNavigatorKey,
-                  pageBuilder: (context, state) =>
-                      _buildFullScreenPage(state, const MembersPage()),
+                  pageBuilder: (context, state) => _buildFullScreenPage(
+                    state,
+                    MultiBlocProvider(
+                      providers: [
+                        BlocProvider(create: (_) => sl<CompanyMembersCubit>()),
+                        BlocProvider(create: (_) => sl<CompanySettingsCubit>()),
+                      ],
+                      child: const MembersPage(),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -7,10 +7,8 @@ import 'package:makhzanflow/core/constants/app_colors.dart';
 import 'package:makhzanflow/core/constants/app_routes.dart';
 import 'package:makhzanflow/core/constants/app_sizes.dart';
 import 'package:makhzanflow/core/constants/app_strings.dart';
-import 'package:makhzanflow/core/di/service_locator.dart';
 import 'package:makhzanflow/features/invoice/domain/entities/invoice.dart';
 import 'package:makhzanflow/features/invoice/domain/entities/invoice_status.dart';
-import 'package:makhzanflow/features/invoice/domain/usecases/get_invoices_usecase.dart';
 import '../cubit/customer_invoices/customer_invoices_cubit.dart';
 
 class CustomerInvoicesScreen extends StatefulWidget {
@@ -29,33 +27,25 @@ class CustomerInvoicesScreen extends StatefulWidget {
 
 class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen>
     with CompanyAwareState<CustomerInvoicesScreen> {
-  late CustomerInvoicesCubit _cubit;
+  late final CustomerInvoicesCubit _cubit;
   final ScrollController _scrollController = ScrollController();
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _cubit = CustomerInvoicesCubit(
-      getInvoicesUseCase: sl<GetInvoicesUseCase>(),
-      customerId: widget.customerId,
-      companyId: companyId,
-      customerName: widget.customerName,
-    );
-    _cubit.loadInvoices();
-    _scrollController.addListener(_onScroll);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _cubit = context.read<CustomerInvoicesCubit>();
+      _cubit.loadInvoices();
+      _scrollController.addListener(_onScroll);
+      _initialized = true;
+    }
   }
 
   @override
   void onCompanyChanged(String companyId) {
-    _cubit.close();
-    _cubit = CustomerInvoicesCubit(
-      getInvoicesUseCase: sl<GetInvoicesUseCase>(),
-      customerId: widget.customerId,
-      companyId: companyId,
-      customerName: widget.customerName,
-    );
-    setState(() {});
-    _cubit.loadInvoices();
+    // The cubit is created by the route with the company selected at push
+    // time; this screen is full-screen, so the company cannot change here.
   }
 
   void _onScroll() {
@@ -69,7 +59,6 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen>
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
-    _cubit.close();
     super.dispose();
   }
 
@@ -89,49 +78,44 @@ class _CustomerInvoicesScreenState extends State<CustomerInvoicesScreen>
           ),
         ),
       ),
-      body: BlocProvider.value(
-        value: _cubit,
-        child: BlocBuilder<CustomerInvoicesCubit, CustomerInvoicesState>(
-          builder: (context, state) {
-            return switch (state.status) {
-              CustomerInvoicesStatus.initial ||
-              CustomerInvoicesStatus.loading => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              CustomerInvoicesStatus.error => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      state.failure?.message ?? AppStrings.unexpectedError,
+      body: BlocBuilder<CustomerInvoicesCubit, CustomerInvoicesState>(
+        builder: (context, state) {
+          return switch (state.status) {
+            CustomerInvoicesStatus.initial || CustomerInvoicesStatus.loading =>
+              const Center(child: CircularProgressIndicator()),
+            CustomerInvoicesStatus.error => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    state.failure?.message ?? AppStrings.unexpectedError,
+                    style: const TextStyle(fontFamily: 'Cairo'),
+                  ),
+                  SizedBox(height: AppSizes.spacingMedium),
+                  TextButton(
+                    onPressed: () => _cubit.loadInvoices(),
+                    child: Text(
+                      AppStrings.productRetry,
                       style: const TextStyle(fontFamily: 'Cairo'),
                     ),
-                    SizedBox(height: AppSizes.spacingMedium),
-                    TextButton(
-                      onPressed: () => _cubit.loadInvoices(),
-                      child: Text(
-                        AppStrings.productRetry,
-                        style: const TextStyle(fontFamily: 'Cairo'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              CustomerInvoicesStatus.loadingMore ||
-              CustomerInvoicesStatus.success => _buildList(state),
-              CustomerInvoicesStatus.empty => Center(
-                child: Text(
-                  AppStrings.emptyInvoices,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: AppSizes.fontMedium,
-                    color: AppColors.textSecondary,
                   ),
+                ],
+              ),
+            ),
+            CustomerInvoicesStatus.loadingMore ||
+            CustomerInvoicesStatus.success => _buildList(state),
+            CustomerInvoicesStatus.empty => Center(
+              child: Text(
+                AppStrings.emptyInvoices,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: AppSizes.fontMedium,
+                  color: AppColors.textSecondary,
                 ),
               ),
-            };
-          },
-        ),
+            ),
+          };
+        },
       ),
     );
   }

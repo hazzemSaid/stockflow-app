@@ -39,7 +39,10 @@ class _EditMemberPermissionsPageState
     setState(() => _isLoading = true);
 
     final cubit = context.read<CompanyMembersCubit>();
-    final existing = await cubit.getMemberPermissions(widget.member.id);
+    final existing = await cubit.getMemberPermissions(
+      widget.companyId,
+      widget.member.userId,
+    );
 
     final flat = <String, bool>{};
     for (final section in permissionSections.values) {
@@ -86,7 +89,7 @@ class _EditMemberPermissionsPageState
     final permissions = _buildPermissionsJson();
     await context.read<CompanyMembersCubit>().updateMemberPermissions(
           widget.companyId,
-          widget.member.id,
+          widget.member.userId,
           permissions,
         );
     if (mounted) {

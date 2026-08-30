@@ -4,6 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/permissions/permission_constants.dart';
+import '../../../../core/permissions/permission_service.dart';
+import '../../../../core/di/service_locator.dart';
 import '../../domain/entities/product.dart';
 import 'dashed_border_painter.dart';
 
@@ -150,8 +153,13 @@ class ProductActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
+    final ps = sl<PermissionService>();
+    final canEdit = ps.hasPermission(PermissionKeys.productsEdit);
+    final canDelete = ps.hasPermission(PermissionKeys.productsDelete);
+
+    final children = <Widget>[];
+    if (canEdit) {
+      children.add(
         Expanded(
           child: ElevatedButton.icon(
             onPressed: onEdit,
@@ -159,7 +167,13 @@ class ProductActionButtons extends StatelessWidget {
             label: Text(AppStrings.productEdit),
           ),
         ),
-        SizedBox(width: AppSizes.spacingMedium),
+      );
+    }
+    if (canEdit && canDelete) {
+      children.add(SizedBox(width: AppSizes.spacingMedium));
+    }
+    if (canDelete) {
+      children.add(
         Expanded(
           child: OutlinedButton.icon(
             onPressed: isDeleting ? null : onDelete,
@@ -178,7 +192,10 @@ class ProductActionButtons extends StatelessWidget {
             ),
           ),
         ),
-      ],
-    );
+      );
+    }
+
+    if (children.isEmpty) return const SizedBox.shrink();
+    return Row(children: children);
   }
 }

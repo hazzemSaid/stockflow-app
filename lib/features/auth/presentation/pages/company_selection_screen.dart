@@ -21,12 +21,10 @@ class _CompanySelectionScreenState extends State<CompanySelectionScreen> {
   @override
   void initState() {
     super.initState();
-    debugPrint('[CompanySelectionScreen] initState — calling loadCompanies');
     context.read<CompanyCubit>().loadCompanies();
   }
 
   Future<void> _selectCompany(Company company) async {
-    debugPrint('[CompanySelectionScreen] _selectCompany — id=${company.id}, name=${company.name}, businessType=${company.businessType}, logoUrl=${company.logoUrl}, inviteCode=${company.inviteCode}');
     await context.read<CompanyCubit>().switchCompany(company);
     if (!mounted) return;
     context.go(AppRoutes.dashboard);
@@ -38,14 +36,8 @@ class _CompanySelectionScreenState extends State<CompanySelectionScreen> {
       backgroundColor: AppColors.appBackground,
         body: BlocConsumer<CompanyCubit, CompanyState>(
           listener: (context, state) {
-          debugPrint('[CompanySelectionScreen] listener — state=$state');
           if (state is CompaniesLoaded) {
-            debugPrint('[CompanySelectionScreen] CompaniesLoaded — count=${state.companies.length}');
-            for (final c in state.companies) {
-              debugPrint('  company: id=${c.id}, name=${c.name}, status=${c.status}');
-            }
             if (state.companies.isEmpty) {
-              debugPrint('[CompanySelectionScreen] no companies — redirecting to /welcome');
               context.go(AppRoutes.welcome);
             }
           } else if (state is CompanyError) {

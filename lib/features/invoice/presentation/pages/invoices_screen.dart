@@ -55,9 +55,8 @@ class _InvoicesScreenState extends State<InvoicesScreen>
     );
   }
 
-void _setCustomerFilter(String? customerId) {
+  void _setCustomerFilter(String? customerId) {
     final resolvedId = customerId?.isEmpty == true ? null : customerId;
-    debugPrint('[_setCustomerFilter] raw: $customerId, resolved: $resolvedId, status: $_selectedStatus');
     setState(() => _selectedCustomerId = resolvedId ?? '');
     context.read<InvoicesCubit>().setFilter(
       companyId: companyId,
@@ -100,6 +99,8 @@ void _setCustomerFilter(String? customerId) {
             _buildFilters(hasActiveFilter),
             Expanded(
               child: BlocBuilder<InvoicesCubit, InvoicesState>(
+                buildWhen: (prev, curr) =>
+                    prev.status != curr.status || prev.invoices != curr.invoices || prev.failure != curr.failure,
                 builder: (context, state) {
                   switch (state.status) {
                     case InvoicesStatus.initial:
@@ -200,7 +201,7 @@ void _setCustomerFilter(String? customerId) {
                           label: AppStrings.customerAllFilter,
                           selected:
                               _selectedStatus == null &&
-                              _selectedCustomerId == null,
+                              _selectedCustomerId.isEmpty,
                           onTap: _clearFilters,
                         ),
                         InvoiceFilterChip(
@@ -226,7 +227,7 @@ void _setCustomerFilter(String? customerId) {
                           label: AppStrings.customerAllFilter,
                           selected:
                               _selectedStatus == null &&
-                              _selectedCustomerId == null,
+                              _selectedCustomerId.isEmpty,
                           onTap: _clearFilters,
                         ),
                         SizedBox(width: AppSizes.spacingSmall),

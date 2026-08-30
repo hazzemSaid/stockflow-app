@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/company/company_cubit.dart';
 import '../../../../core/company/company_state.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -13,14 +12,40 @@ import '../../../../core/permissions/permission_service.dart';
 import '../../../../core/widgets/company_switcher.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _isLoggingOut = false;
+
+  Future<void> _handleSignOut() async {
+    if (_isLoggingOut) return;
+    setState(() => _isLoggingOut = true);
+    final companyCubit = context.read<CompanyCubit>();
     final authCubit = context.read<AuthCubit>();
+    final router = GoRouter.of(context);
+    try {
+      await companyCubit.clearCompany();
+      sl<PermissionService>().clear();
+      await authCubit.signOut();
+      if (mounted) router.go(AppRoutes.login);
+    } catch (_) {
+      if (mounted) router.go(AppRoutes.login);
+    } finally {
+      if (mounted) setState(() => _isLoggingOut = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final companyState = context.watch<CompanyCubit>().state;
-    final isOwner = companyState is CompanySelected && companyState.membership?.isOwner == true;
+    final isOwner =
+        companyState is CompanySelected &&
+        companyState.membership?.isOwner == true;
 
     return SafeArea(
       child: ListView(
@@ -50,11 +75,18 @@ class SettingsScreen extends StatelessWidget {
             child: ListTile(
               leading: Icon(Icons.logout, color: AppColors.error),
               title: Text(AppStrings.signOut),
-              onTap: () {
-                context.read<CompanyCubit>().clearCompany();
-                sl<PermissionService>().clear();
-                authCubit.signOut();
-              },
+              trailing: _isLoggingOut
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.error,
+                      ),
+                    )
+                  : null,
+              enabled: !_isLoggingOut,
+              onTap: _isLoggingOut ? null : _handleSignOut,
             ),
           ),
         ],

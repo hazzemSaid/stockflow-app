@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:makhzanflow/core/constants/app_colors.dart';
-import 'package:makhzanflow/core/constants/app_routes.dart';
 import 'package:makhzanflow/core/constants/app_sizes.dart';
 import 'package:makhzanflow/core/constants/app_strings.dart';
 import 'package:makhzanflow/features/companies/domain/entities/company.dart';
 import 'package:makhzanflow/features/dashboard/domain/entities/dashboard_stats.dart';
-import 'activity_list.dart';
 import 'dashboard_metrics_grid.dart';
 import 'dashboard_quick_actions_grid.dart';
 import 'dashboard_header.dart';

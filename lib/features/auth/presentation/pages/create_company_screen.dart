@@ -5,12 +5,7 @@ import 'package:makhzanflow/core/constants/app_colors.dart';
 import 'package:makhzanflow/core/constants/app_sizes.dart';
 import 'package:makhzanflow/core/constants/app_routes.dart';
 import 'package:makhzanflow/core/constants/app_strings.dart';
-import 'package:makhzanflow/core/di/service_locator.dart';
 import 'package:makhzanflow/core/widgets/app_snackbar.dart';
-import 'package:makhzanflow/core/company/company_cubit.dart';
-import 'package:makhzanflow/features/companies/domain/usecases/create_company_full_usecase.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:makhzanflow/features/auth/presentation/cubit/create_company_cubit.dart';
 import 'package:makhzanflow/features/auth/presentation/widgets/logo_picker.dart';
 
@@ -72,59 +67,51 @@ class _CreateCompanyScreenState extends State<CreateCompanyScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      body: BlocProvider(
-        create: (_) => CreateCompanyCubit(
-          createCompanyFullUseCase: sl<CreateCompanyFullUseCase>(),
-          companyCubit: sl<CompanyCubit>(),
-          picker: ImagePicker(),
-          supabase: Supabase.instance.client,
-        ),
-        child: BlocConsumer<CreateCompanyCubit, CreateCompanyState>(
-          listener: (context, state) {
-            if (state.status == CreateCompanyStatus.success) {
-              context.go(AppRoutes.dashboard);
-            } else if (state.status == CreateCompanyStatus.error &&
-                state.errorMessage != null) {
-              AppSnackbar.error(context, state.errorMessage!);
-            }
-          },
-          builder: (context, state) {
-            return SafeArea(
-              child: Column(
-                children: [
-                  _buildHeader(context),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                        AppSizes.spacingMedium,
-                        AppSizes.spacingSmall,
-                        AppSizes.spacingMedium,
-                        AppSizes.spacingMedium,
-                      ),
-                      child: AnimatedBuilder(
-                        animation: _contentSlide,
-                        builder: (context, child) => Opacity(
-                          opacity: _contentFade.value,
-                          child: Transform.translate(
-                            offset: Offset(
-                              0,
-                              AppSizes.spacingLarge * (1 - _contentSlide.value),
-                            ),
-                            child: child,
+      body: BlocConsumer<CreateCompanyCubit, CreateCompanyState>(
+        listener: (context, state) {
+          if (state.status == CreateCompanyStatus.success) {
+            context.go(AppRoutes.dashboard);
+          } else if (state.status == CreateCompanyStatus.error &&
+              state.errorMessage != null) {
+            AppSnackbar.error(context, state.errorMessage!);
+          }
+        },
+        builder: (context, state) {
+          return SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(context),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSizes.spacingMedium,
+                      AppSizes.spacingSmall,
+                      AppSizes.spacingMedium,
+                      AppSizes.spacingMedium,
+                    ),
+                    child: AnimatedBuilder(
+                      animation: _contentSlide,
+                      builder: (context, child) => Opacity(
+                        opacity: _contentFade.value,
+                        child: Transform.translate(
+                          offset: Offset(
+                            0,
+                            AppSizes.spacingLarge * (1 - _contentSlide.value),
                           ),
+                          child: child,
                         ),
-                        child: Form(
-                          key: _formKey,
-                          child: _buildFormContent(context, state),
-                        ),
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: _buildFormContent(context, state),
                       ),
                     ),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -437,4 +424,3 @@ class _CreateCompanyScreenState extends State<CreateCompanyScreen>
     );
   }
 }
-

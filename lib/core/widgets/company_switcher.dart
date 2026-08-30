@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:makhzanflow/core/company/company_cubit.dart';
 import 'package:makhzanflow/core/company/company_state.dart';
+import 'package:makhzanflow/core/di/service_locator.dart';
+import 'package:makhzanflow/core/permissions/permission_service.dart';
 import 'package:makhzanflow/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:makhzanflow/core/constants/app_colors.dart';
 import 'package:makhzanflow/core/constants/app_sizes.dart';
@@ -22,12 +24,39 @@ class CompanySwitcher extends StatefulWidget {
 }
 
 class _CompanySwitcherState extends State<CompanySwitcher> {
+  bool _isLoggingOut = false;
+
   @override
   void initState() {
     super.initState();
     final state = context.read<CompanyCubit>().state;
     if (state is CompanyInitial) {
       context.read<CompanyCubit>().loadCompanies();
+    }
+  }
+
+  Future<void> _handleLogout(BuildContext sheetContext, void Function(void Function()) setSheetState) async {
+    if (_isLoggingOut) return;
+    setSheetState(() => _isLoggingOut = true);
+    setState(() => _isLoggingOut = true);
+    final companyCubit = context.read<CompanyCubit>();
+    final authCubit = context.read<AuthCubit>();
+    final router = GoRouter.of(context);
+    try {
+      await companyCubit.clearCompany();
+      sl<PermissionService>().clear();
+      await authCubit.signOut();
+      if (sheetContext.mounted && Navigator.canPop(sheetContext)) {
+        Navigator.pop(sheetContext);
+      }
+      if (mounted) router.go(AppRoutes.login);
+    } catch (_) {
+      if (sheetContext.mounted && Navigator.canPop(sheetContext)) {
+        Navigator.pop(sheetContext);
+      }
+      if (mounted) router.go(AppRoutes.login);
+    } finally {
+      if (mounted) setState(() => _isLoggingOut = false);
     }
   }
 
@@ -113,7 +142,8 @@ class _CompanySwitcherState extends State<CompanySwitcher> {
           top: Radius.circular(AppSizes.radiusXLarge),
         ),
       ),
-      builder: (_) => SafeArea(
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => SafeArea(
         child: SizedBox(
           height: 510.h,
           child: Padding(
@@ -233,11 +263,8 @@ class _CompanySwitcherState extends State<CompanySwitcher> {
                               iconBg: AppColors.lightRed,
                               iconColor: AppColors.redDark,
                               labelColor: AppColors.redDark,
-                              onTap: () {
-                                Navigator.pop(context);
-                                context.read<CompanyCubit>().clearCompany();
-                                context.read<AuthCubit>().signOut();
-                              },
+                              isLoading: _isLoggingOut,
+                              onTap: () => _handleLogout(sheetContext, setSheetState),
                               showTopPadding: true,
                             ),
                           ],
@@ -246,6 +273,7 @@ class _CompanySwitcherState extends State<CompanySwitcher> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );
