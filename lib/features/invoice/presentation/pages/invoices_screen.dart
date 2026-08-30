@@ -57,9 +57,6 @@ class _InvoicesScreenState extends State<InvoicesScreen>
 
   void _setCustomerFilter(String? customerId) {
     final resolvedId = customerId?.isEmpty == true ? null : customerId;
-    debugPrint(
-      '[_setCustomerFilter] raw: $customerId, resolved: $resolvedId, status: $_selectedStatus',
-    );
     setState(() => _selectedCustomerId = resolvedId ?? '');
     context.read<InvoicesCubit>().setFilter(
       companyId: companyId,

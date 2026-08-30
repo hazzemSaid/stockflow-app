@@ -77,4 +77,6 @@ abstract class ErrorMessages {
       _tr('تعذر الاتصال بالخادم', 'Failed to connect to the server');
   static String get unsupportedOperation =>
       _tr('هذه العملية غير مدعومة حالياً', 'This operation is not supported yet');
+  static String get fileTooLarge =>
+      _tr('الصورة كبيرة جداً — الحد الأقصى 5 ميجابايت', 'Image is too large — max 5MB');
 }

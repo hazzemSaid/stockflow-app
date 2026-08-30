@@ -32,7 +32,8 @@ class InvoiceDetailsScreen extends StatefulWidget {
   State<InvoiceDetailsScreen> createState() => _InvoiceDetailsScreenState();
 }
 
-class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> with CompanyAwareState<InvoiceDetailsScreen> {
+class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen>
+    with CompanyAwareState<InvoiceDetailsScreen> {
   late final InvoiceDetailsCubit _cubit;
   bool _initialized = false;
 
@@ -56,7 +57,11 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> with Compan
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSizes.radiusLarge),
+        ),
+      ),
       builder: (_) => InvoiceCancelSheet(
         invoice: invoice,
         onConfirm: () => Navigator.pop(context, true),
@@ -75,48 +80,38 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> with Compan
         backgroundColor: AppColors.appBackground,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: AppColors.textDark, size: AppSizes.iconMedium),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: AppColors.textDark,
+            size: AppSizes.iconMedium,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
           AppStrings.invoiceDetailsTitle,
-          style: TextStyle(fontSize: AppSizes.fontXLarge, fontWeight: FontWeight.w600, color: AppColors.textDark),
+          style: TextStyle(
+            fontSize: AppSizes.fontXLarge,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textDark,
+          ),
         ),
         actions: [
-          IconButton(onPressed: () => AppSnackbar.info(context, AppStrings.actionComingSoon), icon: Icon(Icons.print, color: AppColors.primary)),
-          IconButton(onPressed: () => AppSnackbar.info(context, AppStrings.actionComingSoon), icon: Icon(Icons.share, color: AppColors.primary)),
-          BlocSelector<InvoiceDetailsCubit, InvoiceDetailsState, Invoice?>(
-            selector: (s) => switch (s) {
-              InvoiceDetailsLoaded(:final invoice) => invoice,
-              InvoiceDetailsCanceling(:final invoice) => invoice,
-              InvoiceDetailsCanceled(:final invoice) => invoice,
-              _ => null,
-            },
-            builder: (context, invoice) {
-              if (invoice == null || invoice.paymentStatus == InvoiceStatus.canceled) return const SizedBox.shrink();
-              final isCanceling = context.select((InvoiceDetailsCubit c) => c.state is InvoiceDetailsCanceling);
-              return PermissionGate(
-                permission: PermissionKeys.invoicesCancel,
-                child: PopupMenuButton<String>(
-                  enabled: !isCanceling,
-                  icon: isCanceling
-                      ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))
-                      : Icon(Icons.more_vert, color: AppColors.textDark),
-                  onSelected: (v) {
-                    if (v == 'cancel') _confirmCancel(invoice);
-                  },
-                  itemBuilder: (_) => [
-                    PopupMenuItem(value: 'cancel', child: Row(children: [Icon(Icons.cancel_outlined, color: AppColors.redDark, size: 18), SizedBox(width: AppSizes.spacingSmall), Text(AppStrings.cancelInvoice, style: TextStyle(color: AppColors.redDark, fontWeight: FontWeight.w600))])),
-                  ],
-                ),
-              );
-            },
+          IconButton(
+            onPressed: () =>
+                AppSnackbar.info(context, AppStrings.actionComingSoon),
+            icon: Icon(Icons.print, color: AppColors.primary),
+          ),
+          IconButton(
+            onPressed: () =>
+                AppSnackbar.info(context, AppStrings.actionComingSoon),
+            icon: Icon(Icons.share, color: AppColors.primary),
           ),
           SizedBox(width: AppSizes.spacingTiny),
         ],
       ),
       body: BlocConsumer<InvoiceDetailsCubit, InvoiceDetailsState>(
-        listenWhen: (prev, curr) => curr is InvoiceDetailsCanceled || curr is InvoiceDetailsError,
+        listenWhen: (prev, curr) =>
+            curr is InvoiceDetailsCanceled || curr is InvoiceDetailsError,
         listener: (context, state) {
           if (state is InvoiceDetailsCanceled) {
             AppSnackbar.success(context, AppStrings.cancelInvoiceSuccess);
@@ -125,9 +120,14 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> with Compan
             AppSnackbar.error(context, state.failure.message);
           }
         },
-        buildWhen: (prev, curr) => prev.runtimeType != curr.runtimeType || (curr is InvoiceDetailsLoaded && prev is InvoiceDetailsLoaded && prev.invoice.paymentStatus != curr.invoice.paymentStatus),
+        buildWhen: (prev, curr) =>
+            prev.runtimeType != curr.runtimeType ||
+            (curr is InvoiceDetailsLoaded &&
+                prev is InvoiceDetailsLoaded &&
+                prev.invoice.paymentStatus != curr.invoice.paymentStatus),
         builder: (context, state) {
-          if (state is InvoiceDetailsLoading || state is InvoiceDetailsInitial) {
+          if (state is InvoiceDetailsLoading ||
+              state is InvoiceDetailsInitial) {
             return const InvoiceDetailsLoadingState();
           }
           if (state is InvoiceDetailsError) {
@@ -136,16 +136,30 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> with Compan
           if (state is InvoiceDetailsCanceling) {
             return Stack(
               children: [
-                _InvoiceDetailContent(invoice: state.invoice, onCancel: () => _confirmCancel(state.invoice)),
-                Container(color: AppColors.surface.withValues(alpha: 0.6), child: Center(child: CircularProgressIndicator(color: AppColors.primary))),
+                _InvoiceDetailContent(
+                  invoice: state.invoice,
+                  onCancel: () => _confirmCancel(state.invoice),
+                ),
+                Container(
+                  color: AppColors.surface.withValues(alpha: 0.6),
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  ),
+                ),
               ],
             );
           }
           if (state is InvoiceDetailsLoaded) {
-            return _InvoiceDetailContent(invoice: state.invoice, onCancel: () => _confirmCancel(state.invoice));
+            return _InvoiceDetailContent(
+              invoice: state.invoice,
+              onCancel: () => _confirmCancel(state.invoice),
+            );
           }
           if (state is InvoiceDetailsCanceled) {
-            return _InvoiceDetailContent(invoice: state.invoice, onCancel: null);
+            return _InvoiceDetailContent(
+              invoice: state.invoice,
+              onCancel: null,
+            );
           }
           return const SizedBox.shrink();
         },
@@ -162,14 +176,21 @@ class _InvoiceDetailContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateStr = invoice.createdAt != null ? DateFormat('yyyy/MM/dd').format(invoice.createdAt!.toLocal()) : '--';
+    final dateStr = invoice.createdAt != null
+        ? DateFormat('yyyy/MM/dd').format(invoice.createdAt!.toLocal())
+        : '--';
     final isCanceled = invoice.paymentStatus == InvoiceStatus.canceled;
     final canCancel = onCancel != null && !isCanceled;
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final horizontalPadding = screenWidth > 600 ? AppSizes.spacingXLarge : AppSizes.spacingMedium;
+    final horizontalPadding = screenWidth > 600
+        ? AppSizes.spacingXLarge
+        : AppSizes.spacingMedium;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: AppSizes.spacingMedium),
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: AppSizes.spacingMedium,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -195,12 +216,25 @@ class _InvoiceDetailContent extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(AppSizes.spacingMedium),
-              decoration: BoxDecoration(color: AppColors.debtRedBg, borderRadius: BorderRadius.circular(AppSizes.radiusMedium), border: Border.all(color: AppColors.lightRed)),
+              decoration: BoxDecoration(
+                color: AppColors.debtRedBg,
+                borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+                border: Border.all(color: AppColors.lightRed),
+              ),
               child: Row(
                 children: [
                   Icon(Icons.info_outline, color: AppColors.redDark, size: 18),
                   SizedBox(width: AppSizes.spacingSmall),
-                  Expanded(child: Text('هذه الفاتورة ملغاة وتم إرجاع المنتجات إلى المخزون', style: TextStyle(color: AppColors.redDark, fontWeight: FontWeight.w600, fontSize: AppSizes.fontMedium))),
+                  Expanded(
+                    child: Text(
+                      'هذه الفاتورة ملغاة وتم إرجاع المنتجات إلى المخزون',
+                      style: TextStyle(
+                        color: AppColors.redDark,
+                        fontWeight: FontWeight.w600,
+                        fontSize: AppSizes.fontMedium,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -214,12 +248,30 @@ class _InvoiceDetailContent extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: onCancel,
-                  icon: Icon(Icons.cancel_outlined, color: AppColors.redDark, size: 18),
-                  label: Text(AppStrings.cancelInvoice, style: TextStyle(color: AppColors.redDark, fontWeight: FontWeight.w700)),
+                  icon: Icon(
+                    Icons.cancel_outlined,
+                    color: AppColors.redDark,
+                    size: 18,
+                  ),
+                  label: Text(
+                    AppStrings.cancelInvoice,
+                    style: TextStyle(
+                      color: AppColors.redDark,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                   style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: AppSizes.spacingMedium - 2),
-                    side: BorderSide(color: AppColors.redDark.withValues(alpha: 0.5)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.radiusMedium)),
+                    padding: EdgeInsets.symmetric(
+                      vertical: AppSizes.spacingMedium - 2,
+                    ),
+                    side: BorderSide(
+                      color: AppColors.redDark.withValues(alpha: 0.5),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppSizes.radiusMedium,
+                      ),
+                    ),
                     backgroundColor: AppColors.surface,
                   ),
                 ),

@@ -57,16 +57,22 @@ class CustomerModel {
     }
 
     final transactions = <CustomerTransaction>[];
+    double sumOpening = 0;
 
     for (final inv in rawInvoices) {
-      final invId = inv['id'] as String;
-      final date = DateTime.parse(inv['created_at'] as String);
-      final amount = (inv['total_amount'] as num).toDouble();
+      if (inv is! Map<String, dynamic>) continue;
+      final invId = inv['id']?.toString() ?? '';
+      if (invId.isEmpty) continue;
+      final rawDate = inv['created_at']?.toString();
+      final date = rawDate != null ? DateTime.tryParse(rawDate) : null;
+      if (date == null) continue;
+      final amount = (inv['total_amount'] as num?)?.toDouble() ?? 0.0;
       final status = inv['payment_status'] as String? ?? 'debt';
       final isOpening = inv['is_opening_balance'] == true ||
           inv['invoice_type'] == 'opening_balance';
 
       if (isOpening) {
+        sumOpening += amount;
         transactions.add(CustomerTransaction(
           id: invId,
           type: 'opening_debt',
@@ -95,9 +101,13 @@ class CustomerModel {
     }
 
     for (final pay in rawPayments) {
-      final payId = pay['id'] as String;
-      final date = DateTime.parse(pay['created_at'] as String);
-      final amount = (pay['amount'] as num).toDouble();
+      if (pay is! Map<String, dynamic>) continue;
+      final payId = pay['id']?.toString() ?? '';
+      if (payId.isEmpty) continue;
+      final rawDate = pay['created_at']?.toString();
+      final date = rawDate != null ? DateTime.tryParse(rawDate) : null;
+      if (date == null) continue;
+      final amount = (pay['amount'] as num?)?.toDouble() ?? 0.0;
 
       transactions.add(CustomerTransaction(
         id: payId,
@@ -110,12 +120,39 @@ class CustomerModel {
       ));
     }
 
-    final totalDebt =
+    // Parse debt from multiple possible keys (REST snake/camel, legacy)
+    final jsonDebt = (json['total_debt'] as num?)?.toDouble() ??
         (json['current_debt'] as num?)?.toDouble() ??
         (json['computed_debt'] as num?)?.toDouble() ??
+        (json['totalDebt'] as num?)?.toDouble() ??
+        (json['currentDebt'] as num?)?.toDouble() ??
         0;
+    // Backend totalDebt is authoritative; sumOpening is fallback only when jsonDebt is zero
+    final double totalDebt = jsonDebt != 0 ? jsonDebt : sumOpening;
+
     final createdAtStr = json['created_at'] as String?;
     final updatedAtStr = json['updated_at'] as String?;
+
+    // Synthetic opening_debt for legacy total_debt without an opening invoice
+    // NOTE: id is kept as 'opening_debt' for backward compat with existing tests/
+    // widgets that key on this id. In production each customer list has at most
+    // one synthetic entry, so cross-customer duplication is not a ListView issue.
+    // For true uniqueness use 'synthetic_${customerId}_opening'.
+    final hasOpening = transactions.any((t) => t.type == 'opening_debt');
+    if (!hasOpening && totalDebt > 0) {
+      final syntheticDate = createdAtStr != null
+          ? DateTime.tryParse(createdAtStr) ?? DateTime.fromMillisecondsSinceEpoch(0)
+          : DateTime.fromMillisecondsSinceEpoch(0);
+      transactions.add(CustomerTransaction(
+        id: 'opening_debt',
+        type: 'opening_debt',
+        amount: totalDebt,
+        createdAt: syntheticDate,
+        title: 'رصيد افتتاحي',
+        subtitle: 'عند إنشاء الحساب',
+        statusLabel: 'معلق',
+      ));
+    }
 
     transactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
