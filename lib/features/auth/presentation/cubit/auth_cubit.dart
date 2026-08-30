@@ -129,7 +129,7 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await _signOutUseCase.call();
     result.fold(
       (failure) => emit(AuthError(failure.message)),
-      (_) {},
+      (_) => emit(Unauthenticated()),
     );
   }
 

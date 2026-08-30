@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:makhzanflow/core/storage/file_upload_service.dart';
 import 'package:makhzanflow/features/auth/presentation/cubit/create_company_cubit.dart';
 import 'package:makhzanflow/features/companies/domain/usecases/create_company_full_usecase.dart';
 import 'package:makhzanflow/features/companies/presentation/cubit/company_members_cubit.dart';
@@ -100,10 +101,12 @@ final ChangeNotifier _authStateNotifier = _AuthStateNotifier();
 
 class _AuthStateNotifier extends ChangeNotifier {
   Timer? _debounce;
+  late final StreamSubscription _authSub;
+  late final StreamSubscription _companySub;
 
   _AuthStateNotifier() {
-    sl<AuthCubit>().stream.listen((_) => _schedule());
-    sl<CompanyCubit>().stream.listen((_) => _schedule());
+    _authSub = sl<AuthCubit>().stream.listen((_) => _schedule());
+    _companySub = sl<CompanyCubit>().stream.listen((_) => _schedule());
   }
 
   void _schedule() {
@@ -114,6 +117,24 @@ class _AuthStateNotifier extends ChangeNotifier {
   @override
   void dispose() {
     _debounce?.cancel();
+    _authSub.cancel();
+    _companySub.cancel();
+    super.dispose();
+  }
+}
+
+/// Helper to make GoRouter rebuild on stream changes.
+/// Use as `refreshListenable: GoRouterRefreshStream(authCubit.stream)`
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
     super.dispose();
   }
 }
@@ -128,6 +149,7 @@ Widget _buildCreateCompanyPage() {
       createCompanyFullUseCase: sl<CreateCompanyFullUseCase>(),
       companyCubit: sl<CompanyCubit>(),
       picker: ImagePicker(),
+      fileUploadService: sl<FileUploadService>(),
     ),
     child: const CreateCompanyScreen(),
   );
